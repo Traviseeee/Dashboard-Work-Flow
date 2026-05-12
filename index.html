@@ -2610,10 +2610,13 @@ tbody tr:hover{background:var(--bg-main)}
         box-sizing: border-box;
     }
 
-    body.mobile-modal-open,
-    body:has(.modal.show),
-    body:has(.preview-overlay.show) {
+    body.mobile-modal-open {
         overflow: hidden;
+        width: 100%;
+    }
+
+    body.mobile-modal-open .mobile-nav {
+        display: none !important;
     }
 
     .modal {
@@ -2632,21 +2635,21 @@ tbody tr:hover{background:var(--bg-main)}
     .modal-calendar-content {
         width: 100% !important;
         max-width: calc(100vw - 20px) !important;
-        max-height: calc(100dvh - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+        max-height: calc(var(--app-vh, 100svh) - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         margin: 0 auto !important;
         overflow-y: auto !important;
         border-radius: 20px !important;
         padding: 18px !important;
-        transform: translateY(8px) scale(0.98);
+        transform: translateY(0);
         -webkit-overflow-scrolling: touch;
     }
 
     .modal.show .modal-content {
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 
     #settingsModal .modal-content {
-        height: calc(100dvh - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+        height: calc(var(--app-vh, 100svh) - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         display: flex;
         flex-direction: column;
         overflow: hidden !important;
@@ -4962,6 +4965,7 @@ function setupMobileModalLock() {
     const mobileQuery = window.matchMedia('(max-width: 800px)');
     const overlays = Array.from(document.querySelectorAll('.modal, .preview-overlay'));
     if (!overlays.length) return;
+    let lockedScrollY = 0;
 
     function isOpen(el) {
         const style = window.getComputedStyle(el);
@@ -4969,7 +4973,26 @@ function setupMobileModalLock() {
     }
 
     function syncLock() {
-        document.body.classList.toggle('mobile-modal-open', mobileQuery.matches && overlays.some(isOpen));
+        const shouldLock = mobileQuery.matches && overlays.some(isOpen);
+        const isLocked = document.body.classList.contains('mobile-modal-open');
+
+        document.documentElement.style.setProperty('--app-vh', `${window.innerHeight}px`);
+
+        if (shouldLock && !isLocked) {
+            lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+            document.body.classList.add('mobile-modal-open');
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${lockedScrollY}px`;
+            document.body.style.left = '0';
+            document.body.style.right = '0';
+        } else if (!shouldLock && isLocked) {
+            document.body.classList.remove('mobile-modal-open');
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            window.scrollTo(0, lockedScrollY);
+        }
     }
 
     overlays.forEach(el => {
@@ -4980,6 +5003,7 @@ function setupMobileModalLock() {
     });
     if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncLock);
     else if (mobileQuery.addListener) mobileQuery.addListener(syncLock);
+    window.addEventListener('resize', syncLock, { passive: true });
     syncLock();
 }
 
