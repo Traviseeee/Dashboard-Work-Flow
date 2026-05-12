@@ -4741,6 +4741,7 @@ function setupMobileFooterAutoHide() {
     const mobileQuery = window.matchMedia('(max-width: 800px)');
     let lastScrollY = window.scrollY || 0;
     let revealTimer = null;
+    let hideTimer = null;
 
     function setHidden(hidden) {
         if (!mobileQuery.matches) {
@@ -4750,9 +4751,17 @@ function setupMobileFooterAutoHide() {
         nav.classList.toggle('mobile-nav-hidden', hidden);
     }
 
-    function revealSoon() {
+    function revealSoon(delay = 260) {
         window.clearTimeout(revealTimer);
-        revealTimer = window.setTimeout(() => setHidden(false), 420);
+        revealTimer = window.setTimeout(() => {
+            window.clearTimeout(hideTimer);
+            setHidden(false);
+        }, delay);
+    }
+
+    function hideWhileScrolling() {
+        window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => setHidden(true), 40);
     }
 
     function handleScroll() {
@@ -4767,14 +4776,23 @@ function setupMobileFooterAutoHide() {
         if (currentScrollY < 24 || delta < -3) {
             setHidden(false);
         } else if (delta > 4) {
-            setHidden(true);
+            hideWhileScrolling();
         }
 
         lastScrollY = currentScrollY;
-        revealSoon();
+        revealSoon(260);
+    }
+
+    function handleScrollEnd() {
+        if (!mobileQuery.matches) return;
+        window.clearTimeout(hideTimer);
+        setHidden(false);
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scrollend', handleScrollEnd, { passive: true });
+    window.addEventListener('touchend', () => revealSoon(120), { passive: true });
+    window.addEventListener('pointerup', () => revealSoon(120), { passive: true });
     window.addEventListener('resize', () => {
         lastScrollY = window.scrollY || 0;
         setHidden(false);
