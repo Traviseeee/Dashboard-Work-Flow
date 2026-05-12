@@ -2610,6 +2610,106 @@ tbody tr:hover{background:var(--bg-main)}
         box-sizing: border-box;
     }
 
+    body.mobile-modal-open,
+    body:has(.modal.show),
+    body:has(.preview-overlay.show) {
+        overflow: hidden;
+    }
+
+    .modal {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 30000 !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        overflow-y: auto !important;
+        padding: calc(12px + env(safe-area-inset-top)) 10px calc(18px + env(safe-area-inset-bottom)) !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-content,
+    .modal-calendar-content {
+        width: 100% !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100dvh - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+        margin: 0 auto !important;
+        overflow-y: auto !important;
+        border-radius: 20px !important;
+        padding: 18px !important;
+        transform: translateY(8px) scale(0.98);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal.show .modal-content {
+        transform: translateY(0) scale(1);
+    }
+
+    #settingsModal .modal-content {
+        height: calc(100dvh - 30px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden !important;
+    }
+
+    #settingsModal .settings-layout {
+        flex: 1;
+        min-height: 0;
+        height: auto !important;
+        margin: 0 -18px 14px !important;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #settingsModal .settings-tabs {
+        width: 100% !important;
+        flex-direction: row !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 0;
+        padding: 10px;
+        gap: 8px;
+        background: var(--bg-main);
+        flex-shrink: 0;
+        scrollbar-width: none;
+    }
+
+    #settingsModal .settings-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    #settingsModal .settings-tab-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 10px 12px;
+        font-size: 11px;
+        border-radius: 999px;
+    }
+
+    #settingsModal .settings-tab-content {
+        flex: 1;
+        min-height: 0;
+        padding: 16px 18px 22px !important;
+        overflow-y: auto;
+    }
+
+    .form-row-multi {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .modal-btns {
+        position: sticky;
+        bottom: -18px;
+        margin: 14px -18px -18px;
+        padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        background: var(--card-bg);
+        border-top: 1px solid var(--border-color);
+        z-index: 2;
+    }
+
     .mobile-nav {
         display: flex !important;
         left: 10px;
@@ -4858,10 +4958,39 @@ function setupMobileFooterAutoHide() {
     nav.addEventListener('click', () => setHidden(false));
 }
 
+function setupMobileModalLock() {
+    const mobileQuery = window.matchMedia('(max-width: 800px)');
+    const overlays = Array.from(document.querySelectorAll('.modal, .preview-overlay'));
+    if (!overlays.length) return;
+
+    function isOpen(el) {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && (el.classList.contains('show') || style.opacity !== '0');
+    }
+
+    function syncLock() {
+        document.body.classList.toggle('mobile-modal-open', mobileQuery.matches && overlays.some(isOpen));
+    }
+
+    overlays.forEach(el => {
+        new MutationObserver(syncLock).observe(el, {
+            attributes: true,
+            attributeFilter: ['class', 'style']
+        });
+    });
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncLock);
+    else if (mobileQuery.addListener) mobileQuery.addListener(syncLock);
+    syncLock();
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupMobileFooterAutoHide);
+    document.addEventListener('DOMContentLoaded', () => {
+        setupMobileFooterAutoHide();
+        setupMobileModalLock();
+    });
 } else {
     setupMobileFooterAutoHide();
+    setupMobileModalLock();
 }
 </script>
 
