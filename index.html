@@ -2232,6 +2232,134 @@ tbody tr:hover{background:var(--bg-main)}
 .weather-card-uiverse .details p { font-size: 14px; margin: 0; font-weight: bold; }
 
 .scanlines { position: absolute; inset: 0; background: linear-gradient( to bottom, transparent 50%, rgba(0, 0, 0, 0.04) 50% ); background-size: 100% 4px; pointer-events: none; z-index: 20; }
+
+@media (max-width: 800px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    .main {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        padding: 12px 12px calc(84px + env(safe-area-inset-bottom)) !important;
+        box-sizing: border-box;
+    }
+
+    .header-container,
+    .header-panel-group,
+    #mainHeaderPanel {
+        width: 100% !important;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .header-panel,
+    #reportControls {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        box-sizing: border-box;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .month-nav-compact {
+        flex: 1 1 180px;
+        min-width: 0;
+    }
+
+    .current-label {
+        flex: 1;
+        min-width: 0 !important;
+        white-space: nowrap;
+    }
+
+    .btn {
+        flex: 0 0 40px;
+    }
+
+    .cards,
+    .charts-section,
+    .home-decor-container,
+    .home-live-strip,
+    .stats-overview {
+        grid-template-columns: 1fr !important;
+    }
+
+    .homepage-header {
+        padding: 12px !important;
+        margin-bottom: 16px;
+    }
+
+    .weather-card-uiverse {
+        height: auto;
+        min-height: 148px;
+        padding: 18px;
+        margin-bottom: 18px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        border-radius: 18px;
+    }
+
+    .weather-card-uiverse h3 {
+        font-size: 18px;
+    }
+
+    .weather-card-uiverse .temp {
+        font-size: 36px;
+    }
+
+    .weather-card-uiverse .details {
+        width: 100%;
+        text-align: left;
+    }
+
+    .profile-cover-wrapper {
+        height: 140px !important;
+        border-radius: 14px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .profile-info-overlay {
+        left: 16px;
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .profile-info-overlay h1 {
+        font-size: 18px;
+    }
+
+    .cover-weather-info {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .table-wrap,
+    .todo-container,
+    .modal-content {
+        max-width: calc(100vw - 24px) !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .mobile-nav {
+        display: flex !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+}
 </style>
 </head>
 <body>
