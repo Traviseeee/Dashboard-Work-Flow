@@ -4742,6 +4742,8 @@ function setupMobileFooterAutoHide() {
     let lastScrollY = window.scrollY || 0;
     let revealTimer = null;
     let hideTimer = null;
+    let stopWatcher = null;
+    let stableTicks = 0;
 
     function setHidden(hidden) {
         if (!mobileQuery.matches) {
@@ -4764,6 +4766,37 @@ function setupMobileFooterAutoHide() {
         hideTimer = window.setTimeout(() => setHidden(true), 40);
     }
 
+    function watchForScrollStop() {
+        if (stopWatcher) return;
+        stableTicks = 0;
+        let previousY = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+
+        stopWatcher = window.setInterval(() => {
+            if (!mobileQuery.matches) {
+                window.clearInterval(stopWatcher);
+                stopWatcher = null;
+                setHidden(false);
+                return;
+            }
+
+            const currentY = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+            if (Math.abs(currentY - previousY) < 1) {
+                stableTicks += 1;
+            } else {
+                stableTicks = 0;
+                previousY = currentY;
+            }
+
+            if (stableTicks >= 2) {
+                window.clearInterval(stopWatcher);
+                stopWatcher = null;
+                window.clearTimeout(hideTimer);
+                window.clearTimeout(revealTimer);
+                setHidden(false);
+            }
+        }, 100);
+    }
+
     function handleScroll() {
         if (!mobileQuery.matches) {
             setHidden(false);
@@ -4781,11 +4814,17 @@ function setupMobileFooterAutoHide() {
 
         lastScrollY = currentScrollY;
         revealSoon(260);
+        watchForScrollStop();
     }
 
     function handleScrollEnd() {
         if (!mobileQuery.matches) return;
+        if (stopWatcher) {
+            window.clearInterval(stopWatcher);
+            stopWatcher = null;
+        }
         window.clearTimeout(hideTimer);
+        window.clearTimeout(revealTimer);
         setHidden(false);
     }
 
