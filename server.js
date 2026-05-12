@@ -137,5 +137,5 @@ server.on('error', (e) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/index.html`);
+  console.log(`Server running at http://localhost:${PORT}/`);
 });
