@@ -1,15 +1,18 @@
 // ===== WORKSPACE MANAGEMENT =====
 async function switchWorkspace(id) {
-    activeWorkspaceId = id;
-    await BridgeWorkDB.set("settings", "activeWorkspaceId", id);
+    const nextWorkspace = workspaces.find(w => String(w.id) === String(id)) || workspaces[0];
+    if (!nextWorkspace) return;
+
+    activeWorkspaceId = nextWorkspace.id;
+    await BridgeWorkDB.set("settings", "activeWorkspaceId", activeWorkspaceId);
     
-    currentWorkspace = workspaces.find(w => w.id === id);
-    appCategories = currentWorkspace.categories;
+    currentWorkspace = nextWorkspace;
+    appCategories = currentWorkspace.categories || [...DEFAULT_CATEGORIES];
     populateCategorySelect();
     
     clearSearchInput();
 
-    const wsData = appData.filter(d => String(d.workspaceId || "default") === String(id));
+    const wsData = appData.filter(d => String(d.workspaceId || "default") === String(activeWorkspaceId));
     if (wsData.length > 0) {
         const sorted = wsData.sort((a, b) => String(b.date).localeCompare(String(a.date)));
         const latest = String(sorted[0].date).split(/[-/]/);
@@ -21,6 +24,10 @@ async function switchWorkspace(id) {
 
     updateTodoWorkspaceSelector();
     render();
+    const calendarModal = document.getElementById("calendarModal");
+    if (calendarModal && calendarModal.style.display !== "none" && typeof renderCalendar === "function") {
+        renderCalendar();
+    }
     updateWorkspaceUI();
     showToast(`Switched to ${currentWorkspace.name}`, "info");
 }
@@ -29,7 +36,7 @@ function updateTodoWorkspaceSelector() {
     const sel = document.getElementById("todoWorkspaceSelect");
     if (!sel) return;
     sel.innerHTML = workspaces.map(ws => 
-        `<option value="${ws.id}" ${ws.id === activeWorkspaceId ? 'selected' : ''}>${ws.name}</option>`
+        `<option value="${ws.id}" ${String(ws.id) === String(activeWorkspaceId) ? 'selected' : ''}>${ws.name}</option>`
     ).join('');
 }
 

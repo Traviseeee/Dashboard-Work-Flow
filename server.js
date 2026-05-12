@@ -25,8 +25,10 @@ const server = http.createServer((req, res) => {
     return proxyOpenAI(req, res);
   }
 
-  let filePath = path.join(ROOT_DIR, req.url === '/' ? 'index.html' : decodeURIComponent(req.url));
-  if (!filePath.startsWith(ROOT_DIR)) {
+  const requestPath = new URL(req.url, `http://${req.headers.host || 'localhost'}`).pathname;
+  let filePath = path.resolve(ROOT_DIR, requestPath === '/' ? 'index.html' : `.${decodeURIComponent(requestPath)}`);
+  const relativePath = path.relative(ROOT_DIR, filePath);
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
     res.writeHead(400, { 'Content-Type': 'text/plain' });
     return res.end('Bad request');
   }

@@ -414,13 +414,44 @@ function renderTodos() {
         if (khmerHolidays[dateStr]) {
             const hName = khmerHolidays[dateStr][currentLang];
             // Check if we already have a task for this holiday
-            const alreadyDone = appData.some(item => item.task.toLowerCase().includes(hName.toLowerCase()));
+            const alreadyDone = appData.some(item => 
+                String(item.workspaceId || "default") === String(activeWorkspaceId) &&
+                String(item.task || "").toLowerCase().includes(hName.toLowerCase())
+            );
             if (!alreadyDone) upcomingHolidays.push({ name: hName, date: dateStr, daysLeft: i });
         }
     }
 
+    const renderHolidaySuggestion = h => `
+        <div class="todo-item todo-suggestion">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div style="flex:1">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">${h.name} Poster</div>
+                <div style="font-size: 11px; color: #c2410c; font-weight: 700; margin-top: 4px;">${h.daysLeft === 0 ? 'TODAY' : h.daysLeft + ' days remaining'}</div>
+            </div>
+            <button class="btn btn-primary" onclick="document.getElementById('todoInput').value='Design ${h.name} Poster'; addTodo();">Add Task</button>
+        </div>
+    `;
+
     if (filteredTodos.length === 0) {
-        list.innerHTML = `<div class="empty-state">${t[currentLang].todo_empty}</div>`;
+        list.innerHTML = `
+            <div class="todo-header-area">
+                <div class="todo-title-row">
+                    <div>
+                        <h2>To-Do List</h2>
+                        <p style="font-size:11px; color:var(--text-muted); margin:4px 0 0 0">Productivity & Daily Priorities</p>
+                    </div>
+                    <div class="todo-stats-text">0/0 completed (0%)</div>
+                </div>
+                <div class="todo-progress-bg">
+                    <div class="todo-progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            ${upcomingHolidays.map(renderHolidaySuggestion).join('')}
+            <div class="empty-state">${t[currentLang].todo_empty}</div>
+        `;
     } else {
         const todayCheck = new Date(); // For overdue check
         todayCheck.setHours(0, 0, 0, 0);
@@ -443,18 +474,7 @@ function renderTodos() {
 
         // Render Smart Suggestions first
         upcomingHolidays.forEach(h => {
-            html += `
-                <div class="todo-item todo-suggestion">
-                    <div class="icon-box">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <div style="flex:1">
-                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">${h.name} Poster</div>
-                        <div style="font-size: 11px; color: #c2410c; font-weight: 700; margin-top: 4px;">${h.daysLeft === 0 ? 'TODAY' : h.daysLeft + ' days remaining'}</div>
-                    </div>
-                    <button class="btn btn-primary" onclick="document.getElementById('todoInput').value='Design ${h.name} Poster'; addTodo();">Add Task</button>
-                </div>
-            `;
+            html += renderHolidaySuggestion(h);
         });
 
         const statusLabels = {
@@ -2953,7 +2973,10 @@ function renderCalendar() {
         const isToday = dateStr === todayStr;
         const hasLoanPayment = loanDueDatesMap.has(dateStr);
         const holiday = khmerHolidays[dateStr];
-        const hasReport = appData.some(item => item.date === dateStr);
+        const hasReport = appData.some(item => 
+            item.date === dateStr &&
+            String(item.workspaceId || "default") === String(activeWorkspaceId)
+        );
         const dayEvents = appEvents.filter(e => e.date === dateStr);
         const hasCustomEvent = dayEvents.length > 0;
 
