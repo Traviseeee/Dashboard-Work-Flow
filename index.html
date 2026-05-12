@@ -1849,8 +1849,16 @@ tbody tr:hover{background:var(--bg-main)}
     background: none; border: none; color: var(--text-muted);
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     font-size: 10px; cursor: pointer;
+    flex: 1 1 0;
+    min-width: 0;
 }
 .mobile-nav button svg { width: 20px; height: 20px; }
+.mobile-nav button span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .mobile-nav button.active { color: var(--primary); font-weight: 600; }
 
 .modal{
@@ -2625,13 +2633,20 @@ tbody tr:hover{background:var(--bg-main)}
     }
 
     .mobile-nav button {
-        min-width: 46px;
+        min-width: 0;
         min-height: 46px;
         border-radius: 14px;
+        padding: 6px 2px;
+    }
+
+    .mobile-nav button svg {
+        width: 18px;
+        height: 18px;
     }
 
     .mobile-nav button span {
-        font-size: 9px;
+        font-size: 8px;
+        line-height: 1.1;
     }
 }
 </style>
@@ -3611,6 +3626,10 @@ tbody tr:hover{background:var(--bg-main)}
 
 <!-- Mobile Bottom Navigation -->
 <div class="mobile-nav">
+    <button onclick="showView('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-i18n="sidebar_home">Home</span>
+    </button>
     <button class="active" onclick="showView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         <span data-i18n="sidebar_dashboard">Dashboard</span>
