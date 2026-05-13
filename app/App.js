@@ -23,6 +23,7 @@ function changeAppLang(lang) {
 
     populateCategorySelect();
     render();
+    updateShellForView(currentView);
 }
 
 // ===== TOAST NOTIFICATION =====
@@ -47,6 +48,32 @@ function getCurrentViewMonthYear(viewName) {
     return { month: new Date().getMonth(), year: new Date().getFullYear() }; // Fallback
 }
 
+const reportAppViews = ['dashboard', 'notes', 'todo', 'kanban', 'loan', 'income', 'expense', 'eagleGallery', 'chatbot'];
+
+function getShellTitle(viewName) {
+    const titles = {
+        home: 'Home',
+        dashboard: 'Report',
+        compressImage: 'Compress Image',
+        notes: 'Report - Notes',
+        todo: 'Report - To-Do',
+        kanban: 'Report - Kanban',
+        loan: 'Report - Loan',
+        income: 'Report - Income',
+        expense: 'Report - Expenses',
+        eagleGallery: 'Report - Eagle Assets',
+        chatbot: 'Report - AI Chat'
+    };
+    return titles[viewName] || 'Report';
+}
+
+function updateShellForView(viewName) {
+    const headerTitle = document.getElementById("appHeaderTitle");
+    if (headerTitle) headerTitle.textContent = getShellTitle(viewName);
+    document.body.classList.toggle('home-shell', viewName === 'home');
+    document.body.classList.toggle('tool-shell', viewName === 'compressImage');
+}
+
 // ===== NAVIGATION =====
 function showView(viewName) {
     // Prevent access to Eagle Gallery - Coming Soon
@@ -55,7 +82,6 @@ function showView(viewName) {
         return;
     }
 
-    currentView = viewName;
     const dashboardView = document.getElementById("dashboardView");
     const reportsView = document.getElementById("reportsView");
     const notesView = document.getElementById("notesView");
@@ -69,6 +95,7 @@ function showView(viewName) {
     const eagleGalleryView = document.getElementById("eagleGalleryView");
     const chatbotView = document.getElementById("chatbotView");
     const homeView = document.getElementById("homeView");
+    const compressImageView = document.getElementById("compressImageView");
     const reportControls = document.getElementById("reportControls"); // This contains month navigation
 
     // 1. Save current view's month/year state before switching
@@ -106,6 +133,7 @@ function showView(viewName) {
             updateDateTimeText();
         }
     }
+    if (compressImageView) compressImageView.style.display = (viewName === 'compressImage') ? 'block' : 'none';
 
     // Show date navigation for views that depend on monthly reporting (Dashboard, Income, Expense)
     if (reportControls) {
@@ -120,8 +148,12 @@ function showView(viewName) {
     });
     document.querySelectorAll(".mobile-nav button").forEach(btn => {
         const onclickAttr = btn.getAttribute("onclick") || "";
-        btn.classList.toggle("active", onclickAttr.includes(`'${viewName}'`));
+        const isReportButton = onclickAttr.includes("'dashboard'");
+        const isReportView = reportAppViews.includes(viewName) && viewName !== 'home';
+        btn.classList.toggle("active", onclickAttr.includes(`'${viewName}'`) || (isReportButton && isReportView));
     });
+
+    updateShellForView(viewName);
 
     if (viewName === 'kanban') renderKanbanBoard();
     if (viewName === 'loan') renderLoans(); // New: Render loans when switching to loan view
@@ -1568,6 +1600,7 @@ async function updateWeather() {
     });
     updateGreeting();
     applyVisualWeatherEffects(cond.label);
+    if (currentView === 'home' && typeof window.updateHomeLiveStrip === 'function') window.updateHomeLiveStrip();
 }
 
 /**
@@ -3601,6 +3634,374 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 });
 
+// ===== COMPRESS IMAGE TOOL =====
+let compressImageFiles = [];
+let compressedImageResults = [];
+let compressEstimateTimer = null;
+
+function formatBytes(bytes) {
+    const size = Number(bytes) || 0;
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function escapeHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function setCompressStatus(message, type = "") {
+    const status = document.getElementById("compressStatus");
+    if (!status) return;
+    status.className = `compress-status ${type}`.trim();
+    status.innerHTML = `<span></span> ${message}`;
+}
+
+function setCompressProgress(percent, active = true) {
+    const wrap = document.getElementById("compressProgressWrap");
+    const fill = document.getElementById("compressProgressFill");
+    if (!wrap || !fill) return;
+    wrap.classList.toggle("active", active);
+    fill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+}
+
+function setCompressQuality(value) {
+    const quality = Math.max(10, Math.min(100, parseInt(value, 10) || 80));
+    const range = document.getElementById("compressQuality");
+    const label = document.getElementById("compressQualityValue");
+    const badge = document.getElementById("compressQualityBadge");
+    if (range) range.value = quality;
+    if (label) label.textContent = `${quality}%`;
+    if (badge) badge.textContent = `${quality}%`;
+    document.querySelectorAll(".compress-preset").forEach(btn => {
+        const buttonQuality = parseInt(btn.getAttribute("onclick")?.match(/\d+/)?.[0] || "0", 10);
+        btn.classList.toggle("active", buttonQuality === quality);
+    });
+    scheduleCompressEstimate();
+}
+
+function toggleCompressResize(enabled) {
+    const options = document.getElementById("compressResizeOptions");
+    if (options) options.classList.toggle("active", Boolean(enabled));
+    scheduleCompressEstimate();
+}
+
+async function openCompressFilePicker() {
+    if (window.showOpenFilePicker) {
+        try {
+            const handles = await window.showOpenFilePicker({
+                multiple: true,
+                types: [{
+                    description: "Images",
+                    accept: {
+                        "image/jpeg": [".jpg", ".jpeg"],
+                        "image/png": [".png"]
+                    }
+                }]
+            });
+            const entries = [];
+            for (const handle of handles) {
+                const file = await handle.getFile();
+                entries.push({ file, handle });
+            }
+            handleCompressFileEntries(entries);
+            return;
+        } catch (error) {
+            if (error && error.name === "AbortError") return;
+            console.warn("File picker with handles failed, falling back to input.", error);
+        }
+    }
+
+    const fallbackInput = document.getElementById("compressFileInput");
+    if (fallbackInput) fallbackInput.click();
+}
+
+function handleCompressFiles(fileList) {
+    handleCompressFileEntries(Array.from(fileList || []).map(file => ({ file, handle: null })));
+}
+
+function handleCompressFileEntries(entries) {
+    const incoming = Array.from(entries || []).filter(entry => /image\/(jpeg|png)/i.test(entry.file.type));
+    if (!incoming.length) {
+        setCompressStatus("No supported images", "error");
+        return;
+    }
+
+    incoming.forEach(entry => {
+        const id = `compress-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        compressImageFiles.push({
+            id,
+            file: entry.file,
+            handle: entry.handle || null,
+            previewUrl: URL.createObjectURL(entry.file)
+        });
+    });
+
+    compressedImageResults.forEach(result => URL.revokeObjectURL(result.url));
+    compressedImageResults = [];
+    renderCompressPreview();
+    renderCompressResults();
+    setCompressStatus(`${compressImageFiles.length} image(s) ready`, "success");
+}
+
+function removeCompressFile(id) {
+    const item = compressImageFiles.find(entry => entry.id === id);
+    if (item) URL.revokeObjectURL(item.previewUrl);
+    compressImageFiles = compressImageFiles.filter(entry => entry.id !== id);
+    renderCompressPreview();
+    setCompressStatus(compressImageFiles.length ? `${compressImageFiles.length} image(s) ready` : "Ready", compressImageFiles.length ? "success" : "");
+}
+
+function renderCompressPreview() {
+    const grid = document.getElementById("compressPreviewGrid");
+    const runBtn = document.getElementById("compressRunBtn");
+    if (!grid) return;
+    grid.innerHTML = compressImageFiles.map(entry => `
+        <div class="compress-preview-card">
+            <img src="${entry.previewUrl}" alt="">
+            <div>
+                <strong title="${escapeHtml(entry.file.name)}">${escapeHtml(entry.file.name)}</strong>
+                <small>${formatBytes(entry.file.size)}</small>
+                <small class="compress-estimate" id="compressEstimate-${entry.id}"></small>
+            </div>
+            <button class="compress-remove-btn" onclick="removeCompressFile('${entry.id}')">x</button>
+        </div>
+    `).join("");
+    if (runBtn) runBtn.disabled = compressImageFiles.length === 0;
+    scheduleCompressEstimate();
+}
+
+function renderCompressResults() {
+    const list = document.getElementById("compressResults");
+    const summary = document.getElementById("compressSummary");
+    const downloadAll = document.getElementById("compressDownloadAllBtn");
+    if (!list || !summary) return;
+
+    list.innerHTML = compressedImageResults.map(result => `
+        <div class="compress-result-item">
+            <div>
+                <strong title="${escapeHtml(result.name)}">${escapeHtml(result.name)}</strong>
+                <small>${formatBytes(result.originalSize)} to ${formatBytes(result.size)} (${result.savedPercent}% saved)${result.overwritten ? " - saved over original" : ""}</small>
+            </div>
+            ${result.overwritten ? '<span class="compress-saved-pill">Saved</span>' : `<a href="${result.url}" download="${escapeHtml(result.name)}">Download</a>`}
+        </div>
+    `).join("");
+
+    if (!compressedImageResults.length) {
+        summary.textContent = "";
+        if (downloadAll) downloadAll.disabled = true;
+        return;
+    }
+
+    const originalTotal = compressedImageResults.reduce((sum, item) => sum + item.originalSize, 0);
+    const newTotal = compressedImageResults.reduce((sum, item) => sum + item.size, 0);
+    const savedPercent = originalTotal ? Math.max(0, Math.round((1 - newTotal / originalTotal) * 100)) : 0;
+    summary.textContent = `${compressedImageResults.length} image(s): ${formatBytes(originalTotal)} to ${formatBytes(newTotal)} (${savedPercent}% saved)`;
+    if (downloadAll) downloadAll.disabled = compressedImageResults.every(result => result.overwritten);
+}
+
+function loadImageForCompression(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error(`Could not read ${file.name}`));
+        };
+        img.src = url;
+    });
+}
+
+function canvasToBlob(canvas, quality) {
+    return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+}
+
+function getCompressedFileName(originalName) {
+    const base = originalName.replace(/\.[^.]+$/, "");
+    return `${base}-compressed.jpg`;
+}
+
+async function compressOneImage(entry) {
+    const quality = (parseInt(document.getElementById("compressQuality")?.value || "80", 10) || 80) / 100;
+    const shouldResize = Boolean(document.getElementById("compressResizeToggle")?.checked);
+    const maxWidth = parseInt(document.getElementById("compressMaxWidth")?.value || "1920", 10) || 1920;
+    const maxHeight = parseInt(document.getElementById("compressMaxHeight")?.value || "1080", 10) || 1080;
+    const img = await loadImageForCompression(entry.file);
+
+    let width = img.naturalWidth || img.width;
+    let height = img.naturalHeight || img.height;
+    if (shouldResize && width > 0 && height > 0) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+        width = Math.max(1, Math.round(width * ratio));
+        height = Math.max(1, Math.round(height * ratio));
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const blob = await canvasToBlob(canvas, quality);
+    if (!blob) throw new Error(`Could not compress ${entry.file.name}`);
+    const savedPercent = entry.file.size ? Math.max(0, Math.round((1 - blob.size / entry.file.size) * 100)) : 0;
+    const overwriteEnabled = Boolean(document.getElementById("compressOverwriteToggle")?.checked);
+    let overwritten = false;
+    if (overwriteEnabled && entry.handle) {
+        const writable = await entry.handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        overwritten = true;
+    }
+    return {
+        name: getCompressedFileName(entry.file.name),
+        originalSize: entry.file.size,
+        size: blob.size,
+        url: URL.createObjectURL(blob),
+        savedPercent,
+        overwritten
+    };
+}
+
+async function estimateOneCompressedImage(entry) {
+    const quality = (parseInt(document.getElementById("compressQuality")?.value || "80", 10) || 80) / 100;
+    const shouldResize = Boolean(document.getElementById("compressResizeToggle")?.checked);
+    const maxWidth = parseInt(document.getElementById("compressMaxWidth")?.value || "1920", 10) || 1920;
+    const maxHeight = parseInt(document.getElementById("compressMaxHeight")?.value || "1080", 10) || 1080;
+    const img = await loadImageForCompression(entry.file);
+
+    let width = img.naturalWidth || img.width;
+    let height = img.naturalHeight || img.height;
+    if (shouldResize && width > 0 && height > 0) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+        width = Math.max(1, Math.round(width * ratio));
+        height = Math.max(1, Math.round(height * ratio));
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const blob = await canvasToBlob(canvas, quality);
+    return blob ? blob.size : null;
+}
+
+function scheduleCompressEstimate() {
+    window.clearTimeout(compressEstimateTimer);
+    if (!compressImageFiles.length) return;
+    compressEstimateTimer = window.setTimeout(updateCompressEstimates, 220);
+}
+
+async function updateCompressEstimates() {
+    if (!compressImageFiles.length) return;
+    let originalTotal = 0;
+    let estimatedTotal = 0;
+
+    for (const entry of compressImageFiles) {
+        const el = document.getElementById(`compressEstimate-${entry.id}`);
+        if (!el) continue;
+        el.textContent = "Estimating...";
+        originalTotal += entry.file.size;
+        try {
+            const estimatedSize = await estimateOneCompressedImage(entry);
+            if (!estimatedSize) {
+                el.textContent = "";
+                continue;
+            }
+            estimatedTotal += estimatedSize;
+            const savedPercent = entry.file.size ? Math.max(0, Math.round((1 - estimatedSize / entry.file.size) * 100)) : 0;
+            el.textContent = `Estimated: ${formatBytes(estimatedSize)} (${savedPercent}% saved)`;
+        } catch {
+            el.textContent = "";
+        }
+    }
+
+    if (estimatedTotal > 0) {
+        const totalSaved = originalTotal ? Math.max(0, Math.round((1 - estimatedTotal / originalTotal) * 100)) : 0;
+        setCompressStatus(`Estimated: ${formatBytes(originalTotal)} to ${formatBytes(estimatedTotal)} (${totalSaved}% saved)`, "success");
+    }
+}
+
+async function compressSelectedImages() {
+    if (!compressImageFiles.length) return;
+    const runBtn = document.getElementById("compressRunBtn");
+    if (runBtn) runBtn.disabled = true;
+    compressedImageResults.forEach(result => URL.revokeObjectURL(result.url));
+    compressedImageResults = [];
+    renderCompressResults();
+    setCompressStatus("Compressing...");
+    setCompressProgress(0, true);
+
+    try {
+        for (let i = 0; i < compressImageFiles.length; i++) {
+            compressedImageResults.push(await compressOneImage(compressImageFiles[i]));
+            setCompressProgress(((i + 1) / compressImageFiles.length) * 100, true);
+            renderCompressResults();
+        }
+        const overwrittenCount = compressedImageResults.filter(result => result.overwritten).length;
+        setCompressStatus(overwrittenCount ? `Compression complete, ${overwrittenCount} original file(s) overwritten` : "Compression complete", "success");
+    } catch (error) {
+        console.error(error);
+        setCompressStatus(error.message || "Compression failed", "error");
+    } finally {
+        window.setTimeout(() => setCompressProgress(0, false), 700);
+        if (runBtn) runBtn.disabled = compressImageFiles.length === 0;
+    }
+}
+
+function downloadAllCompressedImages() {
+    compressedImageResults.forEach((result, index) => {
+        window.setTimeout(() => {
+            const link = document.createElement("a");
+            link.href = result.url;
+            link.download = result.name;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }, index * 180);
+    });
+}
+
+function setupCompressDropZone() {
+    const dropZone = document.getElementById("compressDropZone");
+    if (!dropZone || dropZone.dataset.ready === "true") return;
+    dropZone.dataset.ready = "true";
+    ["dragenter", "dragover"].forEach(eventName => {
+        dropZone.addEventListener(eventName, event => {
+            event.preventDefault();
+            dropZone.classList.add("dragover");
+        });
+    });
+    ["dragleave", "drop"].forEach(eventName => {
+        dropZone.addEventListener(eventName, event => {
+            event.preventDefault();
+            dropZone.classList.remove("dragover");
+        });
+    });
+    dropZone.addEventListener("drop", event => handleCompressFiles(event.dataTransfer.files));
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupCompressDropZone);
+} else {
+    setupCompressDropZone();
+}
+
 // Expose functions to window for HTML onclick attributes
 window.triggerLogoUpload = triggerLogoUpload;
 window.handleLogoUpload = handleLogoUpload;
@@ -3619,6 +4020,14 @@ window.deleteActiveWorkspace = deleteActiveWorkspace;
 window.setLang = changeAppLang;
 window.showView = showView;
 window.toggleDarkMode = toggleDarkMode;
+window.setCompressQuality = setCompressQuality;
+window.toggleCompressResize = toggleCompressResize;
+window.openCompressFilePicker = openCompressFilePicker;
+window.scheduleCompressEstimate = scheduleCompressEstimate;
+window.handleCompressFiles = handleCompressFiles;
+window.removeCompressFile = removeCompressFile;
+window.compressSelectedImages = compressSelectedImages;
+window.downloadAllCompressedImages = downloadAllCompressedImages;
 window.addNote = addNote;
 window.togglePin = togglePin;
 window.convertNoteToTodo = convertNoteToTodo;

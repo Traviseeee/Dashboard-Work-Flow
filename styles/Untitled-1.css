@@ -458,6 +458,23 @@
     font-size: 13px !important;
 }
 
+body.home-shell .sidebar-nav-content .nav-label,
+body.home-shell .sidebar-nav-content a[onclick*="'notes'"],
+body.home-shell .sidebar-nav-content a[onclick*="'todo'"],
+body.home-shell .sidebar-nav-content a[onclick*="'kanban'"],
+body.home-shell .sidebar-nav-content a[onclick*="'loan'"],
+body.home-shell .sidebar-nav-content a[onclick*="'income'"],
+body.home-shell .sidebar-nav-content a[onclick*="'expense'"],
+body.home-shell .sidebar-nav-content a[onclick*="'chatbot'"],
+body.home-shell #sideActionReport,
+body.home-shell #syncTXT,
+body.home-shell #syncCSV,
+body.home-shell #sideActionEagle,
+body.home-shell #sideActionExcel,
+body.home-shell #sideActionClear {
+    display: none !important;
+}
+
 /* To-Do List Styles */
 .todo-container {
     width: 100%;

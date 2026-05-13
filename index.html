@@ -777,6 +777,18 @@ body::after {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.05) 100%);
 }
 
+.app-card-placeholder {
+    opacity: 0.58;
+    cursor: default;
+}
+
+.app-card-placeholder:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+    border-color: var(--border-color);
+    background: var(--card-bg);
+}
+
 [data-theme='dark'] .app-card:hover {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.1) 100%);
 }
@@ -2752,14 +2764,656 @@ tbody tr:hover{background:var(--bg-main)}
         line-height: 1.1;
     }
 }
+
+body.home-shell .sidebar,
+body.tool-shell .sidebar,
+body.home-shell .header-container,
+body.tool-shell .header-container,
+body.home-shell > .mobile-nav,
+body.tool-shell > .mobile-nav,
+body.home-shell .main > .ticker-wrap {
+    display: none !important;
+}
+
+body.tool-shell .main > .ticker-wrap {
+    display: none !important;
+}
+
+body.home-shell .main {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 42px clamp(18px, 5vw, 72px) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: rgba(5, 18, 43, 0.66) !important;
+}
+
+body.tool-shell .main {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 24px clamp(14px, 4vw, 48px) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: rgba(5, 18, 43, 0.72) !important;
+}
+
+body.home-shell #homeView {
+    min-height: calc(100vh - 84px);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+body.home-shell #homeView > :not(.phone-launcher):not(.home-weather-effect) {
+    display: none !important;
+}
+
+.phone-launcher {
+    width: min(920px, 100%);
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 52px);
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255,255,255,0.55);
+    box-shadow: 0 30px 90px rgba(15, 23, 42, 0.24);
+    backdrop-filter: blur(22px);
+}
+
+.phone-launcher-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 36px;
+}
+
+.phone-launcher-kicker {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.phone-launcher h1 {
+    margin: 2px 0 0;
+    font-size: clamp(34px, 6vw, 64px);
+    line-height: 1;
+    color: var(--text-main);
+    letter-spacing: 0;
+}
+
+.phone-launcher h3 {
+    margin: 0 0 18px;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.phone-launcher-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
+.phone-launcher-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.home-shell .apps-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 22px;
+    margin: 0;
+}
+
+body.home-shell .app-card {
+    min-height: 150px;
+    border-radius: 24px;
+}
+
+body.home-shell .app-icon {
+    width: 74px;
+    height: 74px;
+    border-radius: 22px;
+}
+
+@media (max-width: 700px) {
+    body.home-shell .main {
+        padding: 20px !important;
+    }
+
+    body.tool-shell .main {
+        padding: 14px !important;
+    }
+
+    .phone-launcher {
+        border-radius: 24px;
+    }
+
+    body.home-shell .apps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.compress-tool-view {
+    min-height: calc(100vh - 48px);
+}
+
+.compress-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.compress-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0 22px;
+    margin-bottom: 8px;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+.compress-back-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: 14px;
+    background: var(--card-bg);
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.compress-back-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.compress-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #22d3a0;
+    background: rgba(34, 211, 160, 0.12);
+    border: 1px solid rgba(34, 211, 160, 0.18);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.compress-badge span,
+.compress-status span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.compress-header h1 {
+    margin: 7px 0 3px;
+    font-size: clamp(24px, 3vw, 34px);
+    color: #f8fafc;
+    letter-spacing: 0;
+}
+
+.compress-header p {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.78);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.compress-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.28);
+    color: rgba(226, 232, 240, 0.82);
+    border: 1px solid rgba(226, 232, 240, 0.12);
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.compress-status.success {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(52, 211, 153, 0.18);
+}
+.compress-status.error {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(252, 165, 165, 0.18);
+}
+
+.compress-progress {
+    height: 4px;
+    background: rgba(255,255,255,0.16);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    display: none;
+}
+
+.compress-progress.active {
+    display: block;
+}
+
+.compress-progress div {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #22d3a0, #06b6d4);
+    transition: width 0.25s ease;
+}
+
+.compress-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 16px;
+    align-items: start;
+}
+
+.compress-panel {
+    padding: 16px;
+    border-radius: 18px !important;
+    background: rgba(255,255,255,0.82) !important;
+}
+
+.compress-presets {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.compress-preset {
+    flex: 1;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(248, 250, 252, 0.9);
+    color: var(--text-muted);
+    border-radius: 11px;
+    padding: 9px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.compress-preset.active {
+    color: #052e2b;
+    background: #22d3a0;
+    border-color: #22d3a0;
+}
+
+.compress-drop-zone {
+    width: 100%;
+    min-height: 210px;
+    border: 1.5px dashed rgba(34, 211, 160, 0.3);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.04);
+    color: var(--text-main);
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 8px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.compress-drop-zone.dragover {
+    border-color: #22d3a0;
+    background: rgba(34, 211, 160, 0.12);
+}
+
+.compress-drop-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(34, 211, 160, 0.12);
+    color: #22d3a0;
+}
+
+.compress-drop-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.compress-drop-zone small {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.compress-preview-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.compress-preview-card {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px 8px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(248, 250, 252, 0.92);
+}
+
+.compress-preview-card img {
+    width: 72px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #0f172a;
+}
+
+.compress-preview-card strong {
+    display: block;
+    color: var(--text-main);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.compress-preview-card small {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.compress-preview-card .compress-estimate {
+    display: block;
+    margin-top: 2px;
+    color: #0891b2;
+    font-weight: 900;
+}
+
+.compress-remove-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.compress-panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.compress-panel-title b {
+    color: #06b6d4;
+    background: rgba(6, 182, 212, 0.12);
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+
+.compress-slider-row {
+    display: grid;
+    grid-template-columns: 1fr 48px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.compress-slider-row input {
+    width: 100%;
+    accent-color: #22d3a0;
+}
+
+.compress-slider-row span {
+    font-weight: 900;
+    color: var(--text-main);
+    text-align: right;
+}
+
+.compress-toggle-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.compress-overwrite-row {
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+
+.compress-option-note {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 14px;
+}
+
+.compress-toggle-row input {
+    display: none;
+}
+
+.compress-toggle-row span {
+    width: 34px;
+    height: 19px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.14);
+    position: relative;
+}
+
+.compress-toggle-row span::after {
+    content: '';
+    width: 13px;
+    height: 13px;
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    border-radius: 50%;
+    background: #94a3b8;
+    transition: left 0.2s ease, background 0.2s ease;
+}
+
+.compress-toggle-row input:checked + span {
+    background: rgba(34, 211, 160, 0.28);
+}
+
+.compress-toggle-row input:checked + span::after {
+    left: 18px;
+    background: #22d3a0;
+}
+
+.compress-resize-options {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.compress-resize-options.active {
+    display: flex;
+}
+
+.compress-resize-options input {
+    width: 86px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 9px;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.compress-action-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.compress-run-btn,
+.compress-download-all {
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: none;
+    cursor: pointer;
+}
+
+.compress-run-btn {
+    color: #042f2e;
+    background: linear-gradient(135deg, #22d3a0, #06b6d4);
+}
+
+.compress-download-all {
+    min-width: 124px;
+    color: #06b6d4;
+    background: rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.24);
+}
+
+.compress-download-all:disabled {
+    display: none;
+}
+
+.compress-run-btn:disabled,
+.compress-download-all:disabled {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--text-muted);
+    border-color: transparent;
+    cursor: not-allowed;
+}
+
+.compress-results {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.compress-result-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 10px;
+    border-radius: 12px;
+    background: rgba(248, 250, 252, 0.94);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.compress-result-item strong {
+    display: block;
+    font-size: 12px;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.compress-result-item small {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.compress-result-item a {
+    color: #042f2e;
+    background: #22d3a0;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 7px 9px;
+    border-radius: 10px;
+}
+
+.compress-saved-pill {
+    color: #047857;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    font-size: 11px;
+    font-weight: 900;
+    padding: 7px 9px;
+    border-radius: 10px;
+}
+
+.compress-summary {
+    margin-top: 9px;
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 900;
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .compress-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .compress-header {
+        grid-template-columns: auto 1fr;
+    }
+
+    .compress-status {
+        grid-column: 1 / -1;
+        width: fit-content;
+    }
+
+    .compress-action-row {
+        grid-template-columns: 1fr;
+    }
+
+    .compress-download-all {
+        width: 100%;
+    }
+}
 </style>
 </head>
-<body>
+<body class="home-shell">
 
 <div class="sidebar">
     <div class="logo" onclick="triggerLogoUpload()">
         <div class="logo-icon-container" id="logoIconContainer">B</div>
-        <span class="logo-text">Dashboard</span>
+        <span class="logo-text">Tools Home</span>
         <input type="file" id="logoUploadInput" hidden accept="image/*" onchange="handleLogoUpload(this)">
     </div>
     
@@ -2779,9 +3433,9 @@ tbody tr:hover{background:var(--bg-main)}
         </a>
         <a onclick="showView('dashboard')" class="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            <span data-i18n="sidebar_dashboard">Dashboard</span>
+            <span>Report</span>
         </a>
-        <div class="nav-label">Apps & Tools</div>
+        <div class="nav-label">Report Tools</div>
         <a onclick="showView('notes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8.5L15.5 3z"/><path d="M15 3v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
             <span data-i18n="sidebar_notes">Notes</span>
@@ -2823,7 +3477,7 @@ tbody tr:hover{background:var(--bg-main)}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span data-i18n="sidebar_link_csv">Sync CSV File</span> <small id="csvStatus" style="font-size:8px;opacity:0.6;margin-left:auto"></small>
         </a>
-        <a onclick="showToast('Eagle Assets feature is coming soon!', 'info')" style="opacity: 0.5; cursor: not-allowed;">
+        <a id="sideActionEagle" onclick="showToast('Eagle Assets feature is coming soon!', 'info')" style="opacity: 0.5; cursor: not-allowed;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             <span>Eagle Assets</span> <small style="font-size:8px;opacity:0.6;margin-left:auto">Coming Soon</small>
         </a>
@@ -2852,7 +3506,7 @@ tbody tr:hover{background:var(--bg-main)}
     <div class="header-panel-group" id="mainHeaderPanel">
         <div class="header-panel">
             <div class="header-info-box">
-                <h2 data-i18n="header_title">Dashboard</h2>
+                <h2 id="appHeaderTitle">Report</h2>
                 <div id="greeting" style="font-size:9px;color:var(--text-muted);font-weight:800;text-transform:uppercase;letter-spacing:0.3px">Welcome...</div>
             </div>
             <div class="active-widgets">
@@ -2900,7 +3554,7 @@ tbody tr:hover{background:var(--bg-main)}
 </div>
 
 <!-- HOME VIEW -->
-<div id="homeView" class="animate-stagger" style="display:none;">
+<div id="homeView" class="animate-stagger" style="display:block;">
     <div class="home-weather-effect" aria-hidden="true"></div>
     <div class="homepage-header">
         <div class="weather-card-uiverse">
@@ -3078,50 +3732,104 @@ tbody tr:hover{background:var(--bg-main)}
         </div>
     </div>
 
-    <h3 style="font-size:14px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:20px; margin-top:30px;" data-i18n="home_all_apps">All Apps</h3>
+    <div class="phone-launcher">
+        <div class="phone-launcher-top">
+            <div>
+                <div class="phone-launcher-kicker" id="homeDatetime">Today</div>
+                <h1 id="homeGreeting">Home</h1>
+            </div>
+            <div class="phone-launcher-avatar">
+                <img src="assets/images/tra.jpg" alt="Profile">
+            </div>
+        </div>
+
+        <!-- Integrated Weather Card -->
+        <div class="weather-card-uiverse" style="margin-bottom: 24px;">
+            <div class="weather-left" style="flex: 1; text-align: left;">
+                <div id="homeGreetingText" style="font-size: 18px; font-weight: 800; color: inherit;">Welcome Back!</div>
+                <div style="font-size: 11px; font-weight: 700; opacity: 0.7; color: inherit; margin-top: 4px;">WEATHER</div>
+            </div>
+
+            <div class="icon-container" style="flex: 1;">
+                <svg viewBox="0 0 64 64" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" class="weather-svg">
+                    <defs>
+                        <linearGradient gradientUnits="userSpaceOnUse" y2="28.33" y1="19.67" x2="21.5" x1="16.5" id="b">
+                            <stop stop-color="#fbbf24" offset="0"></stop>
+                            <stop stop-color="#fbbf24" offset=".45"></stop>
+                            <stop stop-color="#f59e0b" offset="1"></stop>
+                        </linearGradient>
+                        <linearGradient gradientUnits="userSpaceOnUse" y2="50.8" y1="21.96" x2="39.2" x1="22.56" id="c">
+                            <stop stop-color="#f3f7fe" offset="0"></stop>
+                            <stop stop-color="#f3f7fe" offset=".45"></stop>
+                            <stop stop-color="#deeafb" offset="1"></stop>
+                        </linearGradient>
+                        <linearGradient gradientUnits="userSpaceOnUse" y2="48.05" y1="42.95" x2="25.47" x1="22.53" id="a">
+                            <stop stop-color="#4286ee" offset="0"></stop>
+                            <stop stop-color="#4286ee" offset=".45"></stop>
+                            <stop stop-color="#0950bc" offset="1"></stop>
+                        </linearGradient>
+                        <linearGradient xlink:href="#a" y2="48.05" y1="42.95" x2="32.47" x1="29.53" id="d"></linearGradient>
+                        <linearGradient xlink:href="#a" y2="48.05" y1="42.95" x2="39.47" x1="36.53" id="e"></linearGradient>
+                    </defs>
+                    <g id="homeCardIconSun">
+                        <circle stroke-width=".5" stroke-miterlimit="10" stroke="#f8af18" fill="url(#b)" r="5" cy="24" cx="19"></circle>
+                        <path d="M19 15.67V12.5m0 23v-3.17m5.89-14.22l2.24-2.24M10.87 32.13l2.24-2.24m0-11.78l-2.24-2.24m16.26 16.26l-2.24-2.24M7.5 24h3.17m19.83 0h-3.17" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke="#fbbf24" fill="none">
+                            <animateTransform values="0 19 24; 360 19 24" type="rotate" repeatCount="indefinite" dur="45s" attributeName="transform"></animateTransform>
+                        </path>
+                    </g>
+                    <g id="homeCardIconMoon" style="display:none">
+                        <path d="M19 19a5 5 0 1 0 5 5 5 5 0 0 1-5-5z" stroke-width=".5" stroke-miterlimit="10" stroke="#e6effc" fill="url(#moonGrad)">
+                            <animateTransform values="0 19 24; 5 19 24; 0 19 24" type="rotate" repeatCount="indefinite" dur="10s" attributeName="transform"></animateTransform>
+                        </path>
+                    </g>
+                    <path id="homeCardIconCloud" d="M46.5 31.5h-.32a10.49 10.49 0 00-19.11-8 7 7 0 00-10.57 6 7.21 7.21 0 00.1 1.14A7.5 7.5 0 0018 45.5a4.19 4.19 0 00.5 0v0h28a7 7 0 000-14z" stroke-width=".5" stroke-miterlimit="10" stroke="#e6effc" fill="url(#c)"></path>
+                    <g id="homeCardIconRain">
+                        <path d="M24.39 43.03l-.78 4.94" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke="url(#a)" fill="none">
+                            <animateTransform values="1 -5; -2 10" type="translate" repeatCount="indefinite" dur="0.7s" attributeName="transform"></animateTransform>
+                        </path>
+                        <path d="M31.39 43.03l-.78 4.94" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke="url(#d)" fill="none">
+                            <animateTransform values="1 -5; -2 10" type="translate" repeatCount="indefinite" dur="0.7s" begin="-0.4s" attributeName="transform"></animateTransform>
+                        </path>
+                        <path d="M38.39 43.03l-.78 4.94" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke="url(#e)" fill="none">
+                            <animateTransform values="1 -5; -2 10" type="translate" repeatCount="indefinite" dur="0.7s" begin="-0.2s" attributeName="transform"></animateTransform>
+                        </path>
+                    </g>
+                </svg>
+                <h4 id="homeWeatherCardTemp" class="temp">--°C</h4>
+            </div>
+            <div class="details" style="flex: 1;"><p id="homeWeatherCardStatus" style="font-size: 18px; text-transform: uppercase;">Sunny</p><p style="font-size: 10px; font-weight: 800; opacity: 0.5; margin-top: 4px;">PHNOM PENH, KH</p></div>
+            <div class="scanlines"></div>
+        </div>
+
+        <!-- Daily Progress -->
+        <div style="margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
+                <span id="homeProgressLabel">Daily Completion</span>
+                <span id="homeProgressPct">0%</span>
+            </div>
+            <div class="progress-joy-bar">
+                <div id="homeProgressBar" class="progress-joy-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <h3>Apps</h3>
     
-    <div class="apps-grid">
-        <a onclick="showView('dashboard')" class="app-card" data-color="blue">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_dashboard">Dashboard</div>
-        </a>
+        <div class="apps-grid">
+            <a onclick="showView('dashboard')" class="app-card" data-color="indigo">
+                <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+                <div class="app-label">Report</div>
+            </a>
 
-        <a onclick="showView('notes')" class="app-card" data-color="purple">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8.5L15.5 3z"/><path d="M15 3v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_notes">Notes</div>
-        </a>
+            <a onclick="showView('compressImage')" class="app-card" data-color="cyan">
+                <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5L5 21"/><path d="M14 5v4h4"/></svg></div>
+                <div class="app-label">Compress Image</div>
+            </a>
 
-        <a onclick="showView('todo')" class="app-card" data-color="pink">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_todo">Tasks</div>
-        </a>
-
-        <a onclick="showView('kanban')" class="app-card" data-color="green">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z"/><path d="M9 3v18"/><path d="M15 3v18"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_kanban">Kanban</div>
-        </a>
-
-        <a onclick="showView('loan')" class="app-card" data-color="orange">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_loan">Loan</div>
-        </a>
-
-        <a onclick="showView('income')" class="app-card" data-color="cyan">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_income">Income</div>
-        </a>
-
-        <a onclick="showView('chatbot')" class="app-card" data-color="red">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg></div>
-            <div class="app-label" data-i18n="sidebar_chatbot">AI Chat</div>
-        </a>
-
-
-
-        <a onclick="document.getElementById('sideActionReport').click()" class="app-card" data-color="indigo">
-            <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-            <div class="app-label" data-i18n="btn_report">Report</div>
-        </a>
+            <a class="app-card app-card-placeholder" data-color="cyan" aria-disabled="true">
+                <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                <div class="app-label">New Tool</div>
+            </a>
+        </div>
     </div>
 
     <div class="quick-stats">
@@ -3141,7 +3849,88 @@ tbody tr:hover{background:var(--bg-main)}
 </div>
 <!-- END HOME VIEW -->
 
-<div id="dashboardView" class="animate-stagger">
+<div id="compressImageView" class="compress-tool-view" style="display:none;">
+    <div class="compress-shell">
+        <div class="compress-header glass">
+            <button class="compress-back-btn" onclick="showView('home')" title="Back to Home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div>
+                <div class="compress-badge"><span></span> Image Tool</div>
+                <h1>Compress Image</h1>
+                <p>Optimize JPG and PNG images in your browser. Choose quality, resize, preview, then download.</p>
+            </div>
+            <div id="compressStatus" class="compress-status"><span></span> Ready</div>
+        </div>
+
+        <div class="compress-progress" id="compressProgressWrap">
+            <div id="compressProgressFill"></div>
+        </div>
+
+        <div class="compress-layout">
+            <div class="compress-panel glass">
+                <div id="compressBrowsePanel">
+                    <input type="file" id="compressFileInput" accept="image/jpeg,image/png" multiple hidden onchange="handleCompressFiles(this.files)">
+                    <div id="compressDropZone" class="compress-drop-zone" onclick="openCompressFilePicker()">
+                        <div class="compress-drop-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+                        </div>
+                        <strong>Drop images here or click to browse</strong>
+                        <small>Supports JPG, JPEG, PNG</small>
+                    </div>
+                </div>
+
+                <div id="compressPreviewGrid" class="compress-preview-grid"></div>
+            </div>
+
+            <div class="compress-panel glass">
+                <div class="compress-panel-title">
+                    <span>Quality</span>
+                    <b id="compressQualityBadge">80%</b>
+                </div>
+                <div class="compress-presets">
+                    <button class="compress-preset" onclick="setCompressQuality(90)">High</button>
+                    <button class="compress-preset active" onclick="setCompressQuality(80)">Medium</button>
+                    <button class="compress-preset" onclick="setCompressQuality(60)">Low</button>
+                    <button class="compress-preset" onclick="setCompressQuality(40)">Tiny</button>
+                </div>
+                <div class="compress-slider-row">
+                    <input type="range" id="compressQuality" min="10" max="100" value="80" step="5" oninput="setCompressQuality(this.value)">
+                    <span id="compressQualityValue">80%</span>
+                </div>
+
+                <label class="compress-toggle-row">
+                    <input type="checkbox" id="compressResizeToggle" onchange="toggleCompressResize(this.checked)">
+                    <span></span>
+                    Resize max dimension
+                </label>
+                <div id="compressResizeOptions" class="compress-resize-options">
+                    <input type="number" id="compressMaxWidth" value="1920" min="100" max="10000" aria-label="Max width" oninput="scheduleCompressEstimate()">
+                    <span>x</span>
+                    <input type="number" id="compressMaxHeight" value="1080" min="100" max="10000" aria-label="Max height" oninput="scheduleCompressEstimate()">
+                    <small>px</small>
+                </div>
+
+                <label class="compress-toggle-row compress-overwrite-row" title="Works for files selected with the file picker in supported browsers.">
+                    <input type="checkbox" id="compressOverwriteToggle">
+                    <span></span>
+                    Save over original files
+                </label>
+                <div class="compress-option-note">If browser permission is unavailable, compressed files will download instead.</div>
+
+                <div class="compress-action-row">
+                    <button id="compressRunBtn" class="compress-run-btn" onclick="compressSelectedImages()" disabled>Compress</button>
+                    <button id="compressDownloadAllBtn" class="compress-download-all" onclick="downloadAllCompressedImages()" disabled>Download All</button>
+                </div>
+
+                <div id="compressResults" class="compress-results"></div>
+                <div id="compressSummary" class="compress-summary"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="dashboardView" class="animate-stagger" style="display:none;">
     <div class="profile-cover-wrapper" style="height: 180px; margin-bottom: 24px; border-radius: 20px; background: #1e293b;">
         <div class="cover-image-container">
             <img id="dashboardCoverImg" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop" style="object-position: center 50%;" alt="Dashboard Banner">
@@ -3735,19 +4524,7 @@ tbody tr:hover{background:var(--bg-main)}
     </button>
     <button class="active" onclick="showView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span data-i18n="sidebar_dashboard">Dashboard</span>
-    </button>
-    <button onclick="showView('todo')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <span data-i18n="sidebar_todo">To-Do</span>
-    </button>
-    <button onclick="showView('income')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
-        <span data-i18n="sidebar_income">Income</span>
-    </button>
-    <button onclick="showView('chatbot')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
-        <span data-i18n="sidebar_chatbot">AI Chat</span>
+        <span>Report</span>
     </button>
     <button onclick="openSettings()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -4312,8 +5089,9 @@ function updateGreetingText() {
     const headerGreetingEl = document.getElementById('homeGreeting');
     if (headerGreetingEl) headerGreetingEl.textContent = g + "! 👋";
 
-    const greetingCardEl = document.getElementById('homeGreetingText');
-    if (greetingCardEl) greetingCardEl.textContent = g + "! 👋";
+    document.querySelectorAll('#homeGreetingText').forEach(el => {
+        el.textContent = g + "! 👋";
+    });
 }
 
 function updateDateTimeText() {
@@ -4356,45 +5134,48 @@ function updateHomeLiveStrip() {
     updateHomeWeatherEffect(weatherText);
     
     // Update weather card dynamic elements
-    const cardEl = document.querySelector('.weather-card-uiverse');
-    const cardTempEl = document.getElementById('homeWeatherCardTemp');
-    const cardStatusEl = document.getElementById('homeWeatherCardStatus');
-
-    const iconSun = document.getElementById('homeCardIconSun');
-    const iconCloud = document.getElementById('homeCardIconCloud');
-    const iconRain = document.getElementById('homeCardIconRain');
-    const iconMoon = document.getElementById('homeCardIconMoon');
-
     const tempMatch = weatherText.match(/(-?\d+)\s*[°Â]?\s*C/i);
     const temp = tempMatch ? Number(tempMatch[1]) : null;
-    
-    if (cardTempEl) cardTempEl.textContent = (temp !== null ? temp + '°C' : '32°C');
-    if (cardStatusEl) cardStatusEl.textContent = weatherStatus;
+    const tempStr = (temp !== null ? temp + '°C' : '32°C');
 
-    // Toggle specific icon parts and backgrounds based on weather status
-    if (cardEl && iconSun && iconCloud && iconRain && iconMoon) {
+    // Update all weather card instances (handle duplicate IDs in the launcher)
+    document.querySelectorAll('.weather-card-uiverse').forEach(cardEl => {
         cardEl.classList.remove('is-sunny', 'is-cloudy', 'is-rainy', 'is-night');
-        iconSun.style.display = 'none'; 
-        iconCloud.style.display = 'none'; 
-        iconRain.style.display = 'none';
-        iconMoon.style.display = 'none';
+        
+        const cardTempEl = cardEl.querySelector('#homeWeatherCardTemp');
+        const cardStatusEl = cardEl.querySelector('#homeWeatherCardStatus');
+        if (cardTempEl) cardTempEl.textContent = tempStr;
+        if (cardStatusEl) cardStatusEl.textContent = weatherStatus;
+
+        const iconSun = cardEl.querySelector('#homeCardIconSun');
+        const iconCloud = cardEl.querySelector('#homeCardIconCloud');
+        const iconRain = cardEl.querySelector('#homeCardIconRain');
+        const iconMoon = cardEl.querySelector('#homeCardIconMoon');
+        
+        if (iconSun) iconSun.style.display = 'none';
+        if (iconCloud) iconCloud.style.display = 'none';
+        if (iconRain) iconRain.style.display = 'none';
+        if (iconMoon) iconMoon.style.display = 'none';
         
         const sunOrMoon = isNight ? iconMoon : iconSun;
 
         if (weatherStatusLower.includes('rain') || weatherStatusLower.includes('storm') || weatherStatusLower.includes('ភ្លៀង')) {
             cardEl.classList.add('is-rainy');
-            sunOrMoon.style.display = 'block'; iconCloud.style.display = 'block'; iconRain.style.display = 'block';
+            if (sunOrMoon) sunOrMoon.style.display = 'block'; 
+            if (iconCloud) iconCloud.style.display = 'block'; 
+            if (iconRain) iconRain.style.display = 'block';
         } else if (weatherStatusLower.includes('cloud') || weatherStatusLower.includes('ស្រទុំ')) {
             cardEl.classList.add('is-cloudy');
-            sunOrMoon.style.display = 'block'; iconCloud.style.display = 'block';
+            if (sunOrMoon) sunOrMoon.style.display = 'block'; 
+            if (iconCloud) iconCloud.style.display = 'block';
         } else if (isNightText || isNight || weatherStatusLower.includes('night')) {
             cardEl.classList.add('is-night');
-            iconMoon.style.display = 'block';
+            if (iconMoon) iconMoon.style.display = 'block';
         } else {
             cardEl.classList.add('is-sunny');
-            iconSun.style.display = 'block'; iconCloud.style.display = 'none'; iconRain.style.display = 'none';
+            if (iconSun) iconSun.style.display = 'block';
         }
-    }
+    });
 
     // Update traditional Live Strip widgets
     const weatherEl = document.getElementById('homeLiveWeather');
@@ -4790,6 +5571,7 @@ function updateHomeDecor() {
     updateGreetingText();
     updateDateTimeText();
     updateHomeProgress();
+    updateWeather(); // Ensure weather data is available before updating home live strip
     updateTodayWorkSummary();
     setMusicVolume(0.5);
     

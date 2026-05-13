@@ -135,7 +135,7 @@ async function initializeApp() {
     });
     appPrefs.showExpenses = savedPrefs.showExpenses !== undefined ? savedPrefs.showExpenses : true;
     applyAppPrefs();
-    await showView(currentView || 'dashboard', true);
+    await showView(currentView || 'home', true);
     showWhatsNewAlert();
     if (currentView === 'eagleGallery') refreshEagleAssets();
     render();
@@ -158,7 +158,7 @@ let modalRows = [];
 let searchQuery = "";
 let currentSort = { key: 'date', dir: 'asc' };
 let lastReminderDate = "";
-let currentView = 'dashboard';
+let currentView = 'home';
 let currentIncomeId = null;
 
 async function save() {
