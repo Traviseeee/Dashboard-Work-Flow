@@ -425,6 +425,6 @@ function initDragAndDrop() {
 function updateAppSetting(key, val) {
     appPrefs[key] = val;
     savePrefs();
-    if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage'].includes(key)) applyAppPrefs();
+    if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage', 'homeShowWeather', 'homeShowProgress', 'homeShowDecor', 'homeShowNews'].includes(key)) applyAppPrefs();
     if (key === 'currency') render();
 }

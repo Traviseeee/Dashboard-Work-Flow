@@ -143,6 +143,7 @@ function changeAppLang(lang) {
 
     populateCategorySelect();
     render();
+    if (typeof updateWeather === 'function') updateWeather();
 }
 
 function showToast(msg, type = "info") {
@@ -401,7 +402,7 @@ function openSettings() {
     setCheck("showModuleIncome", appPrefs.showIncome);
     setCheck("showIncomePrivacy", appPrefs.incomePrivacy);
     setVal("uiScaleInput", appPrefs.uiScale || 100);
-    setVal("currencyInput", appPrefs.currency || "$" );
+    setVal("currencyInput", appPrefs.currency || "$");
     setCheck("compactSidebarInput", !!appPrefs.compactSidebar);
     setCheck("animationsInput", appPrefs.animations !== false);
     setVal("dateFormatInput", appPrefs.dateFormat || 'DD/MM/YYYY');
@@ -418,9 +419,26 @@ function openSettings() {
     setVal("msgIncome", appPrefs.toolMessages?.income || "");
     setVal("msgExpenses", appPrefs.toolMessages?.expenses || "");
     setCheck("showModuleTicker", appPrefs.showTicker);
+    setCheck("homeShowWeatherInput", appPrefs.homeShowWeather);
+    setCheck("homeShowProgressInput", appPrefs.homeShowProgress);
+    setCheck("homeShowDecorInput", appPrefs.homeShowDecor);
+    setCheck("homeShowNewsInput", appPrefs.homeShowNews);
+
+    // Filter tabs based on context (Home vs Report)
+    const isHome = currentView === 'home';
+    const reportTabs = ['project', 'categories', 'modules', 'data'];
+    document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+        const tab = btn.getAttribute('data-tab');
+        btn.style.display = (isHome && reportTabs.includes(tab)) ? 'none' : 'flex';
+    });
+
     const langSelect = document.getElementById("settingsLangSelect");
     if (langSelect) langSelect.value = currentLang;
-    switchSettingsTab('profile');
+    
+    // Default to Launcher tab if on Home, otherwise Profile
+    const startTab = currentView === 'home' ? 'launcher' : 'profile';
+    switchSettingsTab(startTab);
+    
     renderCategories();
 }
 

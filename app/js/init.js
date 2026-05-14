@@ -134,6 +134,7 @@ async function initializeApp() {
         await updateCoverUI(view);
     });
     appPrefs.showExpenses = savedPrefs.showExpenses !== undefined ? savedPrefs.showExpenses : true;
+    appPrefs.showInvoice = savedPrefs.showInvoice !== undefined ? savedPrefs.showInvoice : true;
     applyAppPrefs();
     await showView(currentView || 'home', true);
     showWhatsNewAlert();
@@ -975,12 +976,19 @@ function updateToolTickerMessage(view, message) {
 }
 
 function applyModuleVisibility() {
-    const expenseLink = document.querySelector('a[onclick="showView(\'expense\')"]');
-    const loanLink = document.querySelector('a[onclick="showView(\'loan\')"]');
-    const todoLink = document.querySelector('a[onclick="showView(\'todo\')"]');
-    const incomeLink = document.querySelector('a[onclick="showView(\'income\')"]');
-    if (loanLink) loanLink.style.display = appPrefs.showLoan ? 'flex' : 'none';
-    if (todoLink) todoLink.style.display = appPrefs.showTodo ? 'flex' : 'none';
-    if (incomeLink) incomeLink.style.display = appPrefs.showIncome ? 'flex' : 'none';
-    if (expenseLink) expenseLink.style.display = appPrefs.showExpenses ? 'flex' : 'none';
+    const modules = [
+        { key: 'showLoan', view: 'loan' },
+        { key: 'showTodo', view: 'todo' },
+        { key: 'showIncome', view: 'income' },
+        { key: 'showExpenses', view: 'expense' },
+        { key: 'showInvoice', view: 'invoice' }
+    ];
+
+    modules.forEach(m => {
+        const isVisible = appPrefs[m.key] !== false;
+        // Use querySelectorAll to find buttons on both the sidebar and the home launcher
+        document.querySelectorAll(`[onclick*="showView('${m.view}')"]`).forEach(el => {
+            el.style.display = isVisible ? (el.tagName === 'A' || el.tagName === 'BUTTON' ? 'flex' : 'block') : 'none';
+        });
+    });
 }

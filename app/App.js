@@ -7,181 +7,6 @@ async function save() {
     await BridgeWorkDB.set("app_data", "main", appData);
 }
 
-// Stale workspace/help/file sync code removed; logic now lives in js/workspaces.js and js/help.js.
-
-// ===== LANGUAGE SWITCHER =====
-function changeAppLang(lang) {
-    updateI18n(lang);
-
-    const btnEN = document.getElementById("btnEN");
-    const btnKH = document.getElementById("btnKH");
-    if (btnEN) btnEN.classList.toggle("active", lang === "en");
-    if (btnKH) btnKH.classList.toggle("active", lang === "kh");
-
-    const settingsLangSelect = document.getElementById("settingsLangSelect");
-    if (settingsLangSelect) settingsLangSelect.value = lang;
-
-    populateCategorySelect();
-    render();
-    updateShellForView(currentView);
-}
-
-// ===== TOAST NOTIFICATION =====
-function showToast(msg, type = "info") {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    let icon = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-    if (type === "success") icon = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-    if (type === "error") icon = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-    toast.innerHTML = `${icon}<span>${msg}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => { toast.classList.add("fade-out"); setTimeout(() => toast.remove(), 300); }, 3500);
-}
-
-// Helper to get the current month/year state for a given view
-function getCurrentViewMonthYear(viewName) {
-    if (viewName === 'dashboard') return { month: dashboardMonthState, year: dashboardYearState };
-    if (viewName === 'income') return { month: incomeMonthState, year: incomeYearState };
-    if (viewName === 'expense') return { month: expenseMonthState, year: expenseYearState };
-    return { month: new Date().getMonth(), year: new Date().getFullYear() }; // Fallback
-}
-
-const reportAppViews = ['dashboard', 'notes', 'todo', 'kanban', 'loan', 'income', 'expense', 'eagleGallery', 'chatbot'];
-
-function getShellTitle(viewName) {
-    const titles = {
-        home: 'Home',
-        dashboard: 'Report',
-        compressImage: 'Compress Image',
-        notes: 'Report - Notes',
-        todo: 'Report - To-Do',
-        kanban: 'Report - Kanban',
-        loan: 'Report - Loan',
-        income: 'Report - Income',
-        expense: 'Report - Expenses',
-        eagleGallery: 'Report - Eagle Assets',
-        chatbot: 'Report - AI Chat'
-    };
-    return titles[viewName] || 'Report';
-}
-
-function updateShellForView(viewName) {
-    const headerTitle = document.getElementById("appHeaderTitle");
-    if (headerTitle) headerTitle.textContent = getShellTitle(viewName);
-    document.body.classList.toggle('home-shell', viewName === 'home');
-    document.body.classList.toggle('tool-shell', viewName === 'compressImage');
-}
-
-// ===== NAVIGATION =====
-function showView(viewName) {
-    // Prevent access to Eagle Gallery - Coming Soon
-    if (viewName === 'eagleGallery') {
-        showToast('Eagle Assets feature is coming soon!', 'info');
-        return;
-    }
-
-    const dashboardView = document.getElementById("dashboardView");
-    const reportsView = document.getElementById("reportsView");
-    const notesView = document.getElementById("notesView");
-    const todoView = document.getElementById("todoView");
-    const kanbanView = document.getElementById("kanbanView");
-    const mainHeaderPanel = document.getElementById("mainHeaderPanel");
-    const loanView = document.getElementById("loanView");
-    const incomeView = document.getElementById("incomeView");
-    const expenseView = document.getElementById("expenseView");
-    const ticker = document.querySelector(".ticker-wrap");
-    const eagleGalleryView = document.getElementById("eagleGalleryView");
-    const chatbotView = document.getElementById("chatbotView");
-    const homeView = document.getElementById("homeView");
-    const compressImageView = document.getElementById("compressImageView");
-    const reportControls = document.getElementById("reportControls"); // This contains month navigation
-
-    // 1. Save current view's month/year state before switching
-    if (currentView === 'dashboard') { dashboardMonthState = viewMonth; dashboardYearState = viewYear; }
-    else if (currentView === 'income') { incomeMonthState = viewMonth; incomeYearState = viewYear; }
-    else if (currentView === 'expense') { expenseMonthState = viewMonth; expenseYearState = viewYear; }
-
-    // 2. Update currentView
-    currentView = viewName;
-
-    // 3. Load new view's month/year state into global viewMonth/viewYear
-    const newViewDateState = getCurrentViewMonthYear(currentView);
-    viewMonth = newViewDateState.month;
-    viewYear = newViewDateState.year;
-    
-    // Hierarchy: Dashboard shows both stats and the recent entries table
-    if (dashboardView) dashboardView.style.display = (viewName === 'dashboard') ? 'block' : 'none';
-    if (reportsView) reportsView.style.display = (viewName === 'dashboard') ? 'block' : 'none';
-    if (notesView) notesView.style.display = (viewName === 'notes') ? 'block' : 'none';
-    if (eagleGalleryView) eagleGalleryView.style.display = (viewName === 'eagleGallery') ? 'block' : 'none';
-    if (document.getElementById("helpModal")) document.getElementById("helpModal").style.display = 'none'; // Close help modal if open
-    if (todoView) todoView.style.display = (viewName === 'todo') ? 'block' : 'none';
-    if (kanbanView) kanbanView.style.display = (viewName === 'kanban') ? 'block' : 'none';
-    if (loanView) loanView.style.display = (viewName === 'loan') ? 'block' : 'none';
-    if (incomeView) incomeView.style.display = (viewName === 'income') ? 'block' : 'none';
-    // New: Expense View
-    if (expenseView) expenseView.style.display = (viewName === 'expense') ? 'block' : 'none';
-    // AI Chatbot View
-    if (chatbotView) chatbotView.style.display = (viewName === 'chatbot') ? 'block' : 'none';
-    // Home View
-    if (homeView) { 
-        homeView.style.display = (viewName === 'home') ? 'block' : 'none';
-        if (viewName === 'home') {
-            updateGreetingText();
-            updateDateTimeText();
-        }
-    }
-    if (compressImageView) compressImageView.style.display = (viewName === 'compressImage') ? 'block' : 'none';
-
-    // Show date navigation for views that depend on monthly reporting (Dashboard, Income, Expense)
-    if (reportControls) {
-        const monthlyViews = ['dashboard', 'income', 'expense'];
-        reportControls.style.display = monthlyViews.includes(viewName) ? 'flex' : 'none';
-    }
-    
-    // Update Sidebar Active State
-    document.querySelectorAll(".sidebar a").forEach(link => {
-        const view = link.getAttribute("onclick")?.match(/'([^']+)'/)?.[1];
-        link.classList.toggle("active", view === viewName);
-    });
-    document.querySelectorAll(".mobile-nav button").forEach(btn => {
-        const onclickAttr = btn.getAttribute("onclick") || "";
-        const isReportButton = onclickAttr.includes("'dashboard'");
-        const isReportView = reportAppViews.includes(viewName) && viewName !== 'home';
-        btn.classList.toggle("active", onclickAttr.includes(`'${viewName}'`) || (isReportButton && isReportView));
-    });
-
-    updateShellForView(viewName);
-
-    if (viewName === 'kanban') renderKanbanBoard();
-    if (viewName === 'loan') renderLoans(); // New: Render loans when switching to loan view
-    if (viewName === 'income') renderIncomes(); // New: Render incomes
-    if (viewName === 'expense') renderExpenses(); // Render expenses
-    if (viewName === 'eagleGallery') renderEagleGallery();
-    
-    triggerStagger();
-    render();
-    updateMonthDisplay(); // Update month display in header
-}
-
-function toggleDarkMode() {
-    isDarkMode = !isDarkMode;
-    BridgeWorkDB.set("settings", "darkMode", isDarkMode);
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    updateThemeUI();
-}
-
-function updateThemeUI() {
-    const btn = document.getElementById("darkToggle");
-    if (btn) {
-        btn.innerHTML = isDarkMode 
-            ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark Mode' 
-            : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Light Mode';
-    }
-}
-
 // Help functionality now lives in js/help.js
 
 // ===== NOTES LOGIC =====
@@ -717,7 +542,7 @@ function initDragAndDrop() {
 function updateAppSetting(key, val) {
     appPrefs[key] = val;
     savePrefs(); // Use the new savePrefs function
-    if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage'].includes(key)) applyAppPrefs();
+    if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage', 'homeShowWeather', 'homeShowProgress', 'homeShowDecor', 'homeShowNews'].includes(key)) applyAppPrefs();
     if (key === 'currency') render(); 
 }
 
@@ -739,6 +564,20 @@ function applyAppPrefs() {
     
     // Apply Sidebar visibility logic
     applyModuleVisibility();
+
+    // Apply Home Launcher specific settings
+    const homeView = document.getElementById('homeView');
+    if (homeView) {
+        document.querySelectorAll('.weather-card-uiverse').forEach(el => el.style.display = appPrefs.homeShowWeather ? 'flex' : 'none');
+        const progressSection = homeView.querySelector('.progress-joy-bar')?.parentElement;
+        if (progressSection) progressSection.style.display = appPrefs.homeShowProgress ? 'block' : 'none';
+        document.querySelectorAll('#musicWidget, #homeDailyFocus, #homeQuoteDisplay, #zenZoneCard').forEach(el => {
+             const card = el.closest('.decor-card');
+             if (card) card.style.display = appPrefs.homeShowDecor ? 'flex' : 'none';
+        });
+        const newsCard = document.getElementById('homeNewsDisplay')?.closest('.decor-card');
+        if (newsCard) newsCard.style.display = appPrefs.homeShowNews ? 'flex' : 'none';
+    }
 }
 
 function applyBackgroundImage() {
@@ -1487,6 +1326,14 @@ function populateCategorySelect() {
     if (todoCat) todoCat.innerHTML = options;
 }
 
+function getProductivityStatus(hours, limit) {
+    const pct = (hours / limit) * 100;
+    if (hours === 0) return { label: currentLang === 'kh' ? "ទើបតែចាប់ផ្តើម" : "Just Starting", color: "#64748b" };
+    if (pct < 50) return { label: currentLang === 'kh' ? "កំពុងបន្ត" : "Steady Progress", color: "#f59e0b" };
+    if (pct < 100) return { label: currentLang === 'kh' ? "ជិតដល់ហើយ" : "Almost There", color: "#6366f1" };
+    return { label: currentLang === 'kh' ? "សម្រេចគោលដៅ" : "Target Achieved", color: "#10b981" };
+}
+
 function updateGreeting() {
     const hr = new Date().getHours();
     const el = document.getElementById("greeting");
@@ -1508,12 +1355,40 @@ function updateGreeting() {
         else g = "សាយ័ន្តសួស្តី";
     }
 
-    el.innerHTML = `${g}, `;
+    // Calculate Today's Insights for a more dynamic home experience
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayData = appData.filter(d => d.date === todayStr);
+    const todayHours = todayData.reduce((sum, d) => sum + (parseFloat(d.hours) || 0), 0);
+    const pendingTasks = appTodos.filter(t => !t.completed).length;
+
+    // Create a personalized subtitle based on current status
+    let statusMsg = "";
+    if (currentLang === 'kh') {
+        statusMsg = todayHours > 0 
+            ? `អ្នកបានកត់ត្រា ${todayHours}ម៉ោង ថ្ងៃនេះ។` 
+            : `មិនទាន់មានការងារកត់ត្រាទេថ្ងៃនេះ។`;
+    } else {
+        statusMsg = todayHours > 0 
+            ? `You've logged ${todayHours}h today.` 
+            : `No hours logged yet today.`;
+    }
+
+    const status = getProductivityStatus(todayHours, DAILY_HOUR_LIMIT);
+    
+    // Enhanced Home Header with Live Status Badge
+    el.innerHTML = `
+        <div class="home-greeting-wrap">
+            <span>${g}, </span>
+            <span class="productivity-badge" style="background: ${status.color}15; color: ${status.color}; border: 1px solid ${status.color}30;">
+                ${status.label}
+            </span>
+        </div>
+    `;
     
     if (currentLang === 'kh') el.style.fontSize = '0.95em'; else el.style.fontSize = '';
 
     welcomeNames.forEach(nameEl => { 
-        nameEl.textContent = userName; 
+        nameEl.innerHTML = `${userName} <span class="home-task-badge">${pendingTasks}</span>`; 
         // Adjusting font size for Khmer headings on the profile cover
         if (currentLang === 'kh') nameEl.style.fontSize = '1.5rem'; 
         else nameEl.style.fontSize = '';
@@ -1570,10 +1445,21 @@ async function updateWeather() {
     const coverWeatherContainers = document.querySelectorAll(".cover-weather-info");
     const hrs = new Date().getHours();
     const isNight = hrs >= 18 || hrs < 6;
+    const now = Date.now();
     
     // Simulated weather logic (replaces static text)
     const temps = isNight ? [24, 25, 26, 27, 28] : [31, 32, 33, 34, 35];
-    const temp = temps[Math.floor(Math.random() * temps.length)];
+
+    if (!appWeatherCache || (now - appWeatherCache.timestamp > 300000) || appWeatherCache.isNight !== isNight) {
+        appWeatherCache = {
+            tempIndex: Math.floor(Math.random() * temps.length),
+            condIndex: Math.floor(Math.random() * (isNight ? 3 : 4)),
+            isNight: isNight,
+            timestamp: now
+        };
+    }
+
+    const temp = temps[appWeatherCache.tempIndex];
 
     let conditions;
     if (isNight) {
@@ -1591,13 +1477,33 @@ async function updateWeather() {
         ];
     }
 
-    const cond = conditions[Math.floor(Math.random() * conditions.length)];
+    const condIdx = Math.min(appWeatherCache.condIndex, conditions.length - 1);
+    const cond = conditions[condIdx];
     const city = currentLang === 'kh' ? 'ភ្នំពេញ' : 'Phnom Penh';
 
     if (el) el.innerHTML = `<span class="widget-emoji ${cond.class}">${cond.emoji}</span> ${cond.label} • ${city}: ${temp}°C`;
     coverWeatherContainers.forEach(container => {
         container.innerHTML = `<span class="widget-emoji ${cond.class}">${cond.emoji}</span> ${cond.label} • ${temp}°C`;
     });
+    
+    // Update Home Live Progress Strip
+    if (currentView === 'home') {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayHours = appData.filter(d => d.date === todayStr).reduce((sum, d) => sum + (parseFloat(d.hours) || 0), 0);
+        const limit = DAILY_HOUR_LIMIT || 7.5;
+        const progressPct = Math.min(100, (todayHours / limit) * 100);
+        
+        const progressFill = document.querySelector('.home-live-progress-fill');
+        const progressText = document.querySelector('.home-live-progress-text');
+        
+        if (progressFill) progressFill.style.width = `${progressPct}%`;
+        if (progressText) {
+            progressText.textContent = currentLang === 'kh'
+                ? `វឌ្ឍនភាពថ្ងៃនេះ: ${Math.round(progressPct)}% (${todayHours}/${limit}ម៉ោង)`
+                : `Today's Progress: ${Math.round(progressPct)}% (${todayHours}/${limit}h)`;
+        }
+    }
+
     updateGreeting();
     applyVisualWeatherEffects(cond.label);
     if (currentView === 'home' && typeof window.updateHomeLiveStrip === 'function') window.updateHomeLiveStrip();
@@ -1641,6 +1547,11 @@ function applyVisualWeatherEffects(conditionLabel) {
             }
         }
     });
+}
+
+function updateDate() {
+    const el = document.getElementById('date');
+    if (el) el.value = new Date().toISOString().split('T')[0];
 }
 
 // ===== DATE FORMATTER (DD/Month/YYYY) =====
@@ -1857,6 +1768,7 @@ function updateModuleVisibility(module, isVisible) {
     if (module === 'todo') appPrefs.showTodo = isVisible;
     if (module === 'income') appPrefs.showIncome = isVisible; // New: Income visibility
     if (module === 'ticker') appPrefs.showTicker = isVisible;
+    if (module === 'invoice') appPrefs.showInvoice = isVisible;
     if (module === 'expenses') appPrefs.showExpenses = isVisible; // New
     if (module === 'incomePrivacy') appPrefs.incomePrivacy = isVisible;
     
@@ -1931,6 +1843,98 @@ async function resetAllSettings() {
     setTimeout(() => window.location.reload(), 1000);
 }
 
+function addRow() {
+    const tbody = document.getElementById('rows-body');
+    if (!tbody) return;
+    const rowCount = tbody.children.length + 1;
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = "1px solid #f1f5f9";
+    tr.innerHTML = `
+        <td style="text-align: center; padding: 12px 10px; color: #94a3b8; font-weight: 700;">${rowCount}</td>
+        <td style="padding: 12px 10px;"><input type="text" data-field="desc" placeholder="Enter item description..." style="width: 100%; border: none; outline: none; background: transparent; font-weight: 600; color: #334155; font-size: 13px;"></td>
+        <td style="padding: 12px 10px; text-align: center;"><input type="number" data-field="qty" value="1" oninput="calc()" style="width: 60px; text-align: center; border: none; outline: none; background: transparent; font-weight: 800; color: #0f172a;"></td>
+        <td style="padding: 12px 10px; text-align: center;"><input type="number" data-field="price" value="0" oninput="calc()" style="width: 80px; text-align: center; border: none; outline: none; background: transparent; font-weight: 800; color: #0f172a;"></td>
+        <td style="padding: 12px 15px; text-align: right; font-weight: 900; color: #0f172a;">$ <span class="row-total">0.00</span></td>
+        <td class="no-print" style="text-align: center;"><button class="del-btn" onclick="this.closest('tr').remove(); calc();" style="opacity: 0.5;">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+    calc();
+}
+
+function calc() {
+    let subtotal = 0;
+    document.querySelectorAll('#rows-body tr').forEach(row => {
+        const qtyInput = row.querySelector('[data-field="qty"]');
+        const priceInput = row.querySelector('[data-field="price"]');
+        if (!qtyInput || !priceInput) return;
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const total = qty * price;
+        const totalEl = row.querySelector('.row-total');
+        if (totalEl) totalEl.textContent = total.toFixed(2);
+        subtotal += total;
+    });
+
+    const taxEnabled = document.getElementById('taxToggle')?.checked;
+    const vat = taxEnabled ? (subtotal * 0.15) : 0;
+    const grand = subtotal + vat;
+
+    if (document.getElementById('sub')) document.getElementById('sub').textContent = subtotal.toFixed(2);
+    if (document.getElementById('vat')) document.getElementById('vat').textContent = vat.toFixed(2);
+    if (document.getElementById('grand')) document.getElementById('grand').textContent = grand.toFixed(2);
+    if (document.getElementById('bal')) document.getElementById('bal').textContent = grand.toFixed(2);
+    
+    const vatRow = document.getElementById('vatRow');
+    if (vatRow) vatRow.style.visibility = taxEnabled ? 'visible' : 'hidden';
+}
+
+function saveImage() {
+    const area = document.getElementById('invoiceCaptureArea');
+    if (!area || typeof html2canvas === 'undefined') return;
+    html2canvas(area).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'invoice.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
+
+function exportInvoiceToExcel() {
+    if (typeof XLSX === 'undefined') return;
+    const data = [];
+    document.querySelectorAll('#rows-body tr').forEach(row => {
+        const desc = row.querySelector('[data-field="desc"]')?.value || "";
+        const qty = row.querySelector('[data-field="qty"]')?.value || "0";
+        const price = row.querySelector('[data-field="price"]')?.value || "0";
+        const total = row.querySelector('.row-total')?.textContent || "0.00";
+        data.push({
+            Description: desc,
+            Qty: qty,
+            Price: price,
+            Total: total
+        });
+    });
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Invoice");
+    XLSX.writeFile(wb, "invoice.xlsx");
+}
+
+function updateDocumentTitle(val) {
+    const titleLabel = document.getElementById('docTitleLabel');
+    if (titleLabel) {
+        if (val === 'invoice') titleLabel.textContent = "INVOICE";
+        else if (val === 'quotation') titleLabel.textContent = "QUOTATION";
+        else titleLabel.textContent = "DOCUMENT";
+    }
+    document.title = (val ? val.toUpperCase() : "Invoice") + " - BridgeWork Pro";
+}
+
+function triggerCalendar() {
+    toggleCalendar();
+}
+
 function updateToolTickerMessage(view, message) {
     if (!appPrefs.toolMessages) appPrefs.toolMessages = {};
     appPrefs.toolMessages[view] = message;
@@ -1939,20 +1943,20 @@ function updateToolTickerMessage(view, message) {
 }
 
 function applyModuleVisibility() {
-    const expenseLink = document.querySelector('a[onclick="showView(\'expense\')"]');
-    const loanLink = document.querySelector('a[onclick="showView(\'loan\')"]');
-    const todoLink = document.querySelector('a[onclick="showView(\'todo\')"]');
-    const incomeLink = document.querySelector('a[onclick="showView(\'income\')"]');
-    if (loanLink) loanLink.style.display = appPrefs.showLoan ? 'flex' : 'none';
-    if (todoLink) todoLink.style.display = appPrefs.showTodo ? 'flex' : 'none';
-    if (incomeLink) incomeLink.style.display = appPrefs.showIncome ? 'flex' : 'none';
-    // New: Handle expense tracker visibility
-    if (expenseLink) expenseLink.style.display = appPrefs.showExpenses ? 'flex' : 'none';
+    const modules = [
+        { key: 'showLoan', view: 'loan' },
+        { key: 'showTodo', view: 'todo' },
+        { key: 'showIncome', view: 'income' },
+        { key: 'showExpenses', view: 'expense' },
+        { key: 'showInvoice', view: 'invoice' }
+    ];
 
-    // Update sidebar links for todos and kanban to reflect current workspace
-    const todoSidebarLink = document.querySelector('.sidebar a[onclick="showView(\'todo\')"]');
-    const kanbanSidebarLink = document.querySelector('.sidebar a[onclick="showView(\'kanban\')"]');
-    // No direct change needed here, as the `showView` function already handles filtering.
+    modules.forEach(m => {
+        const isVisible = appPrefs[m.key] !== false;
+        document.querySelectorAll(`[onclick*="showView('${m.view}')"]`).forEach(el => {
+            el.style.display = isVisible ? (el.tagName === 'A' || el.tagName === 'BUTTON' ? 'flex' : 'block') : 'none';
+        });
+    });
 }
 
 function openSettings() {
@@ -1984,6 +1988,7 @@ function openSettings() {
     setCheck("showModuleLoan", appPrefs.showLoan);
     setCheck("showModuleTodo", appPrefs.showTodo);
     setCheck("showModuleIncome", appPrefs.showIncome);
+    setCheck("showModuleInvoice", appPrefs.showInvoice !== false);
     setCheck("showIncomePrivacy", appPrefs.incomePrivacy);
     setVal("uiScaleInput", appPrefs.uiScale || 100);
     setVal("currencyInput", appPrefs.currency || "$");
@@ -2004,12 +2009,24 @@ function openSettings() {
     setVal("msgIncome", appPrefs.toolMessages?.income || "");
     setVal("msgExpenses", appPrefs.toolMessages?.expenses || "");
     setCheck("showModuleTicker", appPrefs.showTicker);
+    setCheck("homeShowWeatherInput", appPrefs.homeShowWeather);
+    setCheck("homeShowProgressInput", appPrefs.homeShowProgress);
+    setCheck("homeShowDecorInput", appPrefs.homeShowDecor);
+    setCheck("homeShowNewsInput", appPrefs.homeShowNews);
+
+    // Filter tabs based on context (Home vs Report)
+    const isHome = currentView === 'home';
+    const reportTabs = ['project', 'categories', 'modules', 'data'];
+    document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+        const tab = btn.getAttribute('data-tab');
+        btn.style.display = (isHome && reportTabs.includes(tab)) ? 'none' : 'flex';
+    });
 
     // Set Language UI in settings
     const langSelect = document.getElementById("settingsLangSelect");
     if (langSelect) langSelect.value = currentLang;
 
-    switchSettingsTab('profile');
+    switchSettingsTab(currentView === 'home' ? 'launcher' : 'profile');
     
     renderCategories();
 }
@@ -2525,6 +2542,12 @@ function updateToolSummaries() {
             return d.getUTCMonth() === viewMonth && d.getUTCFullYear() === viewYear;
         }).reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
         sexp.textContent = `${getTranslation('summary_total')}: ${cur}${totalExpenses.toLocaleString()}`;
+    }
+
+    // 8. Invoice Status
+    const siv = document.getElementById('summaryInvoice');
+    if (siv) {
+        siv.textContent = currentLang === 'kh' ? "រួចរាល់" : "Ready";
     }
 
     // 8. Home Stats Reports (Current Month Count)
@@ -4100,6 +4123,15 @@ window.importProjectFromCSV = importProjectFromCSV;
 window.exportCSV = exportCSV;
 window.toggleSort = toggleSort;
 window.setDateSort = setDateSort;
+window.updateInvoiceHeader = updateInvoiceHeader;
+window.handleInvoiceLogo = handleInvoiceLogo;
+window.addRow = addRow;
+window.calc = calc;
+window.saveImage = saveImage;
+window.exportInvoiceToExcel = exportInvoiceToExcel;
+window.updateDocumentTitle = updateDocumentTitle;
+window.triggerCalendar = triggerCalendar;
+window.updateDate = updateDate;
 window.renderKanbanBoard = renderKanbanBoard;
 window.refreshEagleAssets = refreshEagleAssets;
 window.backupData = backupData;

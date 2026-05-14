@@ -1,0 +1,114 @@
+<!-- iOS-style HEADER -->
+<div class="ios-header no-print">
+    <span class="ios-header-title">VUTHY TAILOR</span>
+</div>
+
+<!-- CONTROL PANEL -->
+<div class="no-print sticky top-[56px] bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+    <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
+    
+    <div class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-lg border border-amber-300">
+        <span class="text-xs font-bold text-amber-700 uppercase">Doc Type</span>
+        <select id="docType" onchange="updateDocumentTitle()" class="bg-white border border-amber-300 rounded px-2 py-1 text-sm font-bold text-amber-800">
+            <option value="invoice" selected>Invoice</option>
+            <option value="quotation">Quotation</option>
+        </select>
+    </div>
+    
+    <div class="flex items-center gap-3 bg-blue-50 px-5 py-3 rounded-lg border-2 border-blue-300 shadow-sm">
+        <span class="text-xs font-black text-blue-700 uppercase tracking-wide">📊 ពន្ធ (15%) / TAX</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+            <div class="w-12 h-7 bg-gray-300 peer-focus:ring-4 peer-focus:ring-blue-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+        </label>
+    </div>
+
+    <button onclick="exportInvoiceToExcel()" class="bg-green-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-green-800 transition-all">Export Excel</button>
+    <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">🖼️ រក្សាទុកជារូបភាព / Save Image</button>
+    <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
+</div>
+
+<div class="invoice-wrapper" id="capture-area">
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="w-16"><img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png"></div>
+        <div class="text-center text-maroon">
+            <h1 id="businessNameKh" class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
+            <h2 id="businessNameEn" class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true">VUTHY TAILOR</h2>
+        </div>
+        <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png"></div>
+    </div>
+
+    <div class="text-center text-maroon text-[14px] mb-8">
+        <p id="businessAddressKh" class="font-bold uppercase tracking-tight" contenteditable="true">អាសយដ្ឋាន: ផ្ទះលេខ ៦៩៥EO ផ្លូវមុនីវង្ស សង្កាត់បឹងកេងកង ៣ ខណ្ឌចំការមន ភ្នំពេញ</p>
+        <p id="businessAddressEn" class="font-medium" contenteditable="true">Address : #695Eo, Street Monivong, Sangkat Boengkengkang III, Khan Chamka Morn, Phnom Penh</p>
+        <p id="businessPhone" class="font-bold text-lg mt-1 tracking-wide" contenteditable="true">Tel : 098 22 00 20 / 012 690 595 ➲ 031 7000002</p>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="flex justify-between mb-8 px-2">
+        <div class="w-1/2 space-y-4">
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">អតិថិជន / CLIENT NAME</p>
+                <input type="text" id="clientName" placeholder="Enter client name" class="text-xl font-bold text-gray-800 leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0" value="">
+            </div>
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">លេខទូរស័ព្ទ / PHONE NUMBER</p>
+                <input type="text" id="clientPhone" placeholder="Enter phone number" class="font-bold leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0" value="">
+            </div>
+        </div>
+        <div class="text-right flex flex-col justify-between">
+            <div class="leading-none">
+                <h3 id="docTitle" class="text-3xl font-black text-gray-900 mb-1">វិក្កយបត្រ / INVOICE</h3>
+                <p class="text-xl font-black text-red-700">Nº <span id="invoiceNumber" contenteditable="true">000XXX</span></p>
+            </div>
+            <div class="relative inline-block text-right">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">កាលបរិច្ឆេទ / DATE</p>
+                <div class="date-container font-black text-lg leading-tight" onclick="triggerCalendar()">
+                    <span id="khDate">-- -- --</span><br>
+                    <span id="enDate" class="text-xs text-gray-500 font-bold">00-00-0000</span>
+                </div>
+                <input type="date" id="hiddenDatePicker" class="hidden" onchange="updateDate(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <table class="mb-6">
+        <thead>
+            <tr class="font-black text-gray-800">
+                <th class="w-12">Nº</th>
+                <th class="text-left px-4 italic font-bold">រាយមុខទំនិញ / DESCRIPTION</th>
+                <th class="w-20 text-center">QTY</th>
+                <th class="w-24 text-center">PRICE ($)</th>
+                <th class="w-32 text-right pr-4">AMOUNT ($)</th>
+                <th class="w-10 no-print"></th>
+            </tr>
+        </thead>
+        <tbody id="rows-body"></tbody>
+    </table>
+
+    <div class="flex justify-between items-start mt-4">
+        <div class="w-1/2">
+            <div class="aba-box p-5 rounded-2xl">
+                <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
+                <p class="text-blue-900 font-bold text-sm">ABA Name: <span id="abaName" contenteditable="true" class="font-black">LIM VUTHY</span></p>
+                <p id="abaNumber" class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+            </div>
+        </div>
+        <div class="w-5/12 space-y-2 pr-2">
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow"><span>សរុប / SUB-TOTAL</span><span class="text-gray-900 font-black">$ <span id="sub">0.00</span></span></div>
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow"><span>ពន្ធ ១៥% / VAT 15%</span><span class="text-gray-900 font-black">$ <span id="vat">0.00</span></span></div>
+            <div class="flex justify-between items-end border-t border-gray-100 pt-3">
+                <div class="text-left leading-none"><p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p><p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p></div>
+                <div class="text-right"><p class="text-red-700 font-black text-4xl tracking-tighter leading-none">$ <span id="grand">0.00</span></p></div>
+            </div>
+            <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700"><span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span><div class="text-xl font-black flex items-center">$ <div contenteditable="true" id="dep" oninput="calc()" onblur="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div></div></div>
+            <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black"><span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span><span class="text-3xl underline decoration-double">$ <span id="bal">0.00</span></span></div>
+        </div>
+    </div>
+
+    <div class="flex justify-between mt-20 text-center px-10">
+        <div class="w-1/3"><p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p><div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div></div>
+        <div class="w-1/4"><p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p><div class="w-full border-b-2 border-gray-200 mb-2"></div><p id="managerName" class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p></div>
+    </div>
+</div>

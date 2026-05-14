@@ -237,6 +237,24 @@ const translations = {
         home_clock_label: "Current Time",
         home_weather_label: "Weather",
         home_music_label: "Music & Lo-Fi",
+        sidebar_ocr: "Scan OCR", // Existing
+        sidebar_settings: "Settings", // Existing, now also used on home launcher
+        sidebar_invoice: "Invoice Generator",
+        ocr_title: "Scan OCR",
+        invoice_title: "Invoice Generator",
+        invoice_subtitle: "Professional invoice & quotation generator for tailors.",
+        settings_launcher_tab: "Launcher",
+        settings_home_weather: "Show Weather Card",
+        settings_home_progress: "Show Progress Bar",
+        settings_home_decor: "Show Focus & Music",
+        settings_home_news: "Show Hot News",
+        home_live_status_label: "Live Status",
+        home_today_progress: "Today's Progress",
+        ocr_subtitle: "Extract text from images using AI (Khmer/English).",
+        ocr_drop_label: "Select or Drop Image",
+        ocr_result: "Result",
+        ocr_copy: "Copy Text",
+        ocr_success: "Text extracted successfully"
     },
     kh: {
         today_work_summary: "សង្ខេបការងារថ្ងៃនេះ",
@@ -474,6 +492,24 @@ const translations = {
         home_clock_label: "ម៉ោងបច្ចុប្បន្ន",
         home_weather_label: "អាកាសធាតុ",
         home_music_label: "តន្ត្រីបំពេអារម្មណ៍",
+        sidebar_ocr: "ស្កេនអត្ថបទ (OCR)", // Existing
+        sidebar_settings: "ការកំណត់", // Existing, now also used on home launcher
+        sidebar_invoice: "បង្កើតវិក្កយបត្រ",
+        ocr_title: "ស្កេនអត្ថបទ",
+        invoice_title: "បង្កើតវិក្កយបត្រ",
+        invoice_subtitle: "កម្មវិធីបង្កើតវិក្កយបត្រ និងសម្រង់តម្លៃអាជីពសម្រាប់ជាងកាត់ដេរ។",
+        settings_launcher_tab: "កម្មវិធីដើម",
+        settings_home_weather: "បង្ហាញកាតអាកាសធាតុ",
+        settings_home_progress: "បង្ហាញរបារវឌ្ឍនភាព",
+        settings_home_decor: "បង្ហាញតន្ត្រី និងការផ្ដោត",
+        settings_home_news: "បង្ហាញព័ត៌មានក្តៅៗ",
+        home_live_status_label: "ស្ថានភាពបច្ចុប្បន្ន",
+        home_today_progress: "វឌ្ឍនភាពថ្ងៃនេះ",
+        ocr_subtitle: "ទាញយកអត្ថបទពីរូបភាពដោយប្រើ AI (ខ្មែរ/អង់គ្លេស)។",
+        ocr_drop_label: "ជ្រើសរើស ឬដាក់រូបភាពទីនេះ",
+        ocr_result: "លទ្ធផល",
+        ocr_copy: "ចម្លងអត្ថបទ",
+        ocr_success: "ទាញយកអត្ថបទបានជោគជ័យ"
     }
 };
 

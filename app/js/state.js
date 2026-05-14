@@ -38,6 +38,10 @@ let appPrefs = {
     backgroundImage: 'none',
     focusMode: false,
     showTicker: true,
+    homeShowWeather: true,
+    homeShowProgress: true,
+    homeShowDecor: true,
+    homeShowNews: true,
     toolMessages: { dashboard: "", notes: "", todo: "", loan: "", income: "", expenses: "" },
     lastSeenAppVersion: "0.0.0",
     behanceUrl: "https://www.behance.net/chinchetra",
@@ -47,6 +51,7 @@ let appPrefs = {
 
 let viewMonth = new Date().getMonth();
 let viewYear = new Date().getFullYear();
+let appWeatherCache = null;
 let noteSearchQuery = "";
 
 window.OPENAI_CONFIG = window.OPENAI_CONFIG || {
