@@ -2925,6 +2925,185 @@ body.home-shell .app-icon {
     body.tool-shell .main {
         padding: 14px !important;
     }
+    
+    /* Invoice View specific adjustments */
+    body.full-screen-tool-shell #invoiceView .compress-shell {
+        padding: 0 !important; /* Remove outer padding from compress-shell */
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper {
+        padding: 15px !important; /* Reduce main invoice padding */
+        box-shadow: none !important; /* Remove heavy shadow */
+        border-radius: 0 !important; /* No border radius for full width */
+    }
+
+    /* Control panel */
+    body.full-screen-tool-shell #invoiceView .no-print {
+        padding: 10px !important;
+        gap: 8px !important;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    body.full-screen-tool-shell #invoiceView .no-print > div,
+    body.full-screen-tool-shell #invoiceView .no-print > button {
+        flex: 1 1 auto; /* Allow items to grow and shrink */
+        min-width: 120px; /* Minimum width for buttons */
+        font-size: 11px !important;
+        padding: 8px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .no-print .btn-primary,
+    body.full-screen-tool-shell #invoiceView .no-print .btn-outline {
+        padding: 8px 12px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .no-print .divider-v {
+        display: none; /* Hide vertical dividers */
+    }
+    body.full-screen-tool-shell #invoiceView .no-print select {
+        font-size: 11px !important;
+        padding: 6px 8px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .no-print label {
+        font-size: 10px !important;
+    }
+
+    /* Invoice Header */
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:first-child { /* flex items-center justify-between mb-4 */
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px !important;
+        padding-bottom: 15px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceLogoContainer {
+        width: 60px !important;
+        height: 60px !important;
+        margin-bottom: 10px;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h1#businessNameKh {
+        font-size: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h2#businessNameEn {
+        font-size: 18px !important;
+        margin-top: 0 !important;
+        margin-bottom: 5px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper p#businessAddress {
+        font-size: 10px !important;
+        max-width: 100% !important;
+        text-align: center;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #docTitleLabel {
+        font-size: 24px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceNumber {
+        font-size: 16px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #businessPhone {
+        font-size: 11px !important;
+    }
+
+    /* Info Section (Client Name, Phone, Date) */
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(2) { /* flex justify-between mb-8 px-2 */
+        flex-direction: column;
+        margin-bottom: 20px !important;
+        padding: 10px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(2) > div {
+        width: 100% !important;
+        text-align: left !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #clientName,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #clientPhone {
+        font-size: 14px !important;
+        min-width: 100% !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceDateDisplay {
+        font-size: 14px !important;
+        text-align: left !important;
+    }
+
+    /* Table */
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table {
+        font-size: 11px !important;
+        margin-bottom: 20px !important;
+        display: block; /* Allow horizontal scrolling */
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table th,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table td {
+        padding: 8px 6px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table th:nth-child(2),
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table td:nth-child(2) {
+        min-width: 150px; /* Ensure description column has enough space */
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table .qty,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table .price {
+        min-width: 50px;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper table .row-total {
+        min-width: 70px;
+    }
+
+    /* Footer (ABA and Totals) */
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(4) { /* flex justify-between items-start mt-4 */
+        flex-direction: column;
+        gap: 20px;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(4) > div {
+        width: 100% !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #bankTitleLabel {
+        font-size: 9px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #abaName {
+        font-size: 12px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #abaNumber {
+        font-size: 18px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #subtotalRow span,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #vatRow span {
+        font-size: 11px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #grand {
+        font-size: 28px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #bal {
+        font-size: 24px !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #dep {
+        font-size: 16px !important;
+    }
+
+    /* Signatures */
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(5) { /* flex justify-between mt-20 text-center px-10 */
+        flex-direction: column;
+        gap: 30px;
+        margin-top: 40px !important;
+        padding: 0 !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(5) > div {
+        width: 100% !important;
+    }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceManagerName {
+        font-size: 12px !important;
+    }
+
+    /* Setup Panel */
+    body.full-screen-tool-shell #invoiceView #invoiceSetupPanel {
+        padding: 10px !important;
+    }
+    body.full-screen-tool-shell #invoiceView #invoiceSetupPanel > div:nth-child(2) { /* grid */
+        grid-template-columns: 1fr !important;
+    }
+    body.full-screen-tool-shell #invoiceView #invoiceSetupPanel input,
+    body.full-screen-tool-shell #invoiceView #invoiceSetupPanel select,
+    body.full-screen-tool-shell #invoiceView #invoiceSetupPanel button {
+        font-size: 11px !important;
+        padding: 8px !important;
+    }
 
     .phone-launcher {
         border-radius: 20px;
