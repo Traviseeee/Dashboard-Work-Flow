@@ -5,6 +5,7 @@
 async function migrateFromLocalStorage() {
     const isMigrated = localStorage.getItem("bw_migrated") === "true";
     if (isMigrated) return;
+    if (!BridgeWorkDB.db) return; // Prevent migration crash if DB failed to init
 
     console.log("BridgeWork Pro: Initiating data migration...");
 
@@ -56,94 +57,105 @@ async function initializeApp() {
         }, 2000);
     }
 
-    await BridgeWorkDB.init();
-    await migrateFromLocalStorage();
-
-    appData = await BridgeWorkDB.get("app_data", "main") || [];
-    appNotes = await BridgeWorkDB.get("notes", "main") || [];
-    appTodos = await BridgeWorkDB.get("todos", "main") || [];
-    appLoans = await BridgeWorkDB.get("loans", "main") || [];
-    appIncomes = await BridgeWorkDB.get("incomes", "main") || [];
-    appExpenses = await BridgeWorkDB.get("expenses", "main") || [];
-    eagleAssets = await BridgeWorkDB.get("eagle_assets", "main") || [];
-
-    appEvents = await BridgeWorkDB.get("events", "main") || [];
-    workspaces = await BridgeWorkDB.get("workspaces", "main") || workspaces;
-    userName = await BridgeWorkDB.get("settings", "userName") || "Chin Chetra";
-    userRole = await BridgeWorkDB.get("settings", "userRole") || "Graphic Designer";
-    isDarkMode = await BridgeWorkDB.get("settings", "darkMode") === true;
-    activeWorkspaceId = await BridgeWorkDB.get("settings", "activeWorkspaceId") || "default";
-    const savedPrefs = await BridgeWorkDB.get("settings", "prefs") || {};
-    appPrefs = { ...appPrefs, ...savedPrefs };
-    currentLang = await BridgeWorkDB.get("settings", "lang") || currentLang;
-    updateProfileUI();
-
-    if (appData.length > 0) {
-        const sorted = [...appData].sort((a, b) => String(b.date).localeCompare(String(a.date)));
-        const latest = String(sorted[0].date).split(/[-/]/);
-        if (latest.length === 3) {
-            viewYear = parseInt(latest[0]) || viewYear;
-            viewMonth = parseInt(latest[1]) - 1;
-            dashboardYearState = parseInt(latest[0]) || dashboardYearState;
-            dashboardMonthState = parseInt(latest[1]) - 1;
+    try {
+        try {
+            await BridgeWorkDB.init();
+        } catch (e) {
+            console.error("[BridgeWork Pro] IndexedDB initialization failed.", e);
         }
-    }
 
-    viewMonth = dashboardMonthState;
-    viewYear = dashboardYearState;
+        await migrateFromLocalStorage();
 
-    DAILY_HOUR_LIMIT = parseFloat(await BridgeWorkDB.get("settings", "limit")) || DEFAULT_DAILY_HOUR_LIMIT;
-    appCoverPositions = await BridgeWorkDB.get("settings", "coverPositions") || {};
+        appData = await BridgeWorkDB.get("app_data", "main") || [];
+        appNotes = await BridgeWorkDB.get("notes", "main") || [];
+        appTodos = await BridgeWorkDB.get("todos", "main") || [];
+        appLoans = await BridgeWorkDB.get("loans", "main") || [];
+        appIncomes = await BridgeWorkDB.get("incomes", "main") || [];
+        appExpenses = await BridgeWorkDB.get("expenses", "main") || [];
+        eagleAssets = await BridgeWorkDB.get("eagle_assets", "main") || [];
 
-    let foundWorkspace = workspaces.find(w => String(w.id) === String(activeWorkspaceId));
-    if (!foundWorkspace) {
-        foundWorkspace = workspaces[0];
-        activeWorkspaceId = foundWorkspace.id;
-    }
-    currentWorkspace = foundWorkspace;
-    appCategories = currentWorkspace.categories;
+        appEvents = await BridgeWorkDB.get("events", "main") || [];
+        workspaces = await BridgeWorkDB.get("workspaces", "main") || workspaces;
+        userName = await BridgeWorkDB.get("settings", "userName") || "Chin Chetra";
+        userRole = await BridgeWorkDB.get("settings", "userRole") || "Graphic Designer";
+        isDarkMode = await BridgeWorkDB.get("settings", "darkMode") === true;
+        activeWorkspaceId = await BridgeWorkDB.get("settings", "activeWorkspaceId") || "default";
+        const savedPrefs = await BridgeWorkDB.get("settings", "prefs") || {};
+        appPrefs = { ...appPrefs, ...savedPrefs };
+        currentLang = await BridgeWorkDB.get("settings", "lang") || currentLang;
+        updateProfileUI();
 
-    appIncomes = appIncomes.map(inc => {
-        if (!inc.id) inc.id = "inc_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
-        return inc;
-    });
-
-    appTodos = appTodos.map(todo => {
-        if (!todo.workspaceId) todo.workspaceId = "default";
-        return todo;
-    });
-
-    appData = appData.map(item => {
-        if (item.date && !/^\d{4}-\d{2}-\d{2}$/.test(item.date)) {
-            const dObj = new Date(item.date);
-            if (!isNaN(dObj.getTime())) {
-                const y = dObj.getUTCFullYear();
-                const m = String(dObj.getUTCMonth() + 1).padStart(2, '0');
-                const dd = String(dObj.getUTCDate()).padStart(2, '0');
-                item.date = `${y}-${m}-${dd}`;
+        if (appData.length > 0) {
+            const sorted = [...appData].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+            const latest = String(sorted[0].date).split(/[-/]/);
+            if (latest.length === 3) {
+                viewYear = parseInt(latest[0]) || viewYear;
+                viewMonth = parseInt(latest[1]) - 1;
+                dashboardYearState = parseInt(latest[0]) || dashboardYearState;
+                dashboardMonthState = parseInt(latest[1]) - 1;
             }
         }
-        return item;
-    });
 
-    await changeAppLang(currentLang);
-    updateSyncStatus();
+        viewMonth = dashboardMonthState;
+        viewYear = dashboardYearState;
 
-    ['dashboardView', 'notesView', 'todoView', 'loanView', 'incomeView', 'expenseView'].forEach(async (view) => {
-        if (view === 'todoView') updateTodoWorkspaceSelector();
-        await updateCoverUI(view);
-    });
-    appPrefs.showExpenses = savedPrefs.showExpenses !== undefined ? savedPrefs.showExpenses : true;
-    appPrefs.showInvoice = savedPrefs.showInvoice !== undefined ? savedPrefs.showInvoice : true;
-    applyAppPrefs();
-    await showView(currentView || 'home', true);
-    showWhatsNewAlert();
-    if (currentView === 'eagleGallery') refreshEagleAssets();
-    render();
-    renderAllViews();
+        DAILY_HOUR_LIMIT = parseFloat(await BridgeWorkDB.get("settings", "limit")) || DEFAULT_DAILY_HOUR_LIMIT;
+        appCoverPositions = await BridgeWorkDB.get("settings", "coverPositions") || {};
 
-    const mainEl = document.querySelector('.main');
-    if (mainEl) mainEl.classList.remove('loading');
+        let foundWorkspace = workspaces.find(w => String(w.id) === String(activeWorkspaceId));
+        if (!foundWorkspace) {
+            foundWorkspace = workspaces[0];
+            activeWorkspaceId = foundWorkspace.id;
+        }
+        currentWorkspace = foundWorkspace;
+        appCategories = currentWorkspace.categories;
+
+        appIncomes = appIncomes.map(inc => {
+            if (!inc.id) inc.id = "inc_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+            return inc;
+        });
+
+        appTodos = appTodos.map(todo => {
+            if (!todo.workspaceId) todo.workspaceId = "default";
+            return todo;
+        });
+
+        appData = appData.map(item => {
+            if (item.date && !/^\d{4}-\d{2}-\d{2}$/.test(item.date)) {
+                const dObj = new Date(item.date);
+                if (!isNaN(dObj.getTime())) {
+                    const y = dObj.getUTCFullYear();
+                    const m = String(dObj.getUTCMonth() + 1).padStart(2, '0');
+                    const dd = String(dObj.getUTCDate()).padStart(2, '0');
+                    item.date = `${y}-${m}-${dd}`;
+                }
+            }
+            return item;
+        });
+
+        await changeAppLang(currentLang);
+        updateSyncStatus();
+
+        const viewsToInit = ['dashboardView', 'notesView', 'todoView', 'loanView', 'incomeView', 'expenseView'];
+        for (const view of viewsToInit) {
+            if (view === 'todoView') updateTodoWorkspaceSelector();
+            await updateCoverUI(view).catch(() => null);
+        }
+        
+        appPrefs.showExpenses = savedPrefs.showExpenses !== undefined ? savedPrefs.showExpenses : true;
+        appPrefs.showInvoice = savedPrefs.showInvoice !== undefined ? savedPrefs.showInvoice : true;
+        applyAppPrefs();
+        await showView(currentView || 'home', true);
+        showWhatsNewAlert();
+        if (currentView === 'eagleGallery') refreshEagleAssets();
+        render();
+        renderAllViews();
+    } catch (err) {
+        console.error("[BridgeWork Pro] Initialization error:", err);
+    } finally {
+        const mainEl = document.querySelector('.main');
+        if (mainEl) mainEl.classList.remove('loading');
+    }
 }
 
 let lineChart, barChart, incomePieChart;
@@ -986,9 +998,12 @@ function applyModuleVisibility() {
 
     modules.forEach(m => {
         const isVisible = appPrefs[m.key] !== false;
-        // Use querySelectorAll to find buttons on both the sidebar and the home launcher
         document.querySelectorAll(`[onclick*="showView('${m.view}')"]`).forEach(el => {
-            el.style.display = isVisible ? (el.tagName === 'A' || el.tagName === 'BUTTON' ? 'flex' : 'block') : 'none';
+            if (isVisible) {
+                el.style.display = (el.tagName === 'A' || el.tagName === 'BUTTON') ? 'flex' : '';
+            } else {
+                el.style.display = 'none';
+            }
         });
     });
 }

@@ -81,8 +81,11 @@ function getDocumentTypeMeta() {
 
 function updateDocumentTitle() {
     const meta = getDocumentTypeMeta();
-    const titleEl = document.getElementById('docTitle');
-    if (titleEl) titleEl.innerText = meta.khEnTitle;
+    const titleEl = document.getElementById('docTitleLabel');
+    if (titleEl) {
+        titleEl.innerText = meta.khEnTitle;
+        titleEl.style.fontSize = '34px'; // Increased font size for better visibility
+    }
 }
 
 function exportInvoiceToExcel() {
@@ -141,7 +144,7 @@ function calc() {
 }
 
 async function saveImage() {
-    const target = document.getElementById('capture-area');
+    const target = document.getElementById('invoiceCaptureArea');
     if (!target) return;
     const originalStyle = target.getAttribute('style') || '';
     
@@ -185,19 +188,22 @@ function updateInvoiceHeader() {
     const bankNo = getText('setupBankNumber', '000 000 000');
     const manager = getText('setupManagerName', 'Manager Name');
 
-    const set = (id, val, prefix = '') => { 
+    const set = (id, val, prefix = '', size = null) => { 
         const el = document.getElementById(id); 
-        if (el) el.innerText = prefix + val; 
+        if (el) {
+            el.innerText = prefix + val;
+            if (size) el.style.fontSize = size;
+        }
     };
 
-    set('businessNameEn', name.toUpperCase());
-    set('businessNameKh', nameKh);
-    set('businessPhone', phone, 'Tel : ');
-    set('businessAddress', address);
+    set('businessNameEn', name.toUpperCase(), '', '36px'); // Made English header bigger
+    set('businessNameKh', nameKh, '', '42px');             // Made Khmer header bigger
+    set('businessPhone', phone, 'Tel : ', '14px');
+    set('businessAddress', address, '', '12px');
     set('abaName', name.toUpperCase()); 
     set('abaNumber', bankNo);
-    set('bankTitleLabel', bankName.toUpperCase() + ' PAYMENT INFO');
-    set('managerSignName', manager);
+    set('bankTitleLabel', bankName.toUpperCase() + ' PAYMENT INFO', '', '16px');
+    set('invoiceManagerName', manager); // Corrected ID to match index.html
 }
 
 /**

@@ -2568,7 +2568,26 @@ function updateToolSummaries() {
 // ===== RENDER =====
 // ===== RENDER DISPATCHER =====
 function render() {
-    if (currentView === 'dashboard') renderDashboard();
+    if (currentView === 'home') {
+        updateGreeting();
+        updateWeather();
+        updateToolSummaries();
+    } else if (currentView === 'dashboard') renderDashboard();
+    else if (currentView === 'invoice') {
+        initInvoiceView();
+    }
+    else if (currentView === 'ocr') {
+        // OCR doesn't have a single init function, but we can ensure its state is clean
+        removeOCRFile(); // Clear any previously loaded file
+        setupOCRDropZone(); // Ensure drop zone listeners are active
+    }
+    else if (currentView === 'compressImage') {
+        compressImageFiles = []; // Clear previous files
+        compressedImageResults = []; // Clear previous results
+        renderCompressPreview(); // Update UI
+        renderCompressResults(); // Update UI
+        setupCompressDropZone(); // Ensure drop zone listeners are active
+    }
     else if (currentView === 'income') renderIncomes();
     else if (currentView === 'expense') renderExpenses();
     else if (currentView === 'notes') renderNotes();

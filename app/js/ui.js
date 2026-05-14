@@ -174,6 +174,16 @@ function getCurrentViewMonthYear(viewName) {
 
 function showView(viewName) {
     currentView = viewName;
+
+    // Update body classes for layout switching
+    document.body.classList.toggle('home-shell', viewName === 'home');
+    document.body.classList.toggle('tool-shell', viewName !== 'home');
+    document.body.classList.toggle('full-screen-tool-shell', 
+        viewName === 'ocr' || 
+        viewName === 'compressImage' || 
+        viewName === 'invoice');
+
+    const homeView = document.getElementById("homeView");
     const dashboardView = document.getElementById("dashboardView");
     const reportsView = document.getElementById("reportsView");
     const notesView = document.getElementById("notesView");
@@ -183,8 +193,6 @@ function showView(viewName) {
     const loanView = document.getElementById("loanView");
     const incomeView = document.getElementById("incomeView");
     const expenseView = document.getElementById("expenseView");
-    const ticker = document.querySelector(".ticker-wrap");
-    const eagleGalleryView = document.getElementById("eagleGalleryView");
     const chatbotView = document.getElementById("chatbotView");
     const reportControls = document.getElementById("reportControls");
 
@@ -196,6 +204,7 @@ function showView(viewName) {
     viewMonth = newViewDateState.month;
     viewYear = newViewDateState.year;
 
+    if (homeView) homeView.style.display = (viewName === 'home') ? 'block' : 'none';
     if (dashboardView) dashboardView.style.display = (viewName === 'dashboard') ? 'block' : 'none';
     if (reportsView) reportsView.style.display = (viewName === 'dashboard') ? 'block' : 'none';
     if (notesView) notesView.style.display = (viewName === 'notes') ? 'block' : 'none';
@@ -205,6 +214,9 @@ function showView(viewName) {
     if (loanView) loanView.style.display = (viewName === 'loan') ? 'block' : 'none';
     if (incomeView) incomeView.style.display = (viewName === 'income') ? 'block' : 'none';
     if (expenseView) expenseView.style.display = (viewName === 'expense') ? 'block' : 'none';
+    if (ocrView) ocrView.style.display = (viewName === 'ocr') ? 'block' : 'none';
+    if (compressImageView) compressImageView.style.display = (viewName === 'compressImage') ? 'block' : 'none';
+    if (invoiceView) invoiceView.style.display = (viewName === 'invoice') ? 'block' : 'none';
     if (chatbotView) chatbotView.style.display = (viewName === 'chatbot') ? 'block' : 'none';
 
     if (reportControls) {

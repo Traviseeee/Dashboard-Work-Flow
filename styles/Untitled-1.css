@@ -159,7 +159,7 @@
 
 .profile-info-overlay h1 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 600;
     margin: 0;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -278,7 +278,7 @@
 
 #currentViewLabel {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 20px;
     color: var(--text-main);
     padding: 0 12px;
     min-width: 140px;
