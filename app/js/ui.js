@@ -146,6 +146,10 @@ function changeAppLang(lang) {
     if (typeof updateWeather === 'function') updateWeather();
 }
 
+function toggleMobileSidebar() {
+    document.body.classList.toggle('mobile-sidebar-open');
+}
+
 function showToast(msg, type = "info") {
     const container = document.getElementById("toastContainer");
     if (!container) return;
@@ -175,9 +179,13 @@ function getCurrentViewMonthYear(viewName) {
 function showView(viewName) {
     currentView = viewName;
 
+    // Auto-close mobile sidebar when a view is selected
+    document.body.classList.remove('mobile-sidebar-open');
+
     // Update body classes for layout switching
     document.body.classList.toggle('home-shell', viewName === 'home');
     document.body.classList.toggle('tool-shell', viewName !== 'home');
+    document.body.classList.toggle('report-dashboard-shell', viewName === 'dashboard');
     document.body.classList.toggle('full-screen-tool-shell', 
         viewName === 'ocr' || 
         viewName === 'compressImage' || 

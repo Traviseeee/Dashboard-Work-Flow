@@ -200,6 +200,8 @@ function updateInvoiceHeader() {
     set('businessNameKh', nameKh, '', '42px');             // Made Khmer header bigger
     set('businessPhone', phone, 'Tel : ', '14px');
     set('businessAddress', address, '', '12px');
+    set('invoiceFooterPhone', phone, 'Tel : ');
+    set('invoiceFooterAddress', address);
     set('abaName', name.toUpperCase()); 
     set('abaNumber', bankNo);
     set('bankTitleLabel', bankName.toUpperCase() + ' PAYMENT INFO', '', '16px');

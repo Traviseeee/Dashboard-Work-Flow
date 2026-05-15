@@ -2817,6 +2817,90 @@ body.tool-shell:not(.full-screen-tool-shell) .main {
     background: rgba(5, 18, 43, 0.72) !important;
 }
 
+.mobile-report-menu-btn,
+.invoice-control-label {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    body.tool-shell:not(.full-screen-tool-shell) .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        width: min(82vw, 310px) !important;
+        height: 100dvh !important;
+        transform: translateX(-105%) !important;
+        visibility: hidden !important;
+        opacity: 0;
+        z-index: 10000 !important;
+        border-radius: 0 22px 22px 0 !important;
+        transition: transform 0.28s ease, opacity 0.28s ease, visibility 0.28s ease !important;
+        overflow-y: auto !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell).mobile-sidebar-open .sidebar {
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        opacity: 1;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) .main {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-height: 100dvh;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f6f8fc !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell)::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.48);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transition: opacity 0.25s ease;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell).mobile-sidebar-open::before {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) .view-section {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    body.report-dashboard-shell .mobile-report-menu-btn {
+        position: fixed;
+        left: max(12px, env(safe-area-inset-left));
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        z-index: 9000;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border: 0;
+        border-radius: 16px;
+        background: #111827;
+        color: #fff;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.3);
+        cursor: pointer;
+    }
+
+    body.report-dashboard-shell .mobile-report-menu-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
 /* Independent Tool Layout (OCR, Compress, Invoice) */
 body.full-screen-tool-shell .main {
     width: 100% !important;
@@ -2828,6 +2912,10 @@ body.full-screen-tool-shell .main {
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
+}
+
+body.full-screen-tool-shell > .mobile-nav {
+    display: none !important;
 }
 
 body.home-shell #homeView {
@@ -2925,6 +3013,215 @@ body.home-shell .app-icon {
     body.tool-shell .main {
         padding: 14px !important;
     }
+
+    body.tool-shell:not(.full-screen-tool-shell) .main {
+        padding: 0 0 calc(78px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) .header-container {
+        position: sticky;
+        top: 0;
+        z-index: 80;
+        padding: 8px 8px 6px !important;
+        background: #f6f8fc;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) .header-panel-group,
+    body.tool-shell:not(.full-screen-tool-shell) .header-panel {
+        gap: 6px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #mainHeaderPanel {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) .active-widgets {
+        display: none !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #reportControls {
+        margin-left: 0 !important;
+        width: 100%;
+        justify-content: space-between !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView {
+        padding: 0 8px 12px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .profile-cover-wrapper {
+        height: 118px !important;
+        margin-bottom: 10px !important;
+        border-radius: 16px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .profile-info-overlay {
+        left: 16px !important;
+        bottom: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .profile-info-overlay h1 {
+        font-size: 25px !important;
+        letter-spacing: 0 !important;
+        line-height: 1.05 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .profile-info-overlay p,
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .cover-actions-group,
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .greeting-text {
+        display: none !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .cover-weather-info {
+        margin-top: 8px !important;
+        padding: 6px 10px !important;
+        font-size: 9px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView > .card {
+        margin-bottom: 10px !important;
+        padding: 12px !important;
+        border-radius: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tools-grid {
+        display: grid !important;
+        grid-auto-flow: column;
+        grid-auto-columns: 42%;
+        grid-template-rows: repeat(2, minmax(82px, auto));
+        grid-template-columns: none !important;
+        gap: 8px;
+        margin: 0 -8px 12px 0 !important;
+        padding: 0 8px 4px 0;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tools-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tool-card-shortcut {
+        min-height: 82px;
+        padding: 10px 8px !important;
+        border-radius: 14px !important;
+        gap: 6px !important;
+        scroll-snap-align: start;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tool-card-shortcut .icon-box {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 10px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tool-card-shortcut span {
+        max-width: 100%;
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .tool-summary-text {
+        font-size: 8px !important;
+        line-height: 1.1 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .project-selector-card {
+        margin-bottom: 12px !important;
+        padding: 12px !important;
+        border-radius: 16px !important;
+        gap: 10px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .project-icon-glow {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .project-mini-label {
+        font-size: 9px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .workspace-dropdown {
+        font-size: 18px !important;
+        line-height: 1.1 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .new-project-btn-creative {
+        min-width: 104px !important;
+        padding: 10px !important;
+        border-radius: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .cards .card {
+        min-height: 112px;
+        padding: 12px !important;
+        border-radius: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .card-icon {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 10px !important;
+        margin-bottom: 8px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .card-value {
+        font-size: 26px !important;
+        line-height: 1 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .card-label,
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .card-sub {
+        font-size: 9px !important;
+        line-height: 1.2 !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .progress-section {
+        margin-bottom: 12px !important;
+        padding: 12px !important;
+        border-radius: 16px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .rings {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .ring-card {
+        padding: 10px !important;
+        border-radius: 14px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .ring-circle {
+        width: 82px !important;
+        height: 82px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .charts-section {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    body.tool-shell:not(.full-screen-tool-shell) #dashboardView .chart-box {
+        padding: 12px !important;
+        border-radius: 16px !important;
+    }
     
     /* Invoice View specific adjustments */
     body.full-screen-tool-shell #invoiceView .compress-shell {
@@ -2964,6 +3261,100 @@ body.home-shell .app-icon {
     }
     body.full-screen-tool-shell #invoiceView .no-print label {
         font-size: 10px !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-panel {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+        padding: 10px !important;
+        gap: 10px !important;
+        overflow: visible !important;
+        border-radius: 18px !important;
+        background: #eef2f7 !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-panel:has(.invoice-export-group) {
+        margin-bottom: 12px !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-panel > .invoice-control-group {
+        min-width: 0 !important;
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        border-radius: 16px !important;
+        background: #ffffff !important;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-label {
+        display: block !important;
+        grid-column: 1 / -1;
+        font-size: 9px !important;
+        font-weight: 900;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0 2px 2px;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-group > button,
+    body.full-screen-tool-shell #invoiceView .invoice-control-group > select,
+    body.full-screen-tool-shell #invoiceView .invoice-control-group > label {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 38px !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0 !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-control-group > select {
+        text-align: center;
+        text-align-last: center;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-edit-group > button:first-of-type {
+        grid-column: 1 / -1;
+        height: 42px !important;
+        font-size: 12px !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-export-group {
+        position: fixed !important;
+        left: 10px;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        z-index: 1200;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        padding: 8px !important;
+        border-radius: 18px !important;
+        background: rgba(255, 255, 255, 0.94) !important;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22) !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-export-group > button {
+        padding-inline: 6px !important;
+        height: 40px !important;
+        font-size: 10px !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-export-group .invoice-control-label {
+        display: none !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper {
+        margin-top: 12px !important;
+        margin-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
     }
 
     /* Invoice Header */
@@ -3197,6 +3588,10 @@ body.home-shell .app-icon {
     font-size: 10px;
     font-weight: 900;
     text-transform: uppercase;
+}
+
+.compress-badge em {
+    font-style: normal;
 }
 
 .compress-badge span,
@@ -3623,7 +4018,247 @@ body.home-shell .app-icon {
     text-align: center;
 }
 
+.invoice-wrapper.creative-invoice {
+    --invoice-red: #ef3b2d;
+    --invoice-ink: #111827;
+    --invoice-muted: #6b7280;
+    position: relative;
+    overflow: hidden;
+    background: #fff !important;
+    padding: 44px 46px 34px !important;
+    border-radius: 2px !important;
+    box-shadow: 0 24px 55px rgba(15, 23, 42, 0.18) !important;
+    border: 0 !important;
+}
+
+.invoice-wrapper.creative-invoice::before,
+.invoice-wrapper.creative-invoice::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    background: var(--invoice-red);
+    z-index: 0;
+}
+
+.invoice-wrapper.creative-invoice::before { left: 0; }
+.invoice-wrapper.creative-invoice::after { right: 0; }
+.creative-invoice > * { position: relative; z-index: 1; }
+
+.creative-invoice .invoice-brand-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 26px;
+    align-items: start !important;
+    border-bottom: 0 !important;
+    padding-bottom: 26px !important;
+    margin-bottom: 22px !important;
+}
+
+.creative-invoice .invoice-brand { gap: 15px !important; }
+
+.creative-invoice #invoiceLogoContainer {
+    width: 68px !important;
+    height: 68px !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+.creative-invoice #invoiceLogo {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    filter: grayscale(1) contrast(1.25);
+}
+
+.creative-invoice #businessNameKh {
+    color: var(--invoice-red) !important;
+    font-size: 18px !important;
+}
+
+.creative-invoice #businessNameEn {
+    color: var(--invoice-ink) !important;
+    font-size: 20px !important;
+    letter-spacing: 0 !important;
+    margin: 2px 0 !important;
+}
+
+.creative-invoice #businessAddress {
+    color: var(--invoice-muted) !important;
+    font-size: 10px !important;
+    max-width: 285px !important;
+}
+
+.creative-invoice .invoice-title-block {
+    min-width: 230px;
+    padding: 12px 22px 12px 32px;
+    background: var(--invoice-red);
+    color: #fff;
+    text-align: right !important;
+    clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.creative-invoice #docTitleLabel {
+    color: #fff !important;
+    font-size: 26px !important;
+    letter-spacing: 0.04em !important;
+}
+
+.creative-invoice .invoice-title-block > div,
+.creative-invoice #businessPhone {
+    color: #fff !important;
+}
+
+.creative-invoice .invoice-title-block > div {
+    font-size: 14px !important;
+    margin-top: 2px !important;
+}
+
+.creative-invoice .invoice-info-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(180px, 0.9fr);
+    gap: 24px;
+    background: #fff !important;
+    border-radius: 0 !important;
+    border-top: 2px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 18px 0 !important;
+    margin-bottom: 24px !important;
+}
+
+.creative-invoice .invoice-info-card p {
+    color: var(--invoice-red) !important;
+    letter-spacing: 0.08em !important;
+}
+
+.creative-invoice #clientName,
+.creative-invoice #clientPhone,
+.creative-invoice #invoiceDateDisplay {
+    border-bottom-color: #d1d5db !important;
+    color: var(--invoice-ink) !important;
+}
+
+.creative-invoice table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin-bottom: 22px !important;
+}
+
+.creative-invoice thead tr {
+    background: var(--invoice-red) !important;
+    border: 0 !important;
+}
+
+.creative-invoice thead th {
+    padding: 10px 9px !important;
+    color: #fff !important;
+    font-size: 10px !important;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.creative-invoice tbody td {
+    border-bottom: 1px solid #e5e7eb !important;
+    color: var(--invoice-ink) !important;
+}
+
+.creative-invoice .invoice-bottom-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 0.95fr);
+    gap: 24px;
+}
+
+.creative-invoice .invoice-bank-card {
+    width: auto !important;
+    background: #111827 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #fff;
+    padding: 18px !important;
+    align-self: end;
+}
+
+.creative-invoice #bankTitleLabel,
+.creative-invoice .invoice-bank-card p,
+.creative-invoice #abaName,
+.creative-invoice #abaNumber {
+    color: #fff !important;
+}
+
+.creative-invoice #bankTitleLabel { color: var(--invoice-red) !important; }
+.creative-invoice .invoice-totals-card { width: auto !important; }
+
+.creative-invoice .invoice-total-due {
+    background: var(--invoice-red);
+    color: #fff;
+    padding: 10px 14px;
+    margin: 12px 0;
+}
+
+.creative-invoice .invoice-total-due span,
+.creative-invoice .invoice-total-due #grand {
+    color: #fff !important;
+}
+
+.creative-invoice .invoice-balance-card {
+    background: #111827 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.creative-invoice .invoice-balance-card span { color: #fff !important; }
+.creative-invoice .invoice-signatures { margin: 52px 0 24px !important; }
+
+.creative-invoice .invoice-footer-strip {
+    margin: 0 -46px -34px;
+    padding: 16px 48px;
+    background: #111827;
+    color: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.creative-invoice .invoice-footer-strip span { color: #fff; }
+
 @media (max-width: 860px) {
+    .invoice-wrapper.creative-invoice {
+        padding-inline: 18px !important;
+    }
+
+    .creative-invoice::before,
+    .creative-invoice::after {
+        width: 6px !important;
+    }
+
+    .creative-invoice .invoice-brand-row,
+    .creative-invoice .invoice-info-card,
+    .creative-invoice .invoice-bottom-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .creative-invoice .invoice-title-block {
+        min-width: 0;
+        width: 100%;
+        clip-path: none;
+        text-align: left !important;
+        padding: 12px 14px !important;
+    }
+
+    .creative-invoice .invoice-bank-card,
+    .creative-invoice .invoice-totals-card {
+        width: 100% !important;
+    }
+
+    .creative-invoice .invoice-footer-strip {
+        margin-inline: -18px;
+        padding-inline: 22px;
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
     .compress-layout {
         grid-template-columns: 1fr;
     }
@@ -3652,7 +4287,7 @@ body.home-shell .app-icon {
 <div class="sidebar">
     <div class="logo" onclick="triggerLogoUpload()">
         <div class="logo-icon-container" id="logoIconContainer">B</div>
-        <span class="logo-text">Tools Home</span>
+        <span class="logo-text" data-i18n="tools_home">Tools Home</span>
         <input type="file" id="logoUploadInput" hidden accept="image/*" onchange="handleLogoUpload(this)">
     </div>
     
@@ -3672,9 +4307,9 @@ body.home-shell .app-icon {
         </a>
         <a onclick="showView('dashboard')" class="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            <span>Report</span>
+            <span data-i18n="nav_report">Report</span>
         </a>
-        <div class="nav-label">Report Tools</div>
+        <div class="nav-label" data-i18n="sidebar_report_tools">Report Tools</div>
         <a onclick="showView('notes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8.5L15.5 3z"/><path d="M15 3v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
             <span data-i18n="sidebar_notes">Notes</span>
@@ -3740,12 +4375,19 @@ body.home-shell .app-icon {
 </div>
 
 <div class="main">
+<button class="mobile-report-menu-btn" type="button" onclick="toggleMobileSidebar()" aria-label="Open report menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="18" x2="14" y2="18"></line>
+    </svg>
+</button>
 
 <div class="header-container">
     <div class="header-panel-group" id="mainHeaderPanel">
         <div class="header-panel">
             <div class="header-info-box">
-                <h2 id="appHeaderTitle">Report</h2>
+                <h2 id="appHeaderTitle" data-i18n="nav_report">Report</h2>
                 <div id="greeting" style="font-size:9px;color:var(--text-muted);font-weight:800;text-transform:uppercase;letter-spacing:0.3px">Welcome...</div>
             </div>
             <div class="active-widgets">
@@ -4056,7 +4698,7 @@ body.home-shell .app-icon {
             </div>
         </div>
 
-        <h3>Apps</h3>
+        <h3 data-i18n="home_launcher_apps">Apps</h3>
     
         <div class="apps-grid">
             <a onclick="showView('dashboard')" class="app-card" data-color="indigo">
@@ -4076,7 +4718,7 @@ body.home-shell .app-icon {
 
             <a onclick="showView('invoice')" class="app-card" data-color="red">
                 <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-                <div class="app-label" data-i18n="sidebar_invoice">Invoice</div>
+                <div class="app-label" data-i18n="home_app_invoice">Invoice</div>
             </a>
 
             <a onclick="openSettings()" class="app-card" data-color="purple">
@@ -4110,8 +4752,8 @@ body.home-shell .app-icon {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
             </button>
             <div>
-                <div class="compress-badge"><span></span> Image Tool</div>
-                <h1>Compress Image</h1>
+                <div class="compress-badge"><span></span> <em data-i18n="compress_badge">Image Tool</em></div>
+                <h1 data-i18n="compress_title">Compress Image</h1>
                 <p>Optimize JPG and PNG images in your browser. Choose quality, resize, preview, then download.</p>
             </div>
             <div id="compressStatus" class="compress-status"><span></span> Ready</div>
@@ -4129,8 +4771,8 @@ body.home-shell .app-icon {
                         <div class="compress-drop-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
                         </div>
-                        <strong>Drop images here or click to browse</strong>
-                        <small>Supports JPG, JPEG, PNG</small>
+                        <strong data-i18n="compress_drop_label">Drop images here or click to browse</strong>
+                        <small data-i18n="compress_drop_hint">Supports JPG, JPEG, PNG</small>
                     </div>
                 </div>
 
@@ -4139,14 +4781,14 @@ body.home-shell .app-icon {
 
             <div class="compress-panel glass">
                 <div class="compress-panel-title">
-                    <span>Quality</span>
+                    <span data-i18n="compress_quality">Quality</span>
                     <b id="compressQualityBadge">80%</b>
                 </div>
                 <div class="compress-presets">
-                    <button class="compress-preset" onclick="setCompressQuality(90)">High</button>
-                    <button class="compress-preset active" onclick="setCompressQuality(80)">Medium</button>
-                    <button class="compress-preset" onclick="setCompressQuality(60)">Low</button>
-                    <button class="compress-preset" onclick="setCompressQuality(40)">Tiny</button>
+                    <button class="compress-preset" onclick="setCompressQuality(90)" data-i18n="compress_preset_high">High</button>
+                    <button class="compress-preset active" onclick="setCompressQuality(80)" data-i18n="compress_preset_medium">Medium</button>
+                    <button class="compress-preset" onclick="setCompressQuality(60)" data-i18n="compress_preset_low">Low</button>
+                    <button class="compress-preset" onclick="setCompressQuality(40)" data-i18n="compress_preset_tiny">Tiny</button>
                 </div>
                 <div class="compress-slider-row">
                     <input type="range" id="compressQuality" min="10" max="100" value="80" step="5" oninput="setCompressQuality(this.value)">
@@ -4173,8 +4815,8 @@ body.home-shell .app-icon {
                 <div class="compress-option-note">If browser permission is unavailable, compressed files will download instead.</div>
 
                 <div class="compress-action-row">
-                    <button id="compressRunBtn" class="compress-run-btn" onclick="compressSelectedImages()" disabled>Compress</button>
-                    <button id="compressDownloadAllBtn" class="compress-download-all" onclick="downloadAllCompressedImages()" disabled>Download All</button>
+                    <button id="compressRunBtn" class="compress-run-btn" onclick="compressSelectedImages()" disabled data-i18n="compress_action">Compress</button>
+                    <button id="compressDownloadAllBtn" class="compress-download-all" onclick="downloadAllCompressedImages()" disabled data-i18n="compress_download_all">Download All</button>
                 </div>
 
                 <div id="compressResults" class="compress-results"></div>
@@ -4188,10 +4830,11 @@ body.home-shell .app-icon {
     <div class="compress-shell" style="max-width: 950px; padding: 20px;">
         
         <!-- MINIMAL CONTROL PANEL -->
-        <div class="no-print" style="background: white; padding: 12px 20px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 15px; box-shadow: var(--card-shadow); overflow-x: auto;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button onclick="addRow()" class="btn btn-primary" style="padding: 8px 16px; font-weight: 800; white-space: nowrap;">+ ថែមជួរ / Add Row</button>
-                <button onclick="toggleInvoiceSetup()" class="btn btn-outline" style="font-size: 11px; padding: 8px 12px; white-space: nowrap;">Setup Info</button>
+        <div class="no-print invoice-control-panel" style="background: white; padding: 12px 20px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 15px; box-shadow: var(--card-shadow); overflow-x: auto;">
+            <div class="invoice-control-group invoice-edit-group" style="display: flex; align-items: center; gap: 10px;">
+                <div class="invoice-control-label" data-i18n="invoice_edit_label">Edit Invoice</div>
+                <button onclick="addRow()" class="btn btn-primary" style="padding: 8px 16px; font-weight: 800; white-space: nowrap;" data-i18n="invoice_add_row">+ Add Row</button>
+                <button onclick="toggleInvoiceSetup()" class="btn btn-outline" style="font-size: 11px; padding: 8px 12px; white-space: nowrap;" data-i18n="invoice_setup">Setup Info</button>
                 <div class="divider-v" style="width: 1px; height: 24px; background: var(--border-color);"></div>
                 
                 <select id="docType" onchange="updateDocumentTitle(this.value)" style="border: none; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 11px; cursor: pointer; color: var(--text-main); outline: none;">
@@ -4205,31 +4848,32 @@ body.home-shell .app-icon {
                 </label>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button onclick="exportInvoiceToExcel()" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;">Excel</button>
-                <button onclick="saveImage()" class="btn btn-primary" style="background: #ea580c; font-size: 10px; padding: 8px 12px;">🖼️ Image</button>
-                <button onclick="window.print()" class="btn btn-primary" style="background: #1e293b; font-size: 10px; padding: 8px 12px;">🖨️ PDF</button>
-                <button onclick="showView('home')" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;">Home</button>
+            <div class="invoice-control-group invoice-export-group" style="display: flex; align-items: center; gap: 8px;">
+                <div class="invoice-control-label" data-i18n="invoice_export_label">Export</div>
+                <button onclick="exportInvoiceToExcel()" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;" data-i18n="invoice_excel">Excel</button>
+                <button onclick="saveImage()" class="btn btn-primary" style="background: #ea580c; font-size: 10px; padding: 8px 12px;">🖼️ <span data-i18n="invoice_image">Image</span></button>
+                <button onclick="window.print()" class="btn btn-primary" style="background: #1e293b; font-size: 10px; padding: 8px 12px;">🖨️ <span data-i18n="invoice_pdf">PDF</span></button>
+                <button onclick="showView('home')" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;" data-i18n="sidebar_home">Home</button>
             </div>
         </div>
 
         <!-- BUSINESS SETUP PANEL -->
         <div class="no-print" id="invoiceSetupPanel" style="background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 25px; border: 1px dashed var(--border-color); display: none;">
-            <div style="font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px;">Business Identity Setup</div>
+            <div style="font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px;" data-i18n="invoice_business_setup">Business Identity Setup</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-                <input type="text" id="setupBusinessName" placeholder="Company Name (EN)" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBusinessNameKh" placeholder="ឈ្មោះក្រុមហ៊ុន (KH)" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupPhone" placeholder="Phone Number" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupAddress" placeholder="Address..." oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBankName" placeholder="Bank Name" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBankNumber" placeholder="Account #" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupBusinessName" placeholder="Company Name (EN)" data-i18n-placeholder="invoice_company_name_en_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupBusinessNameKh" placeholder="Company Name (KH)" data-i18n-placeholder="invoice_company_name_kh_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupPhone" placeholder="Phone Number" data-i18n-placeholder="invoice_phone_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupAddress" placeholder="Address..." data-i18n-placeholder="invoice_address_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupBankName" placeholder="Bank Name" data-i18n-placeholder="invoice_bank_name_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupBankNumber" placeholder="Account #" data-i18n-placeholder="invoice_bank_number_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
                 <label class="btn btn-outline" style="cursor: pointer; justify-content: center; font-size: 11px; height: 35px;">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                     Upload Logo
                     <input type="file" hidden accept="image/*" onchange="handleInvoiceLogo(this)">
                 </label>
-                <input type="text" id="setupInvoiceNumber" placeholder="Invoice Number (e.g., 000452)" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupManagerName" placeholder="Manager Name" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupInvoiceNumber" placeholder="Invoice Number (e.g., 000452)" data-i18n-placeholder="invoice_number_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
+                <input type="text" id="setupManagerName" placeholder="Manager Name" data-i18n-placeholder="invoice_manager_name_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 15px;">
                 <select id="invoiceProfileSelect" onchange="loadInvoiceProfile(this.value)" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; background: var(--bg-main);">
@@ -4240,10 +4884,10 @@ body.home-shell .app-icon {
         </div>
 
         <!-- THE INVOICE AREA -->
-        <div class="invoice-wrapper card" id="invoiceCaptureArea" style="background: white; padding: 50px; color: #1e293b; border-radius: 0; box-shadow: 0 10px 50px rgba(0,0,0,0.1); border: none;">
+        <div class="invoice-wrapper creative-invoice card" id="invoiceCaptureArea" style="background: white; padding: 50px; color: #1e293b; border-radius: 0; box-shadow: 0 10px 50px rgba(0,0,0,0.1); border: none;">
             <!-- HEADER -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 25px;">
-                <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="invoice-brand-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 25px;">
+                <div class="invoice-brand" style="display: flex; align-items: center; gap: 20px;">
                     <div id="invoiceLogoContainer" style="width: 80px; height: 80px; background: #f8fafc; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                         <img id="invoiceLogo" src="https://img.icons8.com/ios-filled/100/334155/company.png" style="max-width: 80%; max-height: 80%; object-fit: contain;">
                     </div>
@@ -4253,7 +4897,7 @@ body.home-shell .app-icon {
                         <p id="businessAddress" style="font-size: 11px; color: #64748b; max-width: 300px; line-height: 1.4;">123 Street Address, Sangkat Name, District, City, Cambodia</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
+                <div class="invoice-title-block" style="text-align: right;">
                     <h3 id="docTitleLabel" style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase;">INVOICE</h3>
                     <div style="font-size: 18px; font-weight: 800; color: #ef4444; margin-top: 4px;">Nº <span id="invoiceNumber" contenteditable="true">000452</span></div>
                     <div id="businessPhone" style="font-weight: 800; font-size: 12px; margin-top: 10px; color: #334155;">Tel : 012 345 678</div>
@@ -4261,7 +4905,7 @@ body.home-shell .app-icon {
             </div>
 
             <!-- INFO SECTION -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 40px; background: #f8fafc; padding: 20px; border-radius: 12px;">
+            <div class="invoice-info-card" style="display: flex; justify-content: space-between; margin-bottom: 40px; background: #f8fafc; padding: 20px; border-radius: 12px;">
                 <div style="width: 50%;">
                     <div style="margin-bottom: 15px;">
                         <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 5px;">អតិថិជន / CLIENT NAME</p>
@@ -4293,13 +4937,13 @@ body.home-shell .app-icon {
                 <tbody id="rows-body"></tbody>
             </table>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div style="width: 45%; background: #eff6ff; padding: 20px; border-radius: 16px; border: 1px solid #dbeafe;">
+            <div class="invoice-bottom-row" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="invoice-bank-card" style="width: 45%; background: #eff6ff; padding: 20px; border-radius: 16px; border: 1px solid #dbeafe;">
                     <p id="bankTitleLabel" style="font-size: 10px; font-weight: 900; color: #1d4ed8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">BANK PAYMENT INFO</p>
                     <p style="font-weight: 800; color: #1e3a8a; font-size: 13px; margin-bottom: 5px;">Name: <span id="abaName" style="color: #0f172a;">YOUR NAME</span></p>
                     <p id="abaNumber" style="font-weight: 900; font-size: 22px; color: #1e3a8a; margin: 0; letter-spacing: 1px;">000 000 000</p>
                 </div>
-                <div style="width: 45%;">
+                <div class="invoice-totals-card" style="width: 45%;">
                     <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: #64748b;" id="subtotalRow">
                         <span style="font-weight: 700;">SUB-TOTAL</span>
                         <span style="font-weight: 800; color: #1e293b;">$ <span id="sub">0.00</span></span>
@@ -4308,11 +4952,11 @@ body.home-shell .app-icon {
                         <span style="font-weight: 700;">TAX (15%)</span>
                         <span style="font-weight: 800; color: #1e293b;">$ <span id="vat">0.00</span></span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #f1f5f9; padding-top: 15px; margin-bottom: 15px;">
+                    <div class="invoice-total-due" style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #f1f5f9; padding-top: 15px; margin-bottom: 15px;">
                         <span style="font-weight: 900; font-size: 18px; color: #0f172a;">GRAND TOTAL</span>
                         <span style="font-weight: 900; font-size: 32px; color: #e11d48; letter-spacing: -1px;">$ <span id="grand">0.00</span></span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 12px 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
+                    <div class="invoice-balance-card" style="display: flex; justify-content: space-between; padding: 12px 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
                         <span style="font-size: 11px; font-weight: 800; color: #64748b;">BALANCE DUE</span>
                         <span style="font-weight: 900; font-size: 18px; color: #0f172a;">$ <span id="bal">0.00</span></span>
                     </div>
@@ -4320,7 +4964,7 @@ body.home-shell .app-icon {
             </div>
 
             <!-- FOOTER SIGNATURES -->
-            <div style="display: flex; justify-content: space-between; margin-top: 80px; padding: 0 20px;">
+            <div class="invoice-signatures" style="display: flex; justify-content: space-between; margin-top: 80px; padding: 0 20px;">
                 <div style="text-align: center; width: 200px;">
                     <div style="border-bottom: 1px solid #cbd5e1; height: 40px; margin-bottom: 10px;"></div>
                     <p style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Customer Signature</p>
@@ -4329,6 +4973,10 @@ body.home-shell .app-icon {
                     <div style="border-bottom: 2px solid #0f172a; height: 40px; margin-bottom: 10px;"></div>
                     <p id="invoiceManagerName" style="font-size: 11px; font-weight: 900; color: #0f172a; text-transform: uppercase;">Authorized Manager</p>
                 </div>
+            </div>
+            <div class="invoice-footer-strip">
+                <span id="invoiceFooterPhone">Tel : 012 345 678</span>
+                <span id="invoiceFooterAddress">123 Street Address, City, Cambodia</span>
             </div>
         </div>
     </div>
@@ -4495,7 +5143,7 @@ body.home-shell .app-icon {
         </div>
         <button onclick="openWorkspaceModal()" class="new-project-btn-creative">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span>New Project</span>
+            <span data-i18n="new_project">New Project</span>
         </button>
     </div>
 
@@ -4984,7 +5632,7 @@ body.home-shell .app-icon {
     </button>
     <button class="active" onclick="showView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Report</span>
+        <span data-i18n="nav_report">Report</span>
     </button>
     <button onclick="openSettings()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>

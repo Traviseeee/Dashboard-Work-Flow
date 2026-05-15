@@ -3654,6 +3654,14 @@ document.addEventListener("DOMContentLoaded", async function() {
             closeHelpModal(); // New: Close help modal
         }
     });
+    
+    // Close mobile sidebar when clicking on the overlay (body itself, which acts as the overlay)
+    document.body.addEventListener('click', function(e) {
+        // Check if the sidebar is open and the click target is the body (which is covered by the ::before pseudo-element)
+        if (document.body.classList.contains('mobile-sidebar-open') && e.target === document.body) {
+            toggleMobileSidebar();
+        }
+    });
     document.getElementById("searchInput").addEventListener("input", (e) => handleSearch(e.target.value));
 
     const syncBtn = document.getElementById("syncCSV");
