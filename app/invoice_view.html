@@ -1,10 +1,12 @@
 <!-- iOS-style HEADER -->
 <div class="ios-header no-print">
+    <button type="button" onclick="showView('home')" class="ios-header-back" aria-label="Back">←</button>
     <span class="ios-header-title">VUTHY TAILOR</span>
 </div>
 
 <!-- CONTROL PANEL -->
-<div class="no-print sticky top-[56px] bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+<div class="no-print bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+    <button onclick="showView('home')" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">← Back</button>
     <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
     
     <div class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-lg border border-amber-300">
@@ -21,6 +23,23 @@
             <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
             <div class="w-12 h-7 bg-gray-300 peer-focus:ring-4 peer-focus:ring-blue-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
         </label>
+        <button onclick="exportInvoiceToExcel()" class="bg-green-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-green-800 transition-all">Export Excel</button>
+    </div>
+
+    <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+        <span class="text-xs font-bold text-gray-600 uppercase">Image Size</span>
+        <select id="invoicePaperSize" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
+            <option value="A4" selected>A4</option>
+            <option value="A5">A5</option>
+        </select>
+    </div>
+
+    <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+        <span class="text-xs font-bold text-gray-600 uppercase">Currency</span>
+        <select id="invoiceCurrencySelect" onchange="setInvoiceCurrency(this.value)" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
+            <option value="$" selected>Dollar ($)</option>
+            <option value="៛">Riel (៛)</option>
+        </select>
     </div>
 
     <button onclick="exportInvoiceToExcel()" class="bg-green-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-green-800 transition-all">Export Excel</button>
@@ -28,15 +47,257 @@
     <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
 </div>
 
-<div class="invoice-wrapper" id="capture-area">
+<!-- COMPANY PROFILE (preset fields + save/load) -->
+<div class="no-print bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-49 shadow-sm">
+    <div class="w-full flex flex-wrap items-center justify-center gap-3">
+        <div class="w-full flex flex-col items-center justify-center">
+            <div class="w-full flex justify-center mb-3">
+                <button type="button" onclick="toggleInvoiceProfileSetup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 transition-all">
+                    <span id="toggleProfileSetupText">Show Company Profile Setup</span>
+                </button>
+            </div>
+            <div id="invoiceProfileSetupContent" class="text-left bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 w-full max-w-[980px]" style="display: none;">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <div class="text-xs font-black text-amber-700 uppercase tracking-widest">Company Profile Preset</div>
+                        <div class="text-sm font-bold text-gray-900">Save your business info once, auto-fill invoice every time</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="loadSelectedInvoiceProfile()" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-800 transition-all">Load</button>
+                        <button onclick="saveInvoiceProfile()" class="bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-800 transition-all">Save</button>
+                        <button onclick="deleteInvoiceProfile()" class="bg-white border border-gray-200 text-gray-900 px-4 py-2 rounded-lg font-bold shadow hover:bg-gray-50 transition-all">Delete</button>
+                        <button onclick="clearInvoiceProfile()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-red-700 transition-all">Clear</button>
+                    </div>
+                </div>
+
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Template Name</label>
+                        <input id="profileTemplateName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="My Company / Customer A">
+                    </div>
+                    <div class="min-w-0 md:col-span-2">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Saved Profiles</label>
+                        <select id="savedInvoiceProfileSelect" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold bg-white" onchange="loadSelectedInvoiceProfile()">
+                            <option value="">No saved templates</option>
+                        </select>
+                    </div>
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Company Name (KH)</label>
+                        <input id="profileCompanyNameKh" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="វុទ្ធី ឯកទេសកាត់ដេរ" oninput="updateInvoiceFromPreset()">
+                    </div>
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Company Name (EN)</label>
+                        <input id="profileCompanyNameEn" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="VUTHY TAILOR" oninput="updateInvoiceFromPreset()">
+                    </div>
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Tel</label>
+                        <input id="profileCompanyTel" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="098 22 00 20" oninput="updateInvoiceFromPreset()">
+                    </div>
+
+                    <div class="min-w-0 md:col-span-2">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Address (KH)</label>
+                        <input id="profileCompanyAddressKh" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="អាសយដ្ឋាន..." oninput="updateInvoiceFromPreset()">
+                    </div>
+                    <div class="min-w-0 md:col-span-1">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Address (EN)</label>
+                        <input id="profileCompanyAddressEn" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Address..." oninput="updateInvoiceFromPreset()">
+                    </div>
+
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Bank ABA Name</label>
+                        <input id="profileAbaName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="LIM VUTHY" oninput="updateInvoiceFromPreset()">
+                    </div>
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">ABA Number</label>
+                        <input id="profileAbaNumber" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="000 665 944" oninput="updateInvoiceFromPreset()">
+                    </div>
+
+                    <div class="min-w-0 md:col-span-2">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Manager Name</label>
+                        <input id="profileManagerName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="LIM VUTHY" oninput="updateInvoiceFromPreset()">
+                    </div>
+
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Client Name</label>
+                        <input id="profileClientName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Enter client name" oninput="updateInvoiceFromPreset()">
+                    </div>
+                    <div class="min-w-0">
+                        <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Client Phone</label>
+                        <input id="profileClientPhone" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Enter phone number" oninput="updateInvoiceFromPreset()">
+                    </div>
+
+                    <div class="min-w-0 md:col-span-3">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                            <div class="min-w-[220px]">
+                                <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Logo (optional)</label>
+                                <div class="text-[12px] text-gray-500 font-bold">Upload to replace invoice logo image</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input id="invoiceLogoUpload" type="file" accept="image/*" class="text-sm" onchange="handleInvoiceLogoUpload(this)">
+                                <button type="button" onclick="clearInvoiceLogo()" class="bg-white border border-gray-200 text-gray-900 px-3 py-2 rounded-lg font-bold shadow hover:bg-gray-50 transition-all">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline styles copied/adapted from your provided template -->
+<style>
+    body {
+        font-family: 'Noto Sans Khmer', sans-serif;
+        background: linear-gradient(180deg, #f8fafc 0%, #e0e7ef 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    .khmer-muol { font-family: 'Noto Serif Khmer', serif; }
+    .text-maroon { color: #8B0000; }
+
+    .ios-header {
+        position: relative;
+        top: auto; left: auto; right: auto;
+        height: 56px;
+        background: rgba(255,255,255,0.98);
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e5e7eb;
+        padding: env(safe-area-inset-top) 56px 0 56px; /* keep title away from back button */
+        box-sizing: content-box;
+    }
+
+    .ios-header-back{
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid rgba(229,231,235,1);
+        background: rgba(255,255,255,0.95);
+        color: #8B0000;
+        font-size: 20px;
+        font-weight: 900;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 101;
+    }
+    .ios-header-back:hover{
+        background: rgba(255,255,255,1);
+    }
+
+    .ios-header-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #8B0000;
+        letter-spacing: 0.04em;
+    }
+
+    .invoice-wrapper {
+        width: 100%;
+        max-width: 430px;
+        min-height: 100vh;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+        border-radius: 28px 28px 0 0;
+        padding: 24px 8px 32px 8px;
+        position: relative;
+        margin-top: 0px;
+        margin-bottom: 24px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .invoice-footer {
+        margin-top: auto;
+        padding-top: 16px;
+    }
+
+    /* A4 size for print and all desktop screens */
+    @media print, (min-width: 900px) {
+        .invoice-wrapper {
+            width: 210mm !important;
+            min-height: 297mm !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            margin: 0 auto !important;
+            padding: 12mm !important;
+            box-shadow: none !important;
+        }
+    }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 10px 5px; font-size: 11px; }
+    td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; font-size: 14px; vertical-align: middle; }
+
+    [contenteditable="true"] { outline: none; padding: 2px 4px; border-radius: 4px; }
+    [contenteditable="true"]:hover { background: #fffcf0; }
+    [contenteditable="true"]:focus { background: #fffbeb; box-shadow: inset 0 0 0 1px #fbbf24; }
+
+    .aba-box { background: #f0f7ff; border-left: 5px solid #1e40af; }
+    .balance-box { border-top: 4px double #000; border-bottom: 4px double #000; }
+
+    #hiddenDatePicker { position: absolute; opacity: 0; width: 0; height: 0; z-index: -1; }
+
+    .date-container { cursor: pointer; border-radius: 6px; padding: 4px; transition: all 0.2s; border: 1px solid transparent; }
+    .date-container:hover { border-color: #fbbf24; background: #fffbeb; }
+
+    .tax-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .invoice-wrapper {
+            border-radius: 24px 24px 0 0;
+            padding: 12px 2vw 24px 2vw;
+            margin-top: 64px;
+        }
+        .ios-header {
+            height: 48px;
+            font-size: 1.1rem;
+            padding-left: 48px;
+            padding-right: 48px;
+        }
+        .ios-header-back{
+            left: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+        }
+    }
+
+    @media print {
+        .no-print { display: none !important; }
+        body { background: white; margin: 0; }
+        .invoice-wrapper { box-shadow: none; margin: 0; padding: 8mm; zoom: 98%; border-radius: 0; }
+        .ios-header { display: none !important; }
+    }
+</style>
+
+<div class="invoice-wrapper" id="invoiceCaptureArea">
     <!-- HEADER -->
     <div class="flex items-center justify-between mb-4">
-        <div class="w-16"><img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png"></div>
+        <div class="w-16">
+            <img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png" alt="logo left" />
+        </div>
+
         <div class="text-center text-maroon">
             <h1 id="businessNameKh" class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
             <h2 id="businessNameEn" class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true">VUTHY TAILOR</h2>
         </div>
-        <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png"></div>
+
+        <div class="w-16 flex justify-end">
+            <img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png" alt="logo right" />
+        </div>
     </div>
 
     <div class="text-center text-maroon text-[14px] mb-8">
@@ -50,34 +311,53 @@
         <div class="w-1/2 space-y-4">
             <div class="border-b border-gray-100 pb-1">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">អតិថិជន / CLIENT NAME</p>
-                <input type="text" id="clientName" placeholder="Enter client name" class="text-xl font-bold text-gray-800 leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0" value="">
+                <input
+                    type="text"
+                    id="clientName"
+                    placeholder="Enter client name"
+                    class="text-xl font-bold text-gray-800 leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0"
+                    value=""
+                >
             </div>
+
             <div class="border-b border-gray-100 pb-1">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">លេខទូរស័ព្ទ / PHONE NUMBER</p>
-                <input type="text" id="clientPhone" placeholder="Enter phone number" class="font-bold leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0" value="">
+                <input
+                    type="text"
+                    id="clientPhone"
+                    placeholder="Enter phone number"
+                    class="font-bold leading-none w-full bg-transparent border-0 outline-none focus:ring-0 p-0"
+                    value=""
+                >
             </div>
         </div>
+
         <div class="text-right flex flex-col justify-between">
             <div class="leading-none">
                 <h3 id="docTitle" class="text-3xl font-black text-gray-900 mb-1">វិក្កយបត្រ / INVOICE</h3>
                 <p class="text-xl font-black text-red-700">Nº <span id="invoiceNumber" contenteditable="true">000XXX</span></p>
             </div>
+
             <div class="relative inline-block text-right">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">កាលបរិច្ឆេទ / DATE</p>
-                <div class="date-container font-black text-lg leading-tight" onclick="triggerCalendar()">
+
+                <div class="date-container font-black text-lg leading-tight" onclick="triggerInvoiceCalendar()">
                     <span id="khDate">-- -- --</span><br>
                     <span id="enDate" class="text-xs text-gray-500 font-bold">00-00-0000</span>
                 </div>
-                <input type="date" id="hiddenDatePicker" class="hidden" onchange="updateDate(this.value)">
+
+                <!-- keep this ID because invoice.js expects it -->
+                <input type="date" id="hiddenDatePicker" onchange="updateInvoiceDate(this.value)" />
             </div>
         </div>
     </div>
 
+    <!-- LINE ITEMS -->
     <table class="mb-6">
         <thead>
             <tr class="font-black text-gray-800">
                 <th class="w-12">Nº</th>
-                <th class="text-left px-4 italic font-bold">រាយមុខទំនិញ / DESCRIPTION</th>
+                <th class="text-left px-4" style="border-top:none;border-bottom:none;color:#ea580c;font-weight:900;font-style:normal;">រាយមុខទំនិញ / DESCRIPTION</th>
                 <th class="w-20 text-center">QTY</th>
                 <th class="w-24 text-center">PRICE ($)</th>
                 <th class="w-32 text-right pr-4">AMOUNT ($)</th>
@@ -87,28 +367,63 @@
         <tbody id="rows-body"></tbody>
     </table>
 
-    <div class="flex justify-between items-start mt-4">
-        <div class="w-1/2">
-            <div class="aba-box p-5 rounded-2xl">
-                <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
-                <p class="text-blue-900 font-bold text-sm">ABA Name: <span id="abaName" contenteditable="true" class="font-black">LIM VUTHY</span></p>
-                <p id="abaNumber" class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+    <div class="invoice-footer">
+        <!-- SUMMARY -->
+        <div class="flex justify-between items-start mt-4">
+            <div class="w-1/2">
+                <div class="aba-box p-5 rounded-2xl">
+                    <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
+                    <p class="text-blue-900 font-bold text-sm">ABA Name: <span id="abaName" contenteditable="true" class="font-black">LIM VUTHY</span></p>
+                    <p id="abaNumber" class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+                </div>
             </div>
-        </div>
-        <div class="w-5/12 space-y-2 pr-2">
-            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow"><span>សរុប / SUB-TOTAL</span><span class="text-gray-900 font-black">$ <span id="sub">0.00</span></span></div>
-            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow"><span>ពន្ធ ១៥% / VAT 15%</span><span class="text-gray-900 font-black">$ <span id="vat">0.00</span></span></div>
-            <div class="flex justify-between items-end border-t border-gray-100 pt-3">
-                <div class="text-left leading-none"><p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p><p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p></div>
-                <div class="text-right"><p class="text-red-700 font-black text-4xl tracking-tighter leading-none">$ <span id="grand">0.00</span></p></div>
-            </div>
-            <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700"><span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span><div class="text-xl font-black flex items-center">$ <div contenteditable="true" id="dep" oninput="calc()" onblur="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div></div></div>
-            <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black"><span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span><span class="text-3xl underline decoration-double">$ <span id="bal">0.00</span></span></div>
-        </div>
-    </div>
 
-    <div class="flex justify-between mt-20 text-center px-10">
-        <div class="w-1/3"><p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p><div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div></div>
-        <div class="w-1/4"><p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p><div class="w-full border-b-2 border-gray-200 mb-2"></div><p id="managerName" class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p></div>
+            <div class="w-5/12 space-y-2 pr-2">
+                <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow">
+                    <span>សរុប / SUB-TOTAL</span>
+                    <span class="text-gray-900 font-black"><span class="invoice-currency-symbol">$</span> <span id="sub">0.00</span></span>
+                </div>
+
+                <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow">
+                    <span>ពន្ធ ១៥% / VAT 15%</span>
+                    <span class="text-gray-900 font-black"><span class="invoice-currency-symbol">$</span> <span id="vat">0.00</span></span>
+                </div>
+
+                <div class="flex justify-between items-end border-t border-gray-100 pt-3">
+                    <div class="text-left leading-none">
+                        <p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p>
+                        <p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-red-700 font-black text-4xl tracking-tighter leading-none"><span class="invoice-currency-symbol">$</span> <span id="grand">0.00</span></p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700">
+                    <span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span>
+                    <div class="text-xl font-black flex items-center">
+                        <span class="invoice-currency-symbol">$</span> <div contenteditable="true" id="dep" oninput="calc()" onblur="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span>
+                    <span class="text-3xl underline decoration-double"><span class="invoice-currency-symbol">$</span> <span id="bal">0.00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="flex justify-between mt-20 text-center px-10">
+            <div class="w-1/3">
+                <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p>
+                <div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div>
+            </div>
+            <div class="w-1/4">
+                <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p>
+                <div class="w-full border-b-2 border-gray-200 mb-2"></div>
+                <p id="managerName" class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p>
+            </div>
+        </div>
     </div>
 </div>

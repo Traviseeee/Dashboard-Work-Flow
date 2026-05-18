@@ -290,7 +290,14 @@ const translations = {
         ocr_drop_label: "Select or Drop Image",
         ocr_result: "Result",
         ocr_copy: "Copy Text",
-        ocr_success: "Text extracted successfully"
+        ocr_success: "Text extracted successfully",
+        tool_jpg_viewer: "JPG Viewer",
+        tool_jpg_path_ph: "Paste folder path or image URL...",
+        tool_jpg_browse: "Browse Folder",
+        tool_jpg_scan: "Scan & View",
+        toast_scanning: "Scanning folder...",
+        toast_no_jpg: "No JPG images found in the target folder.",
+        toast_path_invalid: "Please enter a valid URL or browse a folder."
     },
     kh: {
         today_work_summary: "សង្ខេបការងារថ្ងៃនេះ",
@@ -581,7 +588,17 @@ const translations = {
         ocr_drop_label: "ជ្រើសរើស ឬដាក់រូបភាពទីនេះ",
         ocr_result: "លទ្ធផល",
         ocr_copy: "ចម្លងអត្ថបទ",
-        ocr_success: "ទាញយកអត្ថបទបានជោគជ័យ"
+        ocr_success: "ទាញយកអត្ថបទបានជោគជ័យ",
+        tool_jpg_viewer: "មើលរូបភាព JPG",
+        toast_scanning: "កំពុងស្កេនហ្វាល...",
+        ocr_success: "ទាញយកអត្ថបទបានជោគជ័យ",
+        tool_jpg_viewer: "មើលរូបភាព JPG",
+        tool_jpg_path_ph: "បិទភ្ជាប់ផ្លូវហ្វាល ឬ លីងរូបភាព...",
+        tool_jpg_browse: "រើសហ្វាល",
+        tool_jpg_scan: "ស្កេន និងបង្ហាញ",
+        toast_scanning: "កំពុងស្កេនហ្វាល...",
+        toast_no_jpg: "រកមិនឃើញរូបភាព JPG ក្នុងហ្វាលនេះទេ។",
+        toast_path_invalid: "សូមបញ្ចូលលីងឱ្យបានត្រឹមត្រូវ ឬជ្រើសរើសហ្វាល។"
     }
 };
 

@@ -10,9 +10,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/gh/fontsource/fontsource@main/css/inter.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&family=Noto+Serif+Khmer:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/Untitled-1.css">
 <style>
 :root {
@@ -1972,12 +1974,32 @@ tbody tr:hover{background:var(--bg-main)}
 
 /* Image Preview */
 .preview-overlay {
-    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9);
-    display: none; justify-content: center; align-items: center; z-index: 20000;
-    backdrop-filter: blur(10px); opacity: 0; transition: opacity 0.3s ease; cursor: zoom-out;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.9);
+    display: none;
+    justify-content: center; align-items: center;
+    z-index: 99999;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
 }
-.preview-overlay.show { opacity: 1; }
-.preview-overlay img { max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.preview-overlay.show {
+    opacity: 1;
+}
+.preview-overlay img {
+    max-width: 90%;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 .preview-overlay.show img { transform: scale(1); }
 
 .image-thumbnail {
@@ -2176,6 +2198,96 @@ tbody tr:hover{background:var(--bg-main)}
     display: flex; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); 
     border-radius: 20px; padding: 2px; border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+/* VUTHY TAILOR - Pro Smart Invoice UI Styles */
+#invoiceView {
+    font-family: 'Noto Sans Khmer', sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #e0e7ef 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+#invoiceView .khmer-muol { font-family: 'Noto Serif Khmer', serif; }
+#invoiceView .text-maroon { color: #8B0000; }
+#invoiceView .ios-header {
+    position: relative;
+    height: auto;
+    min-height: 56px;
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e5e7eb;
+    padding-top: env(safe-area-inset-top);
+}
+#invoiceView .ios-header-back {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(229,231,235,1);
+    background: rgba(255,255,255,0.95);
+    color: #8B0000;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 101;
+}
+#invoiceView .ios-header-back:hover { background: rgba(255,255,255,1); }
+#invoiceView .ios-header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #8B0000;
+    letter-spacing: 0.04em;
+}
+#invoiceView .invoice-wrapper {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 8px 32px 8px;
+    position: relative;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+/* A4 size for print and all desktop screens */
+@media print, (min-width: 900px) {
+    #invoiceView .invoice-wrapper {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        margin: 0 auto !important;
+        padding: 12mm !important;
+        box-shadow: none !important;
+    }
+}
+#invoiceView table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+#invoiceView th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 10px 5px; font-size: 11px; }
+#invoiceView td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; font-size: 14px; vertical-align: middle; }
+#invoiceView [contenteditable="true"] { outline: none; padding: 2px 4px; border-radius: 4px; }
+#invoiceView [contenteditable="true"]:hover { background: #fffcf0; }
+#invoiceView [contenteditable="true"]:focus { background: #fffbeb; box-shadow: inset 0 0 0 1px #fbbf24; }
+#invoiceView .aba-box { background: #f0f7ff; border-left: 5px solid #1e40af; }
+#invoiceView .balance-box { border-top: 4px double #000; border-bottom: 4px double #000; }
+#invoiceView .date-container { cursor: pointer; border-radius: 6px; padding: 4px; transition: all 0.2s; border: 1px solid transparent; }
+#invoiceView .date-container:hover { border-color: #fbbf24; background: #fffbeb; }
+@media (max-width: 600px) {
+    #invoiceView .invoice-wrapper { border-radius: 24px 24px 0 0; padding: 12px 2vw 24px 2vw; margin-top: 64px; }
+    #invoiceView .ios-header { height: 48px; font-size: 1.1rem; }
 }
 
 /* Weather Card Redesign - Uiverse.io Inspired */
@@ -2901,7 +3013,7 @@ body.tool-shell:not(.full-screen-tool-shell) .main {
     }
 }
 
-/* Independent Tool Layout (OCR, Compress, Invoice) */
+/* Independent Tool Layout (OCR, Compress, Invoice, JPG Viewer) */
 body.full-screen-tool-shell .main {
     width: 100% !important;
     max-width: none !important;
@@ -4019,7 +4131,19 @@ body.home-shell .app-icon {
 }
 
 .invoice-wrapper.creative-invoice {
-    --invoice-red: #ef3b2d;
+    /* Keep existing vars used elsewhere, but override invoice styling to match provided VUTHY TAILOR template */
+    --invoice-red: #8B0000;
+
+    /* VUTHY TAILOR typography + layout */
+    font-family: 'Noto Sans Khmer', sans-serif;
+    background: white !important;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10) !important;
+    border-radius: 28px 28px 0 0 !important;
+
+    /* match your template spacing */
+    padding: 24px 8px 32px 8px !important;
+    overflow: hidden;
+}
     --invoice-ink: #111827;
     --invoice-muted: #6b7280;
     position: relative;
@@ -4044,6 +4168,54 @@ body.home-shell .app-icon {
 
 .invoice-wrapper.creative-invoice::before { left: 0; }
 .invoice-wrapper.creative-invoice::after { right: 0; }
+
+/* ===== VUTHY TAILOR - Pro Smart Invoice UI ===== */
+body.full-screen-tool-shell #invoiceView {
+    font-family: 'Noto Sans Khmer', sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #e0e7ef 100%);
+    min-height: 100vh;
+}
+.khmer-muol { font-family: 'Noto Serif Khmer', serif; }
+.text-maroon { color: #8B0000; }
+.ios-header {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px;
+    background: rgba(255,255,255,0.98); box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #e5e7eb; padding-top: env(safe-area-inset-top);
+}
+.ios-header-title { font-size: 1.25rem; font-weight: 700; color: #8B0000; letter-spacing: 0.04em; }
+.invoice-wrapper {
+    width: 100%; max-width: 430px; min-height: 100vh; margin: 0 auto;
+    background: white; box-shadow: 0 6px 32px rgba(0,0,0,0.10); border-radius: 28px 28px 0 0;
+    padding: 24px 8px 32px 8px; position: relative; margin-top: 72px; margin-bottom: 24px; overflow: hidden;
+}
+@media print, (min-width: 900px) {
+    .invoice-wrapper {
+        width: 210mm !important; min-height: 297mm !important; max-width: none !important;
+        border-radius: 0 !important; margin: 0 auto !important; padding: 12mm !important; box-shadow: none !important;
+    }
+}
+body.full-screen-tool-shell #invoiceView table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+body.full-screen-tool-shell #invoiceView th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 10px 5px; font-size: 11px; }
+body.full-screen-tool-shell #invoiceView td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; font-size: 14px; vertical-align: middle; }
+body.full-screen-tool-shell #invoiceView [contenteditable="true"] { outline: none; padding: 2px 4px; border-radius: 4px; }
+body.full-screen-tool-shell #invoiceView [contenteditable="true"]:hover { background: #fffcf0; }
+body.full-screen-tool-shell #invoiceView [contenteditable="true"]:focus { background: #fffbeb; box-shadow: inset 0 0 0 1px #fbbf24; }
+.aba-box { background: #f0f7ff; border-left: 5px solid #1e40af; }
+.balance-box { border-top: 4px double #000; border-bottom: 4px double #000; }
+#hiddenDatePicker { position: absolute; opacity: 0; width: 0; height: 0; z-index: -1; }
+.date-container { cursor: pointer; border-radius: 6px; padding: 4px; transition: all 0.2s; border: 1px solid transparent; }
+.date-container:hover { border-color: #fbbf24; background: #fffbeb; }
+@media (max-width: 600px) {
+    .invoice-wrapper { border-radius: 24px 24px 0 0; padding: 12px 2vw 24px 2vw; margin-top: 64px; }
+    .ios-header { height: 48px; font-size: 1.1rem; }
+}
+@media print {
+    .no-print { display: none !important; }
+    body { background: white; margin: 0; }
+    .invoice-wrapper { box-shadow: none; margin: 0; padding: 8mm; zoom: 98%; border-radius: 0; }
+    .ios-header { display: none !important; }
+}
 .creative-invoice > * { position: relative; z-index: 1; }
 
 .creative-invoice .invoice-brand-row {
@@ -4222,6 +4394,21 @@ body.home-shell .app-icon {
 }
 
 .creative-invoice .invoice-footer-strip span { color: #fff; }
+
+.jpg-viewer-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    box-shadow: var(--card-shadow);
+}
+.jpg-viewer-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
 @media (max-width: 860px) {
     .invoice-wrapper.creative-invoice {
@@ -4721,6 +4908,11 @@ body.home-shell .app-icon {
                 <div class="app-label" data-i18n="home_app_invoice">Invoice</div>
             </a>
 
+            <a onclick="showView('jpgViewer')" class="app-card" data-color="pink">
+                <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="app-label" data-i18n="tool_jpg_viewer">JPG Viewer</div>
+            </a>
+
             <a onclick="openSettings()" class="app-card" data-color="purple">
                 <div class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
                 <div class="app-label" data-i18n="sidebar_settings">Settings</div>
@@ -4740,6 +4932,41 @@ body.home-shell .app-icon {
         <div class="stat-card">
             <div class="stat-value" id="homeStatReports">0</div>
             <div class="stat-label" data-i18n="home_stat_reports">Reports</div>
+        </div>
+    </div>
+</div>
+
+<!-- JPG VIEWER VIEW -->
+<div id="jpgViewerView" class="compress-tool-view" style="display:none;">
+    <div class="compress-shell">
+        <div class="compress-header glass">
+            <button class="compress-back-btn" onclick="showView('home')" title="Back to Home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div>
+                <div class="compress-badge" style="color: #db2777; background: rgba(219, 39, 119, 0.12); border-color: rgba(219, 39, 119, 0.18);"><span></span> JPG Viewer</div>
+                <h1 data-i18n="tool_jpg_viewer">មើលរូបភាព JPG</h1>
+                <p>Browse local folders or paste image links to view your assets in a gallery.</p>
+            </div>
+        </div>
+
+        <div class="compress-panel glass jpg-viewer-controls" style="margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center; width: 100%; flex-wrap: wrap;">
+                <input type="text" id="jpgPathInput" data-i18n-placeholder="tool_jpg_path_ph" placeholder="Paste folder path or image URL..." 
+                       style="flex: 2; min-width: 250px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-weight: 600; outline: none;">
+                <input type="text" id="jpgSearchInput" placeholder="Search filenames..." 
+                       oninput="filterJpgGallery(this.value)"
+                       style="flex: 1; min-width: 150px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-weight: 600; outline: none;">
+                <button class="btn btn-outline" onclick="browseJpgFolder()" style="height: 44px; padding: 0 15px;" data-i18n="tool_jpg_browse">Browse</button>
+                <button class="btn btn-primary" onclick="scanJpgLocation()" style="height: 44px; padding: 0 20px; background: #db2777;" data-i18n="tool_jpg_scan">Scan</button>
+            </div>
+        </div>
+
+        <div id="jpgGalleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding-bottom: 40px; scroll-margin-top: 120px;">
+            <!-- Images will be injected here -->
+            <div class="empty-state" style="grid-column: 1/-1; padding: 60px; opacity: 0.5;">
+                <p>No images loaded. Enter a path or browse to start.</p>
+            </div>
         </div>
     </div>
 </div>
@@ -4825,214 +5052,261 @@ body.home-shell .app-icon {
         </div>
     </div>
 </div>
+<div id="invoiceView" style="display:none;">
+    <!-- iOS-style HEADER -->
+    <div class="ios-header no-print">
+        <button type="button" onclick="showView('home')" class="ios-header-back" aria-label="Back">←</button>
+        <span class="ios-header-title">VUTHY TAILOR</span>
+    </div>
 
-<div id="invoiceView" class="compress-tool-view" style="display:none; background: #f1f5f9;">
-    <div class="compress-shell" style="max-width: 950px; padding: 20px;">
+    <!-- CONTROL PANEL -->
+    <div class="no-print bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+        <button onclick="showView('home')" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">← Back</button>
+        <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
         
-        <!-- MINIMAL CONTROL PANEL -->
-        <div class="no-print invoice-control-panel" style="background: white; padding: 12px 20px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 15px; box-shadow: var(--card-shadow); overflow-x: auto;">
-            <div class="invoice-control-group invoice-edit-group" style="display: flex; align-items: center; gap: 10px;">
-                <div class="invoice-control-label" data-i18n="invoice_edit_label">Edit Invoice</div>
-                <button onclick="addRow()" class="btn btn-primary" style="padding: 8px 16px; font-weight: 800; white-space: nowrap;" data-i18n="invoice_add_row">+ Add Row</button>
-                <button onclick="toggleInvoiceSetup()" class="btn btn-outline" style="font-size: 11px; padding: 8px 12px; white-space: nowrap;" data-i18n="invoice_setup">Setup Info</button>
-                <div class="divider-v" style="width: 1px; height: 24px; background: var(--border-color);"></div>
-                
-                <select id="docType" onchange="updateDocumentTitle(this.value)" style="border: none; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 11px; cursor: pointer; color: var(--text-main); outline: none;">
-                    <option value="invoice" selected>Invoice / វិក្កយបត្រ</option>
-                    <option value="quotation">Quotation / សម្រង់តម្លៃ</option>
-                </select>
-
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f8fafc; padding: 8px 12px; border-radius: 10px;">
-                    <input type="checkbox" id="taxToggle" checked onchange="calc()" style="accent-color: var(--primary);">
-                    <span style="font-size: 10px; font-weight: 800; color: var(--text-muted);">TAX (15%)</span>
-                </label>
-            </div>
-
-            <div class="invoice-control-group invoice-export-group" style="display: flex; align-items: center; gap: 8px;">
-                <div class="invoice-control-label" data-i18n="invoice_export_label">Export</div>
-                <button onclick="exportInvoiceToExcel()" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;" data-i18n="invoice_excel">Excel</button>
-                <button onclick="saveImage()" class="btn btn-primary" style="background: #ea580c; font-size: 10px; padding: 8px 12px;">🖼️ <span data-i18n="invoice_image">Image</span></button>
-                <button onclick="window.print()" class="btn btn-primary" style="background: #1e293b; font-size: 10px; padding: 8px 12px;">🖨️ <span data-i18n="invoice_pdf">PDF</span></button>
-                <button onclick="showView('home')" class="btn btn-outline" style="font-size: 10px; padding: 8px 12px;" data-i18n="sidebar_home">Home</button>
-            </div>
+        <!-- TAX TOGGLE -->
+        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+            <span class="text-xs font-bold text-gray-600 uppercase">ជាមួយពន្ធ / Tax (15%)</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
         </div>
 
-        <!-- BUSINESS SETUP PANEL -->
-        <div class="no-print" id="invoiceSetupPanel" style="background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 25px; border: 1px dashed var(--border-color); display: none;">
-            <div style="font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px;" data-i18n="invoice_business_setup">Business Identity Setup</div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-                <input type="text" id="setupBusinessName" placeholder="Company Name (EN)" data-i18n-placeholder="invoice_company_name_en_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBusinessNameKh" placeholder="Company Name (KH)" data-i18n-placeholder="invoice_company_name_kh_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupPhone" placeholder="Phone Number" data-i18n-placeholder="invoice_phone_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupAddress" placeholder="Address..." data-i18n-placeholder="invoice_address_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBankName" placeholder="Bank Name" data-i18n-placeholder="invoice_bank_name_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupBankNumber" placeholder="Account #" data-i18n-placeholder="invoice_bank_number_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <label class="btn btn-outline" style="cursor: pointer; justify-content: center; font-size: 11px; height: 35px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                    Upload Logo
-                    <input type="file" hidden accept="image/*" onchange="handleInvoiceLogo(this)">
-                </label>
-                <input type="text" id="setupInvoiceNumber" placeholder="Invoice Number (e.g., 000452)" data-i18n-placeholder="invoice_number_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-                <input type="text" id="setupManagerName" placeholder="Manager Name" data-i18n-placeholder="invoice_manager_name_ph" oninput="updateInvoiceHeader()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;">
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 15px;">
-                <select id="invoiceProfileSelect" onchange="loadInvoiceProfile(this.value)" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; background: var(--bg-main);">
-                    <option value="">-- Select Business Profile --</option>
-                </select>
-                <button onclick="saveCurrentAsProfile()" class="btn btn-primary" style="font-size: 11px; padding: 8px 12px; white-space: nowrap;">Save as Profile</button>
-            </div>
+        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+            <span class="text-xs font-bold text-gray-600 uppercase">Image Size</span>
+            <select id="invoicePaperSize" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
+                <option value="A4" selected>A4</option>
+                <option value="A5">A5</option>
+            </select>
         </div>
 
-        <!-- THE INVOICE AREA -->
-        <div class="invoice-wrapper creative-invoice card" id="invoiceCaptureArea" style="background: white; padding: 50px; color: #1e293b; border-radius: 0; box-shadow: 0 10px 50px rgba(0,0,0,0.1); border: none;">
-            <!-- HEADER -->
-            <div class="invoice-brand-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 25px;">
-                <div class="invoice-brand" style="display: flex; align-items: center; gap: 20px;">
-                    <div id="invoiceLogoContainer" style="width: 80px; height: 80px; background: #f8fafc; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                        <img id="invoiceLogo" src="https://img.icons8.com/ios-filled/100/334155/company.png" style="max-width: 80%; max-height: 80%; object-fit: contain;">
-                    </div>
-                    <div>
-                        <h1 id="businessNameKh" style="font-size: 22px; font-weight: 800; color: var(--primary); margin: 0;">ក្រុមហ៊ុនរបស់អ្នក</h1>
-                        <h2 id="businessNameEn" style="font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin: 2px 0 8px 0; color: #0f172a;">YOUR BUSINESS NAME</h2>
-                        <p id="businessAddress" style="font-size: 11px; color: #64748b; max-width: 300px; line-height: 1.4;">123 Street Address, Sangkat Name, District, City, Cambodia</p>
-                    </div>
-                </div>
-                <div class="invoice-title-block" style="text-align: right;">
-                    <h3 id="docTitleLabel" style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase;">INVOICE</h3>
-                    <div style="font-size: 18px; font-weight: 800; color: #ef4444; margin-top: 4px;">Nº <span id="invoiceNumber" contenteditable="true">000452</span></div>
-                    <div id="businessPhone" style="font-weight: 800; font-size: 12px; margin-top: 10px; color: #334155;">Tel : 012 345 678</div>
-                </div>
-            </div>
+        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+            <span class="text-xs font-bold text-gray-600 uppercase">Currency</span>
+            <select id="invoiceCurrencySelect" onchange="setInvoiceCurrency(this.value)" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
+                <option value="$" selected>Dollar ($)</option>
+                <option value="៛">Riel (៛)</option>
+            </select>
+        </div>
 
-            <!-- INFO SECTION -->
-            <div class="invoice-info-card" style="display: flex; justify-content: space-between; margin-bottom: 40px; background: #f8fafc; padding: 20px; border-radius: 12px;">
-                <div style="width: 50%;">
-                    <div style="margin-bottom: 15px;">
-                        <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 5px;">អតិថិជន / CLIENT NAME</p>
-                        <div id="clientName" contenteditable="true" style="font-size: 18px; font-weight: 800; color: #1e293b; outline: none; border-bottom: 1px dashed #cbd5e1; display: inline-block; min-width: 200px;">John Doe</div>
-                    </div>
-                    <div>
-                        <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 5px;">លេខទូរស័ព្ទ / PHONE NUMBER</p>
-                        <div id="clientPhone" contenteditable="true" style="font-weight: 700; font-size: 14px; color: #334155; outline: none; border-bottom: 1px dashed #cbd5e1; display: inline-block; min-width: 150px;">012 000 000</div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 5px;">កាលបរិច្ឆេទ / DATE</p>
-                    <div id="invoiceDateDisplay" style="font-weight: 800; font-size: 16px; color: #1e293b; cursor: pointer;" onclick="document.getElementById('hiddenDatePicker').showPicker()">01-Jan-2024</div>
-                    <input type="date" id="hiddenDatePicker" style="display: none;" onchange="updateInvoiceDate(this.value)">
-                </div>
-            </div>
+        <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">🖼️ រក្សាទុកជារូបភាព / Save Image</button>
+        <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
+    </div>
 
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #0f172a; background: #fff;">
-                        <th style="padding: 12px 10px; text-align: center; width: 50px; font-weight: 900; color: #0f172a;">Nº</th>
-                        <th style="padding: 12px 10px; text-align: left; font-weight: 900; color: #0f172a;">DESCRIPTION</th>
-                        <th style="padding: 12px 10px; text-align: center; width: 80px; font-weight: 900; color: #0f172a;">QTY</th>
-                        <th style="padding: 12px 10px; text-align: center; width: 100px; font-weight: 900; color: #0f172a;">PRICE ($)</th>
-                        <th style="padding: 12px 15px; text-align: right; width: 120px; font-weight: 900; color: #0f172a;">AMOUNT</th>
-                        <th class="no-print" style="width: 40px;"></th>
-                    </tr>
-                </thead>
-                <tbody id="rows-body"></tbody>
-            </table>
+    <!-- COMPANY PROFILE (preset fields + save/load) -->
+    <div class="no-print bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-49 shadow-sm">
+        <div class="w-full flex flex-wrap items-center justify-center gap-3">
+            <div class="w-full flex flex-col items-center justify-center">
+                <!-- Toggle button for the profile setup content -->
+                <button onclick="toggleInvoiceProfileSetup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 transition-all mb-4">
+                    <span id="toggleProfileSetupText">Show Company Profile Setup</span>
+                </button>
+                <div id="invoiceProfileSetupContent" class="text-left bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 w-full max-w-[980px]" style="display: none;">
+                    <div class="flex items-center justify-between gap-3 flex-wrap">
+                        <div>
+                            <div class="text-xs font-black text-amber-700 uppercase tracking-widest">Company Profile Preset</div>
+                            <div class="text-sm font-bold text-gray-900">Save your business info once, auto-fill invoice every time</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadSelectedInvoiceProfile()" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-800 transition-all">Load</button>
+                            <button onclick="saveInvoiceProfile()" class="bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-800 transition-all">Save</button>
+                            <button onclick="deleteInvoiceProfile()" class="bg-white border border-gray-200 text-gray-900 px-4 py-2 rounded-lg font-bold shadow hover:bg-gray-50 transition-all">Delete</button>
+                        </div>
+                    </div>
 
-            <div class="invoice-bottom-row" style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div class="invoice-bank-card" style="width: 45%; background: #eff6ff; padding: 20px; border-radius: 16px; border: 1px solid #dbeafe;">
-                    <p id="bankTitleLabel" style="font-size: 10px; font-weight: 900; color: #1d4ed8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">BANK PAYMENT INFO</p>
-                    <p style="font-weight: 800; color: #1e3a8a; font-size: 13px; margin-bottom: 5px;">Name: <span id="abaName" style="color: #0f172a;">YOUR NAME</span></p>
-                    <p id="abaNumber" style="font-weight: 900; font-size: 22px; color: #1e3a8a; margin: 0; letter-spacing: 1px;">000 000 000</p>
-                </div>
-                <div class="invoice-totals-card" style="width: 45%;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: #64748b;" id="subtotalRow">
-                        <span style="font-weight: 700;">SUB-TOTAL</span>
-                        <span style="font-weight: 800; color: #1e293b;">$ <span id="sub">0.00</span></span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 15px; color: #64748b;" id="vatRow">
-                        <span style="font-weight: 700;">TAX (15%)</span>
-                        <span style="font-weight: 800; color: #1e293b;">$ <span id="vat">0.00</span></span>
-                    </div>
-                    <div class="invoice-total-due" style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #f1f5f9; padding-top: 15px; margin-bottom: 15px;">
-                        <span style="font-weight: 900; font-size: 18px; color: #0f172a;">GRAND TOTAL</span>
-                        <span style="font-weight: 900; font-size: 32px; color: #e11d48; letter-spacing: -1px;">$ <span id="grand">0.00</span></span>
-                    </div>
-                    <div class="invoice-balance-card" style="display: flex; justify-content: space-between; padding: 12px 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
-                        <span style="font-size: 11px; font-weight: 800; color: #64748b;">BALANCE DUE</span>
-                        <span style="font-weight: 900; font-size: 18px; color: #0f172a;">$ <span id="bal">0.00</span></span>
-                    </div>
-                </div>
-            </div>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Template Name</label>
+                            <input id="profileTemplateName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="My Company / Customer A">
+                        </div>
+                        <div class="min-w-0 md:col-span-2">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Saved Profiles</label>
+                            <select id="savedInvoiceProfileSelect" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold bg-white" onchange="loadSelectedInvoiceProfile()">
+                                <option value="">No saved templates</option>
+                            </select>
+                        </div>
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Company Name (KH)</label>
+                            <input id="profileCompanyNameKh" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="វុទ្ធី ឯកទេសកាត់ដេរ" oninput="updateInvoiceFromPreset()">
+                        </div>
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Company Name (EN)</label>
+                            <input id="profileCompanyNameEn" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="VUTHY TAILOR" oninput="updateInvoiceFromPreset()">
+                        </div>
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Tel</label>
+                            <input id="profileCompanyTel" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="098 22 00 20" oninput="updateInvoiceFromPreset()">
+                        </div>
 
-            <!-- FOOTER SIGNATURES -->
-            <div class="invoice-signatures" style="display: flex; justify-content: space-between; margin-top: 80px; padding: 0 20px;">
-                <div style="text-align: center; width: 200px;">
-                    <div style="border-bottom: 1px solid #cbd5e1; height: 40px; margin-bottom: 10px;"></div>
-                    <p style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Customer Signature</p>
+                        <div class="min-w-0 md:col-span-2">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Address (KH)</label>
+                            <input id="profileCompanyAddressKh" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="អាសយដ្ឋាន..." oninput="updateInvoiceFromPreset()">
+                        </div>
+                        <div class="min-w-0 md:col-span-1">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Address (EN)</label>
+                            <input id="profileCompanyAddressEn" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Address..." oninput="updateInvoiceFromPreset()">
+                        </div>
+
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Bank ABA Name</label>
+                            <input id="profileAbaName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="LIM VUTHY" oninput="updateInvoiceFromPreset()">
+                        </div>
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">ABA Number</label>
+                            <input id="profileAbaNumber" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="000 665 944" oninput="updateInvoiceFromPreset()">
+                        </div>
+
+                        <div class="min-w-0 md:col-span-2">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Manager Name</label>
+                            <input id="profileManagerName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="LIM VUTHY" oninput="updateInvoiceFromPreset()">
+                        </div>
+
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Client Name</label>
+                            <input id="profileClientName" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Enter client name" oninput="updateInvoiceFromPreset()">
+                        </div>
+                        <div class="min-w-0">
+                            <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Client Phone</label>
+                            <input id="profileClientPhone" type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold" placeholder="Enter phone number" oninput="updateInvoiceFromPreset()">
+                        </div>
+
+                        <div class="min-w-0 md:col-span-3">
+                            <div class="flex items-center justify-between gap-3 flex-wrap">
+                                <div class="min-w-[220px]">
+                                    <label class="block text-[11px] font-black uppercase text-gray-500 mb-1">Logo (optional)</label>
+                                    <div class="text-[12px] text-gray-500 font-bold">Upload to replace invoice logo image</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input id="invoiceLogoUpload" type="file" accept="image/*" class="text-sm" onchange="handleInvoiceLogoUpload(this)">
+                                    <button type="button" onclick="clearInvoiceLogo()" class="bg-white border border-gray-200 text-gray-900 px-3 py-2 rounded-lg font-bold shadow hover:bg-gray-50 transition-all">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div style="text-align: center; width: 200px;">
-                    <div style="border-bottom: 2px solid #0f172a; height: 40px; margin-bottom: 10px;"></div>
-                    <p id="invoiceManagerName" style="font-size: 11px; font-weight: 900; color: #0f172a; text-transform: uppercase;">Authorized Manager</p>
-                </div>
-            </div>
-            <div class="invoice-footer-strip">
-                <span id="invoiceFooterPhone">Tel : 012 345 678</span>
-                <span id="invoiceFooterAddress">123 Street Address, City, Cambodia</span>
             </div>
         </div>
     </div>
-</div>
 
-<div id="ocrView" class="compress-tool-view" style="display:none;">
-    <div class="compress-shell">
-        <div class="compress-header glass">
-            <button class="compress-back-btn" onclick="showView('home')" title="Back to Home">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-            </button>
-            <div>
-                <div class="compress-badge" style="color: #f97316; background: rgba(249, 115, 22, 0.12); border-color: rgba(249, 115, 22, 0.18);"><span></span> AI OCR Tool</div>
-                <h1 data-i18n="ocr_title">Scan OCR</h1>
-                <p data-i18n="ocr_subtitle">Extract text from images using AI. Supports Khmer and English languages.</p>
+    <div class="invoice-wrapper" id="capture-area">
+        
+        <!-- HEADER -->
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-16"><img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png" alt="logo left"></div>
+            <div class="text-center text-maroon">
+                <h1 id="businessNameKh" class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
+                <h2 id="businessNameEn" class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true">VUTHY TAILOR</h2>
             </div>
-            <div id="ocrStatus" class="compress-status"><span></span> Ready</div>
+            <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png" alt="logo right"></div>
         </div>
 
-        <div class="compress-progress" id="ocrProgressWrap">
-            <div id="ocrProgressFill"></div>
+        <div class="text-center text-maroon text-[14px] mb-8">
+            <p id="businessAddressKh" class="font-bold uppercase tracking-tight" contenteditable="true">អាសយដ្ឋាន: ផ្ទះលេខ ៦៩៥EO ផ្លូវមុនីវង្ស សង្កាត់បឹងកេងកង ៣ ខណ្ឌចំការមន ភ្នំពេញ</p>
+            <p id="businessAddressEn" class="font-medium" contenteditable="true">Address : #695Eo, Street Monivong, Sangkat Boengkengkang III, Khan Chamka Morn, Phnom Penh</p>
+            <p id="businessPhone" class="font-bold text-lg mt-1 tracking-wide" contenteditable="true">Tel : 098 22 00 20 / 012 690 595 ➲ 031 7000002</p>
         </div>
 
-        <div class="compress-layout">
-            <div class="compress-panel glass">
-                <div class="form-group">
-                    <label data-i18n="form_category">Select Language</label>
-                    <select id="ocrLangSelect" style="width: 100%; margin-bottom: 15px;">
-                        <option value="khm+eng">Khmer + English</option>
-                        <option value="khm">Khmer Only</option>
-                        <option value="eng">English Only</option>
-                    </select>
+        <!-- INFO SECTION -->
+        <div class="flex justify-between mb-8 px-2">
+            <div class="w-1/2 space-y-4">
+                <div class="border-b border-gray-100 pb-1">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">អតិថិជន / CLIENT NAME</p>
+                    <div id="clientName" contenteditable="true" class="text-xl font-bold text-gray-800 leading-none">...</div>
                 </div>
-                <input type="file" id="ocrFileInput" accept="image/*" hidden onchange="handleOCRFile(this)">
-                <div id="ocrDropZone" class="compress-drop-zone" onclick="document.getElementById('ocrFileInput').click()">
-                    <div class="compress-drop-icon" style="color: #f97316; background: rgba(249, 115, 22, 0.12);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-                    <strong data-i18n="ocr_drop_label">Select or Drop Image</strong>
-                    <small>Extract text from JPG, PNG, etc.</small>
+                <div class="border-b border-gray-100 pb-1">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">លេខទូរស័ព្ទ / PHONE NUMBER</p>
+                    <div id="clientPhone" contenteditable="true" class="font-bold leading-none">...</div>
                 </div>
-                <div id="ocrPreviewContainer" class="compress-preview-grid"></div>
             </div>
-            <div class="compress-panel glass">
-                <div class="compress-panel-title"><span data-i18n="ocr_result">Result</span></div>
-                <textarea id="ocrResult" readonly style="width: 100%; height: 200px; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 13px; resize: none; margin-bottom: 15px;" placeholder="Text will appear here..."></textarea>
-                <div class="compress-panel-title" style="margin-top: 10px;"><span>Smart Area Scan</span></div>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px;">
-                    <button onclick="performOCR('all')" class="compress-preset" style="font-size: 9px; padding: 8px 2px;">Full</button>
-                    <button onclick="performOCR('header')" class="compress-preset" style="font-size: 9px; padding: 8px 2px;">Header</button>
-                    <button onclick="performOCR('body')" class="compress-preset" style="font-size: 9px; padding: 8px 2px;">Body</button>
-                    <button onclick="performOCR('footer')" class="compress-preset" style="font-size: 9px; padding: 8px 2px;">Footer</button>
+            <div class="text-right flex flex-col justify-between">
+                <div class="leading-none">
+                    <h3 class="text-3xl font-black text-gray-900 mb-1">វិក្កយបត្រ / INVOICE</h3>
+                    <p class="text-xl font-black text-red-700">Nº <span contenteditable="true">000XXX</span></p>
                 </div>
-                <div class="compress-action-row" style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                    <button id="ocrRunBtn" class="compress-run-btn" style="background: linear-gradient(135deg, #f97316, #ea580c); color: white;" onclick="performOCR('all')" disabled>Scan All</button>
-                    <button id="ocrDownloadBtn" class="compress-download-all" onclick="downloadOCRText()" style="display:none;">Download .txt</button>
-                    <button class="compress-download-all" onclick="copyOCRText()" data-i18n="ocr_copy">Copy Text</button>
+                
+                <div class="relative inline-block text-right">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">កាលបរិច្ឆេទ / DATE</p>
+                    <div class="date-container font-black text-lg leading-tight" onclick="triggerInvoiceCalendar()">
+                        <span id="khDate">-- -- --</span><br>
+                        <span id="enDate" class="text-xs text-gray-500 font-bold">00-00-0000</span>
+                    </div>
+                    <input type="date" id="hiddenDatePicker" onchange="updateInvoiceDate(this.value)">
                 </div>
+            </div>
+        </div>
+
+        <!-- LINE ITEMS -->
+        <table class="mb-6">
+            <thead>
+                <tr class="font-black text-gray-800">
+                    <th class="w-12">Nº</th>
+                    <th class="text-left px-4 italic font-bold">រាយមុខទំនិញ / DESCRIPTION</th>
+                    <th class="w-20 text-center">QTY</th>
+                    <th class="w-24 text-center">PRICE ($)</th>
+                    <th class="w-32 text-right pr-4">AMOUNT ($)</th>
+                    <th class="w-10 no-print"></th>
+                </tr>
+            </thead>
+            <tbody id="rows-body">
+                <!-- Rows -->
+            </tbody>
+        </table>
+
+        <!-- SUMMARY -->
+        <div class="flex justify-between items-start mt-4">
+            <div class="w-1/2">
+                <div class="aba-box p-5 rounded-2xl">
+                    <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
+                    <p class="text-blue-900 font-bold text-sm">ABA Name: <span id="abaName" contenteditable="true" class="font-black">LIM VUTHY</span></p>
+                    <p id="abaNumber" class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+                </div>
+            </div>
+
+            <div class="w-5/12 space-y-2 pr-2">
+                <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow">
+                    <span>សរុប / SUB-TOTAL</span>
+                    <span class="text-gray-900 font-black"><span class="invoice-currency-symbol">$</span> <span id="sub">0.00</span></span>
+                </div>
+                
+                <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow">
+                    <span>ពន្ធ ១៥% / VAT 15%</span>
+                    <span class="text-gray-900 font-black"><span class="invoice-currency-symbol">$</span> <span id="vat">0.00</span></span>
+                </div>
+
+                <div class="flex justify-between items-end border-t border-gray-100 pt-3">
+                    <div class="text-left leading-none">
+                        <p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p>
+                        <p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-red-700 font-black text-4xl tracking-tighter leading-none"><span class="invoice-currency-symbol">$</span> <span id="grand">0.00</span></p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700">
+                    <span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span>
+                    <div class="text-xl font-black flex items-center">
+                        <span class="invoice-currency-symbol">$</span> <div contenteditable="true" id="dep" oninput="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span>
+                    <span class="text-3xl underline decoration-double"><span class="invoice-currency-symbol">$</span> <span id="bal">0.00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="flex justify-between mt-20 text-center px-10">
+            <div class="w-1/3">
+                <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p>
+                <div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div>
+            </div>
+            <div class="w-1/4">
+                <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p>
+                <div class="w-full border-b-2 border-gray-200 mb-2"></div>
+                <p id="managerName" class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p>
             </div>
         </div>
     </div>
@@ -5122,6 +5396,13 @@ body.home-shell .app-icon {
             </div>
             <span data-i18n="btn_report">Report</span>
             <div id="summaryReport" class="tool-summary-text">Ready</div>
+        </div>
+        <div class="tool-card-shortcut" onclick="showView('jpgViewer')">
+            <div class="icon-box" style="background: rgba(219, 39, 119, 0.1); color: #db2777;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <span data-i18n="tool_jpg_viewer">JPG Viewer</span>
+            <div id="summaryJpg" class="tool-summary-text">Ready</div>
         </div>
 
     </div>
@@ -6153,6 +6434,9 @@ body.home-shell .app-icon {
 
 <div id="imagePreviewOverlay" class="preview-overlay" onclick="closePreview()">
     <img id="previewImage" src="" alt="Preview">
+    <div id="previewOpenOriginalWrap" style="position:fixed; left:16px; bottom:16px; z-index:9999; display:flex; gap:10px;">
+        <!-- Filled by showPreview(src) -->
+    </div>
 </div>
 
 <div id="toastContainer" class="toast-container"></div>

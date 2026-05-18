@@ -189,7 +189,8 @@ function showView(viewName) {
     document.body.classList.toggle('full-screen-tool-shell', 
         viewName === 'ocr' || 
         viewName === 'compressImage' || 
-        viewName === 'invoice');
+        viewName === 'invoice' ||
+        viewName === 'jpgViewer');
 
     const homeView = document.getElementById("homeView");
     const dashboardView = document.getElementById("dashboardView");
@@ -203,6 +204,7 @@ function showView(viewName) {
     const expenseView = document.getElementById("expenseView");
     const chatbotView = document.getElementById("chatbotView");
     const reportControls = document.getElementById("reportControls");
+    const jpgViewerView = document.getElementById("jpgViewerView");
 
     if (currentView === 'dashboard') { dashboardMonthState = viewMonth; dashboardYearState = viewYear; }
     else if (currentView === 'income') { incomeMonthState = viewMonth; incomeYearState = viewYear; }
@@ -222,10 +224,11 @@ function showView(viewName) {
     if (loanView) loanView.style.display = (viewName === 'loan') ? 'block' : 'none';
     if (incomeView) incomeView.style.display = (viewName === 'income') ? 'block' : 'none';
     if (expenseView) expenseView.style.display = (viewName === 'expense') ? 'block' : 'none';
-    if (ocrView) ocrView.style.display = (viewName === 'ocr') ? 'block' : 'none';
+    if (typeof ocrView !== 'undefined' && ocrView) ocrView.style.display = (viewName === 'ocr') ? 'block' : 'none';
     if (compressImageView) compressImageView.style.display = (viewName === 'compressImage') ? 'block' : 'none';
     if (invoiceView) invoiceView.style.display = (viewName === 'invoice') ? 'block' : 'none';
     if (chatbotView) chatbotView.style.display = (viewName === 'chatbot') ? 'block' : 'none';
+    if (jpgViewerView) jpgViewerView.style.display = (viewName === 'jpgViewer') ? 'block' : 'none';
 
     if (reportControls) {
         const monthlyViews = ['dashboard', 'income', 'expense'];

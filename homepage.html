@@ -1,677 +1,362 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Home</title>
-<link rel="icon" id="favicon" href="assets/images/tra.jpg" type="image/x-icon">
-<link href="https://cdn.jsdelivr.net/gh/fontsource/fontsource@main/css/inter.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="styles/Untitled-1.css">
-<style>
-:root {
-    --bg-image: none;
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --sidebar-bg: #0f172a;
-    --bg-main: #f8fafc;
-    --card-bg: #ffffff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
-    --sidebar-text: #94a3b8;
-    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
-    --hover-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.4);
-}
-
-[data-theme='dark'] {
-    --bg-main: #0f172a;
-    --bg-page: #0f172a;
-    --card-bg: #1e293b;
-    --bg-card: #1e293b;
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --border-color: #334155;
-    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-
-body {
-    font-family: 'Inter', 'Kantumruy Pro', sans-serif;
-    color: var(--text-main);
-    font-size: 13px;
-    line-height: 1.5;
-    position: relative;
-    overflow-x: hidden;
-    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1124&q=100');
-    background-position: center;
-    background-size: cover;
-    min-height: 100vh;
-    animation: fade-in 0.5s ease-in-out;
-}
-
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: var(--bg-image), rgba(6, 20, 38, 0.40);
-    background-position: center;
-    background-size: cover;
-    z-index: -1;
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-    z-index: -1;
-}
-
-.homepage-container {
-    min-height: 100vh;
-    padding: 24px 32px;
-    max-width: 1250px;
-    margin: 0 auto;
-    opacity: 1;
-    transition: opacity 0.4s ease;
-    background-color: rgba(0, 21, 60, 0.75);
-    backdrop-filter: blur(22px) saturate(180%);
-    -webkit-backdrop-filter: blur(22px) saturate(180%);
-    border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.125);
-    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.14);
-}
-
-[data-theme='dark'] .homepage-container {
-    background: rgba(15, 23, 42, 0.75);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Header Section */
-.homepage-header {
-    margin-bottom: 40px;
-    padding: 30px;
-    text-align: center;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    animation: header-float 4s ease-in-out infinite;
-}
-
-@keyframes header-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-
-.greeting {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: var(--text-main);
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--primary), #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.datetime {
-    font-size: 14px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-/* App Grid */
-.apps-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 28px;
-    max-width: 800px;
-    margin: 0 auto 40px;
-    padding: 40px 20px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-}
-
-@media (max-width: 600px) {
-    .apps-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        padding: 20px;
-    }
-}
-
-@media (min-width: 601px) and (max-width: 1024px) {
-    .apps-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 20px;
-    }
-}
-
-/* App Icon Card */
-.app-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 16px;
-    border-radius: 16px;
-    background-color: var(--card-bg);
-    box-shadow: var(--card-shadow);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-}
-
-.app-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-    transform: rotate(45deg);
-    animation: card-shimmer 3s infinite;
-}
-
-@keyframes card-shimmer {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.app-card:hover {
-    transform: translateY(-12px) scale(1.05);
-    box-shadow: var(--hover-shadow);
-    border-color: var(--primary);
-    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.05) 100%);
-}
-
-[data-theme='dark'] .app-card:hover {
-    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.1) 100%);
-}
-
-.app-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    color: white;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-}
-
-.app-card:hover .app-icon {
-    transform: scale(1.15) rotate(-5deg);
-    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
-}
-
-.app-label {
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    word-break: break-word;
-    color: var(--text-main);
-    letter-spacing: -0.3px;
-    position: relative;
-    z-index: 1;
-}
-
-/* Color variants for different apps */
-.app-card[data-color="blue"] .app-icon {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    animation: color-pulse-blue 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-blue {
-    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
-}
-
-.app-card[data-color="purple"] .app-icon {
-    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-    animation: color-pulse-purple 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-purple {
-    0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
-}
-
-.app-card[data-color="pink"] .app-icon {
-    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-    animation: color-pulse-pink 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-pink {
-    0%, 100% { box-shadow: 0 0 10px rgba(236, 72, 153, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.7); }
-}
-
-.app-card[data-color="green"] .app-icon {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    animation: color-pulse-green 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-green {
-    0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7); }
-}
-
-.app-card[data-color="orange"] .app-icon {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    animation: color-pulse-orange 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-orange {
-    0%, 100% { box-shadow: 0 0 10px rgba(249, 115, 22, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.7); }
-}
-
-.app-card[data-color="red"] .app-icon {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    animation: color-pulse-red 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-red {
-    0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.7); }
-}
-
-.app-card[data-color="cyan"] .app-icon {
-    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-    animation: color-pulse-cyan 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-cyan {
-    0%, 100% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.7); }
-}
-
-.app-card[data-color="indigo"] .app-icon {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    animation: color-pulse-indigo 3s ease-in-out infinite;
-}
-
-@keyframes color-pulse-indigo {
-    0%, 100% { box-shadow: 0 0 10px rgba(99, 102, 241, 0.4); }
-    50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.7); }
-}
-
-/* Quick Stats Section */
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-    padding: 30px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-}
-
-.stat-card {
-    padding: 24px;
-    border-radius: 16px;
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--card-shadow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--hover-shadow);
-    border-color: var(--primary);
-}
-
-.stat-card:hover::before {
-    opacity: 1;
-}
-
-.stat-value {
-    font-size: 32px;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Settings & Theme Toggle */
-.homepage-footer {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 40px;
-    padding: 30px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    flex-wrap: wrap;
-}
-
-.footer-btn {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 12px 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.footer-btn:hover {
-    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-    color: white;
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-}
-
-.footer-btn i {
-    transition: all 0.3s ease;
-}
-
-.footer-btn:hover i {
-    animation: icon-bounce 0.6s ease-in-out;
-}
-
-@keyframes icon-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-}
-
-@media (max-width: 600px) {
-    .homepage-container {
-        padding: 20px;
-        border-radius: 20px;
-    }
-
-    .homepage-header {
-        margin-bottom: 30px;
-        padding: 20px;
-    }
-
-    .greeting {
-        font-size: 24px;
-    }
-
-    .apps-grid {
-        gap: 12px;
-        padding: 20px;
-    }
-
-    .quick-stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 20px;
-    }
-
-    .homepage-footer {
-        flex-direction: column;
-        gap: 12px;
-        padding: 20px;
-    }
-
-    .footer-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 14px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VUTHY TAILOR - Pro Smart Invoice</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Invoice">
+    <meta name="theme-color" content="#8B0000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&family=Noto+Serif+Khmer:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Khmer', sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, #e0e7ef 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .khmer-muol { font-family: 'Noto Serif Khmer', serif; }
+        .text-maroon { color: #8B0000; }
+        .ios-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-top: env(safe-area-inset-top);
+        }
+        .ios-header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #8B0000;
+            letter-spacing: 0.04em;
+        }
+        .invoice-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+            border-radius: 28px 28px 0 0;
+            padding: 24px 8px 32px 8px;
+            position: relative;
+            margin-top: 72px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        @media print, (min-width: 900px) {
+            .invoice-wrapper {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                max-width: none !important;
+                border-radius: 0 !important;
+                margin: 0 auto !important;
+                padding: 12mm !important;
+                box-shadow: none !important;
+            }
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 10px 5px; font-size: 11px; }
+        td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; font-size: 14px; vertical-align: middle; }
+        [contenteditable="true"] { outline: none; padding: 2px 4px; border-radius: 4px; }
+        [contenteditable="true"]:hover { background: #fffcf0; }
+        [contenteditable="true"]:focus { background: #fffbeb; box-shadow: inset 0 0 0 1px #fbbf24; }
+        .aba-box { background: #f0f7ff; border-left: 5px solid #1e40af; }
+        .balance-box { border-top: 4px double #000; border-bottom: 4px double #000; }
+        #hiddenDatePicker { position: absolute; opacity: 0; width: 0; height: 0; z-index: -1; }
+        .date-container { cursor: pointer; border-radius: 6px; padding: 4px; transition: all 0.2s; border: 1px solid transparent; }
+        .date-container:hover { border-color: #fbbf24; background: #fffbeb; }
+        .tax-hidden { display: none !important; }
+        @media (max-width: 600px) {
+            .invoice-wrapper {
+                border-radius: 24px 24px 0 0;
+                padding: 12px 2vw 24px 2vw;
+                margin-top: 64px;
+            }
+            .ios-header {
+                height: 48px;
+                font-size: 1.1rem;
+            }
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; margin: 0; }
+            .invoice-wrapper { box-shadow: none; margin: 0; padding: 8mm; zoom: 98%; border-radius: 0; }
+            .ios-header { display: none !important; }
+        }
+    </style>
 </head>
 <body>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('service-worker.js');
+        });
+    }
+</script>
 
-<div class="homepage-container">
-    <!-- Header -->
-    <div class="homepage-header">
-        <div class="greeting" id="greeting">Good Morning! 👋</div>
-        <div class="datetime" id="datetime"></div>
-    </div>
-
-    <!-- Apps Grid -->
-    <div class="apps-grid">
-        <!-- Dashboard -->
-        <a href="index.html" class="app-card" data-color="blue">
-            <div class="app-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="app-label">Dashboard</div>
-        </a>
-
-        <!-- Reports -->
-        <a href="#reports" class="app-card" data-color="purple">
-            <div class="app-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="app-label">Reports</div>
-        </a>
-
-        <!-- Analytics -->
-        <a href="#analytics" class="app-card" data-color="pink">
-            <div class="app-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="app-label">Analytics</div>
-        </a>
-
-        <!-- Tasks -->
-        <a href="#tasks" class="app-card" data-color="green">
-            <div class="app-icon">
-                <i class="fas fa-tasks"></i>
-            </div>
-            <div class="app-label">Tasks</div>
-        </a>
-
-        <!-- Data -->
-        <a href="#data" class="app-card" data-color="orange">
-            <div class="app-icon">
-                <i class="fas fa-database"></i>
-            </div>
-            <div class="app-label">Data</div>
-        </a>
-
-        <!-- Settings -->
-        <a href="#settings" class="app-card" data-color="cyan">
-            <div class="app-icon">
-                <i class="fas fa-cog"></i>
-            </div>
-            <div class="app-label">Settings</div>
-        </a>
-
-        <!-- Help -->
-        <a href="#help" class="app-card" data-color="indigo">
-            <div class="app-icon">
-                <i class="fas fa-question-circle"></i>
-            </div>
-            <div class="app-label">Help</div>
-        </a>
-
-        <!-- Users -->
-        <a href="#users" class="app-card" data-color="red">
-            <div class="app-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="app-label">Users</div>
-        </a>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="quick-stats">
-        <div class="stat-card">
-            <div class="stat-value" id="stat-reports">0</div>
-            <div class="stat-label">Reports</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="stat-tasks">0</div>
-            <div class="stat-label">Tasks</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="stat-users">0</div>
-            <div class="stat-label">Users</div>
-        </div>
-    </div>
+<div class="ios-header no-print">
+    <span class="ios-header-title">VUTHY TAILOR</span>
 </div>
 
-<!-- Footer -->
-<div class="homepage-footer">
-    <button class="footer-btn" onclick="toggleTheme()">
-        <i class="fas fa-moon"></i>
-        <span>Theme</span>
-    </button>
-    <button class="footer-btn" onclick="goToMainApp()">
-        <i class="fas fa-arrow-right"></i>
-        <span>Go to Dashboard</span>
-    </button>
+<div class="no-print sticky top-[56px] bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+    <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
+
+    <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+        <span class="text-xs font-bold text-gray-600 uppercase">ជាមួយពន្ធ / Tax (15%)</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+
+    <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">🖼️ រក្សាទុកជារូបភាព / Save Image</button>
+    <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
+</div>
+
+<div class="invoice-wrapper" id="capture-area">
+
+    <div class="flex items-center justify-between mb-4">
+        <div class="w-16"><img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png"></div>
+        <div class="text-center text-maroon">
+            <h1 class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
+            <h2 class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true">VUTHY TAILOR</h2>
+        </div>
+        <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png"></div>
+    </div>
+
+    <div class="text-center text-maroon text-[14px] mb-8">
+        <p class="font-bold uppercase tracking-tight" contenteditable="true">អាសយដ្ឋាន: ផ្ទះលេខ ៦៩៥EO ផ្លូវមុនីវង្ស សង្កាត់បឹងកេងកង ៣ ខណ្ឌចំការមន ភ្នំពេញ</p>
+        <p class="font-medium" contenteditable="true">Address : #695Eo, Street Monivong, Sangkat Boengkengkang III, Khan Chamka Morn, Phnom Penh</p>
+        <p class="font-bold text-lg mt-1 tracking-wide" contenteditable="true">Tel : 098 22 00 20 / 012 690 595 ➲ 031 7000002</p>
+    </div>
+
+    <div class="flex justify-between mb-8 px-2">
+        <div class="w-1/2 space-y-4">
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">អតិថិជន / CLIENT NAME</p>
+                <div contenteditable="true" class="text-xl font-bold text-gray-800 leading-none">...</div>
+            </div>
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">លេខទូរស័ព្ទ / PHONE NUMBER</p>
+                <div contenteditable="true" class="font-bold leading-none">...</div>
+            </div>
+        </div>
+        <div class="text-right flex flex-col justify-between">
+            <div class="leading-none">
+                <h3 class="text-3xl font-black text-gray-900 mb-1">វិក្កយបត្រ / INVOICE</h3>
+                <p class="text-xl font-black text-red-700">Nº <span contenteditable="true">000XXX</span></p>
+            </div>
+
+            <div class="relative inline-block text-right">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">កាលបរិច្ឆេទ / DATE</p>
+                <div class="date-container font-black text-lg leading-tight" onclick="triggerCalendar()">
+                    <span id="khDate">-- -- --</span><br>
+                    <span id="enDate" class="text-xs text-gray-500 font-bold">00-00-0000</span>
+                </div>
+                <input type="date" id="hiddenDatePicker" onchange="updateDate(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <table class="mb-6">
+        <thead>
+            <tr class="font-black text-gray-800">
+                <th class="w-12">Nº</th>
+                <th class="text-left px-4 italic font-bold">រាយមុខទំនិញ / DESCRIPTION</th>
+                <th class="w-20 text-center">QTY</th>
+                <th class="w-24 text-center">PRICE ($)</th>
+                <th class="w-32 text-right pr-4">AMOUNT ($)</th>
+                <th class="w-10 no-print"></th>
+            </tr>
+        </thead>
+        <tbody id="rows-body">
+        </tbody>
+    </table>
+
+    <div class="flex justify-between items-start mt-4">
+        <div class="w-1/2">
+            <div class="aba-box p-5 rounded-2xl">
+                <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
+                <p class="text-blue-900 font-bold text-sm">ABA Name: <span contenteditable="true" class="font-black">LIM VUTHY</span></p>
+                <p class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+            </div>
+        </div>
+
+        <div class="w-5/12 space-y-2 pr-2">
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow">
+                <span>សរុប / SUB-TOTAL</span>
+                <span class="text-gray-900 font-black">$ <span id="sub">0.00</span></span>
+            </div>
+
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow">
+                <span>ពន្ធ ១៥% / VAT 15%</span>
+                <span class="text-gray-900 font-black">$ <span id="vat">0.00</span></span>
+            </div>
+
+            <div class="flex justify-between items-end border-t border-gray-100 pt-3">
+                <div class="text-left leading-none">
+                    <p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p>
+                    <p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-red-700 font-black text-4xl tracking-tighter leading-none">$ <span id="grand">0.00</span></p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700">
+                <span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span>
+                <div class="text-xl font-black flex items-center">
+                    $ <div contenteditable="true" id="dep" oninput="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span>
+                <span class="text-3xl underline decoration-double">$ <span id="bal">0.00</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-between mt-20 text-center px-10">
+        <div class="w-1/3">
+            <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p>
+            <div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div>
+        </div>
+        <div class="w-1/4">
+            <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p>
+            <div class="w-full border-b-2 border-gray-200 mb-2"></div>
+            <p class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p>
+        </div>
+    </div>
 </div>
 
 <script>
-// Update greeting based on time of day
-function updateGreeting() {
-    const hour = new Date().getHours();
-    let greeting = '';
-    
-    if (hour < 12) {
-        greeting = 'Good Morning! 👋';
-    } else if (hour < 18) {
-        greeting = 'Good Afternoon! 👋';
-    } else {
-        greeting = 'Good Evening! 👋';
+    const khMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+    const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+
+    function toKhmerNum(num) {
+        return num.toString().split('').map(x => khDigits[parseInt(x)] || x).join('');
     }
-    
-    document.getElementById('greeting').textContent = greeting;
-}
 
-// Update datetime
-function updateDateTime() {
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    };
-    const now = new Date().toLocaleDateString('en-US', options);
-    document.getElementById('datetime').textContent = now;
-}
+    function triggerCalendar() { document.getElementById('hiddenDatePicker').showPicker(); }
 
-// Theme toggle
-function toggleTheme() {
-    const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-}
-
-// Navigate to main dashboard
-function goToMainApp() {
-    const container = document.querySelector('.homepage-container');
-    if (container) {
-        container.style.opacity = '0';
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 300);
-    } else {
-        window.location.href = 'index.html';
+    function updateDate(dateStr) {
+        if (!dateStr) return;
+        const d = new Date(dateStr);
+        document.getElementById('khDate').innerText = `ថ្ងៃទី ${toKhmerNum(d.getDate())} ខែ ${khMonths[d.getMonth()]} ឆ្នាំ ${toKhmerNum(d.getFullYear())}`;
+        document.getElementById('enDate').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
     }
-}
 
-// Load theme preference
-function loadTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-}
+    const today = new Date();
+    document.getElementById('hiddenDatePicker').valueAsDate = today;
+    updateDate(today.toISOString().split('T')[0]);
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadTheme();
-    updateGreeting();
-    updateDateTime();
-    
-    // Update datetime every minute
-    setInterval(updateDateTime, 60000);
-});
+    function addRow() {
+        const body = document.getElementById('rows-body');
+        const count = body.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.className = "group hover:bg-amber-50 transition-colors";
+        tr.innerHTML = `
+            <td class="text-center font-bold text-gray-300 text-xs">${count}</td>
+            <td class="px-4"><div contenteditable="true" class="w-full text-gray-700 font-bold italic">...</div></td>
+            <td class="text-center"><div contenteditable="true" class="qty font-black bg-gray-50 rounded" oninput="calc()">0</div></td>
+            <td class="text-center"><div contenteditable="true" class="price font-black bg-gray-50 rounded" oninput="calc()">0.00</div></td>
+            <td class="text-right pr-4 font-black text-blue-900 font-black">$ <span class="row-total">0.00</span></td>
+            <td class="no-print text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="this.closest('tr').remove(); refreshNums(); calc();" class="text-red-300 hover:text-red-700 font-bold px-2 text-xl transition-all">✕</button>
+            </td>
+        `;
+        body.appendChild(tr);
+        calc();
+    }
 
-// Handle app card clicks (add navigation logic)
-document.querySelectorAll('.app-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href && !href.startsWith('#')) {
-            // Navigate to external pages
-        } else {
-            // Handle internal navigation
-            console.log('App clicked:', this.querySelector('.app-label').textContent);
+    function refreshNums() { document.querySelectorAll('#rows-body tr').forEach((r, i) => r.cells[0].innerText = i + 1); }
+
+    function calc() {
+        let sub = 0;
+        document.querySelectorAll('#rows-body tr').forEach(r => {
+            const q = parseFloat(r.querySelector('.qty').innerText) || 0;
+            const p = parseFloat(r.querySelector('.price').innerText.replace(/[^0-9.]/g, '')) || 0;
+            const amt = q * p;
+            r.querySelector('.row-total').innerText = amt.toFixed(2);
+            sub += amt;
+        });
+
+        const isTaxEnabled = document.getElementById('taxToggle').checked;
+        const vatVal = isTaxEnabled ? sub * 0.15 : 0;
+        const totalVal = sub + vatVal;
+        const depVal = parseFloat(document.getElementById('dep').innerText.replace(/[^0-9.]/g, '')) || 0;
+        const balVal = totalVal - depVal;
+
+        document.getElementById('sub').innerText = sub.toFixed(2);
+        document.getElementById('vat').innerText = vatVal.toFixed(2);
+        document.getElementById('grand').innerText = totalVal.toFixed(2);
+        document.getElementById('bal').innerText = balVal.toFixed(2);
+
+        document.getElementById('vatRow').style.display = isTaxEnabled ? 'flex' : 'none';
+        document.getElementById('subtotalRow').style.display = isTaxEnabled ? 'flex' : 'none';
+    }
+
+    async function saveImage() {
+        const target = document.getElementById('capture-area');
+        const controls = document.querySelectorAll('.no-print');
+        controls.forEach(c => c.style.visibility = 'hidden');
+
+        const originalStyle = target.getAttribute('style') || '';
+        target.style.width = '210mm';
+        target.style.minHeight = '297mm';
+        target.style.maxWidth = 'none';
+        target.style.borderRadius = '0';
+        target.style.margin = '0 auto';
+        target.style.padding = '12mm';
+        target.style.boxShadow = 'none';
+
+        try {
+            const canvas = await html2canvas(target, {
+                scale: 3,
+                backgroundColor: "#ffffff",
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    const state = document.getElementById('taxToggle').checked;
+                    clonedDoc.getElementById('vatRow').style.display = state ? 'flex' : 'none';
+                    clonedDoc.getElementById('subtotalRow').style.display = state ? 'flex' : 'none';
+
+                    const area = clonedDoc.getElementById('capture-area');
+                    area.style.width = '210mm';
+                    area.style.minHeight = '297mm';
+                    area.style.maxWidth = 'none';
+                    area.style.borderRadius = '0';
+                    area.style.margin = '0 auto';
+                    area.style.padding = '12mm';
+                    area.style.boxShadow = 'none';
+                }
+            });
+            const link = document.createElement('a');
+            link.download = `VUTHY_TAILOR_Invoice_${Date.now()}.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 1.0);
+            link.click();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            controls.forEach(c => c.style.visibility = 'visible');
+            target.setAttribute('style', originalStyle);
         }
-    });
-});
+    }
+
+    for(let i=0; i<8; i++) addRow();
 </script>
 
 </body>
