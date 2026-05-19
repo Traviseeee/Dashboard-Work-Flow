@@ -3337,13 +3337,70 @@ body.home-shell .app-icon {
     
     /* Invoice View specific adjustments */
     body.full-screen-tool-shell #invoiceView .compress-shell {
-        padding: 0 !important; /* Remove outer padding from compress-shell */
+        padding: 0 !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-wrapper {
-        padding: 15px !important; /* Reduce main invoice padding */
-        box-shadow: none !important; /* Remove heavy shadow */
-        border-radius: 0 !important; /* No border radius for full width */
+        padding: 15px 5px 40px !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        min-height: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Desktop-like Full UI on Mobile (Keep Side-by-Side) */
+    #invoiceView .invoice-wrapper .flex {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        gap: 4px !important;
+    }
+
+    #invoiceView .invoice-wrapper .w-1/2, 
+    #invoiceView .invoice-wrapper .w-5/12,
+    #invoiceView .invoice-wrapper .w-1/3, 
+    #invoiceView .invoice-wrapper .w-1/4 { width: auto !important; flex: 1; }
+    
+    #invoiceView .invoice-wrapper .w-16 { width: 30px !important; flex-shrink: 0; }
+
+    /* Shrink fonts significantly to fit full horizontal UI */
+    #invoiceView .invoice-wrapper h1#businessNameKh { font-size: 14px !important; margin: 0 !important; }
+    #invoiceView .invoice-wrapper h2#businessNameEn { font-size: 12px !important; margin: 0 !important; }
+    #invoiceView .invoice-wrapper p#businessAddressKh,
+    #invoiceView .invoice-wrapper p#businessAddressEn { font-size: 6.5px !important; line-height: 1.1; }
+    #invoiceView .invoice-wrapper #businessPhone { font-size: 9px !important; }
+    #invoiceView .invoice-wrapper #docTitleLabel { font-size: 16px !important; }
+    #invoiceView .invoice-wrapper .text-3xl { font-size: 16px !important; }
+    #invoiceView .invoice-wrapper .text-xl { font-size: 10px !important; }
+    #invoiceView .invoice-wrapper .text-lg { font-size: 10px !important; }
+
+    #invoiceView .invoice-wrapper table {
+        display: table !important;
+        width: 100% !important;
+        font-size: 7.5px !important;
+        table-layout: auto !important;
+        border-top: 1.5px solid #000;
+    }
+    #invoiceView .invoice-wrapper table th, 
+    #invoiceView .invoice-wrapper table td { padding: 4px 1px !important; border-bottom-width: 1px; }
+    #invoiceView .invoice-wrapper table .pr-4 { padding-right: 1px !important; }
+    
+    #invoiceView .aba-box { padding: 6px !important; border-radius: 8px !important; }
+    #invoiceView #abaNumber { font-size: 12px !important; }
+    #invoiceView #grand { font-size: 18px !important; }
+    #invoiceView #bal { font-size: 16px !important; }
+    #invoiceView .invoice-wrapper .mt-20 { margin-top: 20px !important; }
+    #invoiceView .invoice-wrapper .px-10 { padding-left: 4px !important; padding-right: 4px !important; }
+
+    /* Tighten Control Panel for mobile */
+    body.full-screen-tool-shell #invoiceView .invoice-control-panel {
+        padding: 6px !important;
+        gap: 5px !important;
+        background: #f1f5f9 !important;
     }
 
     /* Control panel */
@@ -5060,37 +5117,40 @@ body.full-screen-tool-shell #invoiceView [contenteditable="true"]:focus { backgr
     </div>
 
     <!-- CONTROL PANEL -->
-    <div class="no-print bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
-        <button onclick="showView('home')" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">← Back</button>
-        <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
-        
-        <!-- TAX TOGGLE -->
-        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
-            <span class="text-xs font-bold text-gray-600 uppercase">ជាមួយពន្ធ / Tax (15%)</span>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
-                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-        </div>
+    <div class="no-print invoice-control-panel bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+        <div class="invoice-control-group invoice-edit-group">
+            <div class="invoice-control-label" data-i18n="invoice_edit_label">Edit Invoice</div>
+            <button onclick="showView('home')" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">← Back</button>
+            <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ Add Row</button>
+            
+            <!-- TAX TOGGLE -->
+            <div class="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg border border-gray-200">
+                <span class="text-[9px] font-bold text-gray-600 uppercase">ជាមួយពន្ធ / Tax</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+                    <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
 
-        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
-            <span class="text-xs font-bold text-gray-600 uppercase">Image Size</span>
-            <select id="invoicePaperSize" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
-                <option value="A4" selected>A4</option>
-                <option value="A5">A5</option>
+            <select id="invoicePaperSize" class="bg-white border border-gray-300 rounded px-2 py-1 text-xs font-bold text-gray-800">
+                <option value="A4" selected>A4 Size</option>
+                <option value="A5">A5 Size</option>
             </select>
-        </div>
 
-        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
-            <span class="text-xs font-bold text-gray-600 uppercase">Currency</span>
-            <select id="invoiceCurrencySelect" onchange="setInvoiceCurrency(this.value)" class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-bold text-gray-800">
+            <select id="invoiceCurrencySelect" onchange="setInvoiceCurrency(this.value)" class="bg-white border border-gray-300 rounded px-2 py-1 text-xs font-bold text-gray-800">
                 <option value="$" selected>Dollar ($)</option>
                 <option value="៛">Riel (៛)</option>
             </select>
-        </div>
 
-        <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">🖼️ រក្សាទុកជារូបភាព / Save Image</button>
-        <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
+            <button onclick="toggleInvoiceProfileSetup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 transition-all">Setup Info</button>
+        </div>
+        
+        <div class="invoice-control-group invoice-export-group">
+            <div class="invoice-control-label" data-i18n="invoice_export_label">Export</div>
+            <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">Image</button>
+            <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">PDF</button>
+            <button onclick="exportInvoiceToExcel()" class="bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-800 transition-all">Excel</button>
+        </div>
     </div>
 
     <!-- COMPANY PROFILE (preset fields + save/load) -->
