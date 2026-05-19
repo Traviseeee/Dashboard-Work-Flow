@@ -25,11 +25,11 @@ function addRow() {
     const tr = document.createElement('tr');
     tr.className = "group hover:bg-amber-50 transition-colors";
     tr.innerHTML = `
-        <td class="text-center font-bold text-gray-300 text-xs">${count}</td>
+        <td class="text-center font-bold text-gray-800 text-xs">${count}</td>
         <td class="px-4"><div contenteditable="true" class="w-full text-gray-700 font-bold italic">...</div></td>
         <td class="text-center"><div contenteditable="true" class="qty font-black bg-gray-50 rounded" oninput="calc()">0</div></td>
         <td class="text-center"><div contenteditable="true" class="price font-black bg-gray-50 rounded" oninput="calc()">0.00</div></td>
-        <td class="text-right pr-4 font-black text-blue-900 font-black">$ <span class="row-total">0.00</span></td>
+        <td class="text-right pr-4 font-black text-blue-900"><span class="invoice-currency-symbol">$</span> <span class="row-total">0.00</span></td>
         <td class="no-print text-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button onclick="this.closest('tr').remove(); refreshNums(); calc();" class="text-red-300 hover:text-red-700 font-bold px-2 text-xl transition-all">✕</button>
         </td>
@@ -39,7 +39,9 @@ function addRow() {
 }
 
 function refreshNums() {
-    document.querySelectorAll('#rows-body tr').forEach((r, i) => r.cells[0].innerText = i + 1); 
+    document.querySelectorAll('#rows-body tr').forEach((r, i) => {
+        if (r.cells[0]) r.cells[0].innerText = i + 1;
+    }); 
 }
 
 function calc() {
@@ -65,8 +67,75 @@ function calc() {
     document.getElementById('bal').innerText = balVal.toFixed(2);
 
     // Toggle Rows based on tax status
-    document.getElementById('vatRow').style.display = isTaxEnabled ? 'flex' : 'none';
-    document.getElementById('subtotalRow').style.display = isTaxEnabled ? 'flex' : 'none';
+    if (document.getElementById('vatRow')) document.getElementById('vatRow').style.display = isTaxEnabled ? 'flex' : 'none';
+    if (document.getElementById('subtotalRow')) document.getElementById('subtotalRow').style.display = isTaxEnabled ? 'flex' : 'none';
+}
+
+function goBack() {
+    window.history.back();
+}
+
+async function exportPdf() {
+    const target = document.getElementById('capture-area') || document.getElementById('invoiceCaptureArea');
+    if (!target) return;
+    const controls = document.querySelectorAll('.no-print');
+    controls.forEach(c => c.style.visibility = 'hidden');
+
+    const originalStyle = target.getAttribute('style') || '';
+    
+    target.style.width = '210mm';
+    target.style.minHeight = '297mm';
+    target.style.maxWidth = 'none';
+    target.style.borderRadius = '0';
+    target.style.margin = '0 auto';
+    target.style.padding = '12mm';
+    target.style.boxShadow = 'none';
+    target.style.transform = 'none'; // Prevent mobile scaling from leaking into the export
+
+    try {
+        // Ensure html2canvas and jspdf are loaded
+        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+            if (typeof showToast === 'function') showToast('Required libraries (html2canvas, jspdf) not loaded.', 'error');
+            return;
+        }
+
+        const canvas = await html2canvas(target, { 
+            scale: 3, 
+            backgroundColor: "#ffffff", 
+            useCORS: true,
+            onclone: (clonedDoc) => {
+                // Force display of tax rows only if they were visible in main doc
+                const state = document.getElementById('taxToggle')?.checked; // Use optional chaining for safety
+                if (clonedDoc.getElementById('vatRow')) clonedDoc.getElementById('vatRow').style.display = state ? 'flex' : 'none';
+                if (clonedDoc.getElementById('subtotalRow')) clonedDoc.getElementById('subtotalRow').style.display = state ? 'flex' : 'none';
+                // Force A4 size in clone
+                const area = clonedDoc.getElementById('capture-area');
+                if (area) { // Check if area exists
+                    area.style.width = '210mm';
+                    area.style.minHeight = '297mm';
+                    area.style.maxWidth = 'none';
+                    area.style.borderRadius = '0';
+                    area.style.margin = '0 auto';
+                    area.style.padding = '12mm';
+                    area.style.boxShadow = 'none';
+                }
+            }
+        });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`VUTHY_TAILOR_Invoice_${Date.now()}.pdf`);
+        if (typeof showToast === 'function') showToast('Invoice exported to PDF!', 'success');
+    } catch (e) {
+        console.error('exportPdf failed:', e);
+        if (typeof showToast === 'function') showToast('Failed to export PDF.', 'error');
+    } finally {
+        controls.forEach(c => c.style.visibility = 'visible');
+        target.setAttribute('style', originalStyle);
+    }
 }
 
 async function saveImage() {
@@ -84,6 +153,7 @@ async function saveImage() {
     target.style.margin = '0 auto';
     target.style.padding = '12mm';
     target.style.boxShadow = 'none';
+    target.style.transform = 'none'; // Prevent mobile scaling from leaking into the export
 
     try {
         const canvas = await html2canvas(target, { 
@@ -394,10 +464,8 @@ async function clearInvoiceProfile() {
         businessNameKh: '', businessNameEn: '', businessTel: '', businessAddressKh: '', businessAddressEn: '',
         abaName: '', abaNumber: '', managerName: '', clientName: '', clientPhone: ''
     }, false);
-    }, true); // Use true to apply default placeholders
 
     if (typeof showToast === 'function') showToast('Profile fields cleared', 'info');
-    // Note: This does NOT delete the saved profile from DB. 
     // User must click "Save" after clearing if they want to overwrite the saved preset with empty data.
     // Delete from IndexedDB
     if (typeof BridgeWorkDB !== 'undefined') {
@@ -411,12 +479,14 @@ async function clearInvoiceProfile() {
 function toggleInvoiceProfileSetup() {
     const setupContent = document.getElementById('invoiceProfileSetupContent');
     const toggleButtonText = document.getElementById('toggleProfileSetupText');
-    if (setupContent.style.display === 'none') {
+    if (setupContent.style.display === 'none' || setupContent.classList.contains('hidden')) {
         setupContent.style.display = 'block';
-        toggleButtonText.textContent = 'Hide Company Profile Setup';
+        setupContent.classList.remove('hidden');
+        if (toggleButtonText) toggleButtonText.textContent = 'Hide';
     } else {
         setupContent.style.display = 'none';
-        toggleButtonText.textContent = 'Show Company Profile Setup';
+        setupContent.classList.add('hidden');
+        if (toggleButtonText) toggleButtonText.textContent = 'Setup';
     }
 }
 
@@ -463,3 +533,5 @@ window.refreshNums = refreshNums;
 window.updateDocumentTitle = updateDocumentTitle;
 window.toggleInvoiceProfileSetup = toggleInvoiceProfileSetup; // Export new function
 window.exportInvoiceToExcel = exportInvoiceToExcel;
+window.goBack = goBack; // Export new function
+window.exportPdf = exportPdf; // Export new function
