@@ -21,16 +21,11 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  const requestPath = parsedUrl.pathname;
-
-  if (requestPath === '/api/openai' && req.method === 'POST') {
+  if (req.url === '/api/openai' && req.method === 'POST') {
     return proxyOpenAI(req, res);
   }
-  if (requestPath === '/api/proxy-image' && req.method === 'GET') {
-    return proxyImage(req, res);
-  }
 
+  const requestPath = new URL(req.url, `http://${req.headers.host || 'localhost'}`).pathname;
   let filePath = path.resolve(ROOT_DIR, requestPath === '/' ? 'index.html' : `.${decodeURIComponent(requestPath)}`);
   const relativePath = path.relative(ROOT_DIR, filePath);
   if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
@@ -133,44 +128,6 @@ function proxyOpenAI(req, res) {
     upstreamReq.write(requestBody);
     upstreamReq.end();
   });
-}
-
-function proxyImage(req, res) {
-  const urlParams = new URL(req.url, `http://${req.headers.host}`).searchParams;
-  const targetUrl = urlParams.get('url');
-
-  if (!targetUrl) {
-    res.writeHead(400);
-    return res.end('URL parameter is required');
-  }
-
-  try {
-    const client = targetUrl.startsWith('https') ? https : http;
-    const proxyReq = client.get(targetUrl, (remoteRes) => {
-      // Security: Only proxy valid image content types
-      const contentType = remoteRes.headers['content-type'];
-      if (!contentType || !contentType.startsWith('image/')) {
-        res.writeHead(400);
-        return res.end('Target URL is not a valid image file');
-      }
-
-      res.writeHead(remoteRes.statusCode, {
-        'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=86400'
-      });
-      remoteRes.pipe(res);
-    });
-
-    proxyReq.on('error', (err) => {
-      res.writeHead(500);
-      res.end(`Proxy Error: ${err.message}`);
-    });
-    proxyReq.end();
-  } catch (e) {
-    res.writeHead(500);
-    res.end(`Invalid URL: ${e.message}`);
-  }
 }
 
 server.on('error', (e) => {

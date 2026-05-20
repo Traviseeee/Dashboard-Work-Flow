@@ -417,177 +417,6 @@ function renderTodos() {
 }
 
 // ===== EAGLE ASSETS LOGIC =====
-
-let allLoadedJpgs = []; // Global cache for current scan results
-
-/**
- * APPROACH A: Node.js / Electron Environment
- * Uses the 'fs' module to read the local drive directly.
- */
-async function scanLocalJpgFolderNode(customPath = "") {
-    try {
-        const fs = require('fs');
-        const path = require('path');
-        const targetPath = customPath || "E:\\02_Freelance\\03_Smartbord\\62_ example this";
-
-        if (!fs.existsSync(targetPath)) {
-            throw new Error("Folder path does not exist.");
-        }
-
-        const jpgFiles = [];
-        function walkSync(currentDir) {
-            const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-            for (const entry of entries) {
-                const res = path.join(currentDir, entry.name);
-                if (entry.isDirectory()) {
-                    walkSync(res);
-                } else if (['.jpg', '.jpeg', '.png'].includes(path.extname(entry.name).toLowerCase())) {
-                    jpgFiles.push(`file://${res}`);
-                }
-            }
-        }
-
-        walkSync(targetPath);
-        return jpgFiles;
-    } catch (err) {
-        console.error("Node.js File Access Error:", err);
-        return null;
-    }
-}
-
-/**
- * APPROACH B: Web App Environment
- * Uses HTML5 File System Access API (Requires User Selection).
- */
-async function scanLocalJpgFolderWeb() {
-    try {
-        const dirHandle = await window.showDirectoryPicker();
-        const files = [];
-        
-        async function handleDirectory(handle) {
-            for await (const entry of handle.values()) {
-                if (entry.kind === 'file') {
-                    const name = entry.name.toLowerCase();
-                    if (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png')) {
-                        const file = await entry.getFile();
-                        files.push({ src: URL.createObjectURL(file), name: entry.name });
-                    }
-                } else if (entry.kind === 'directory') {
-                    await handleDirectory(entry);
-                }
-            }
-        }
-
-        await handleDirectory(dirHandle);
-        return files;
-    } catch (err) {
-        if (err.name !== 'AbortError') showToast("Folder access denied", "error");
-        return null;
-    }
-}
-
-async function browseJpgFolder() {
-    const images = await scanLocalJpgFolderWeb();
-    if (images && images.length > 0) {
-        renderJpgGallery(images);
-    } else if (images) {
-        showToast(getTranslation('toast_no_jpg'), "info");
-    }
-}
-
-/**
- * Main Scanner function triggered by the UI Card
- */
-async function scanJpgLocation() {
-    const pathInput = document.getElementById('jpgPathInput');
-    const pathValue = pathInput ? pathInput.value.trim() : "";
-
-    // If a URL is pasted, we try to show just that image as a starting point
-    if (pathValue.startsWith('http')) {
-        renderJpgGallery([pathValue]);
-        return;
-    }
-    
-    showToast(getTranslation('toast_scanning'), "info");
-
-    // Determine environment and fetch files
-    const isElectron = typeof require !== 'undefined';
-    const images = isElectron ? await scanLocalJpgFolderNode() : (pathValue ? null : await scanLocalJpgFolderWeb());
-
-    if (images && images.length > 0) {
-        renderJpgGallery(images);
-    } else if (images) {
-        showToast(getTranslation('toast_no_jpg'), "info");
-    } else if (pathValue) {
-        showToast("Direct path scanning is only available in Desktop version. Please use 'Browse' for web folders.", "warning");
-    }
-}
-
-/**
- * Filters the current gallery without re-scanning folders
- */
-function filterJpgGallery(query) {
-    const q = query.toLowerCase();
-    const filtered = allLoadedJpgs.filter(item => {
-        const name = (typeof item === 'string' ? item : item.name).toLowerCase();
-        return name.includes(q);
-    });
-    renderJpgGallery(filtered, true);
-}
-
-function renderJpgGallery(images, isFiltering = false) {
-    const grid = document.getElementById("jpgGalleryGrid");
-    if (!grid) return;
-
-    // If this is a fresh scan, clear memory and update cache
-    if (!isFiltering) {
-        // Clean up memory from previous blob URLs
-        allLoadedJpgs.forEach(img => {
-            if (typeof img !== 'string' && img.src.startsWith('blob:')) {
-                URL.revokeObjectURL(img.src);
-            }
-        });
-        allLoadedJpgs = images;
-        const searchInput = document.getElementById('jpgSearchInput');
-        if (searchInput) searchInput.value = "";
-    }
-
-    if (images.length === 0) {
-        grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; padding: 60px; opacity: 0.5;">
-            <p>No matching images found.</p>
-        </div>`;
-        return;
-    }
-
-    grid.innerHTML = images.map(src => {
-        // Handle object format from Web API or string from URL/Node
-        const actualSrc = typeof src === 'string' ? src : src.src;
-        const displayName = typeof src === 'string' 
-            ? src.split(/[\\/]/).pop() 
-            : src.name;
-
-        // Use proxy for web images if not running from file://
-        const proxiedSrc = (actualSrc.startsWith('http') && window.location.protocol !== 'file:') 
-            ? `/api/proxy-image?url=${encodeURIComponent(actualSrc)}` 
-            : actualSrc;
-
-        return `
-            <div class="jpg-viewer-item animate-stagger" onclick="showPreview('${proxiedSrc}', event)" title="${displayName}">
-                <img src="${proxiedSrc}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:15px; font-size:10px; color:var(--text-muted); text-align:center; background:var(--bg-page); gap:5px;&quot;><span>Image Blocked</span><a href=&quot;${actualSrc}&quot; target=&quot;_blank&quot; onclick=&quot;event.stopPropagation()&quot; style=&quot;color:var(--primary); text-decoration:underline&quot;>Open Original</a></div>'">
-            </div>
-        `;
-    }).join('');
-    
-    // Auto-scroll to results if this is a new scan (not just a filter)
-    if (!isFiltering && images.length > 0) {
-        setTimeout(() => {
-            grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 150);
-    }
-
-    triggerStagger();
-}
-
 async function refreshEagleAssets() {
     showToast('Eagle Assets feature is coming soon!', 'info');
 }
@@ -714,13 +543,7 @@ function updateAppSetting(key, val) {
     appPrefs[key] = val;
     savePrefs(); // Use the new savePrefs function
     if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage', 'homeShowWeather', 'homeShowProgress', 'homeShowDecor', 'homeShowNews'].includes(key)) applyAppPrefs();
-    if (key === 'currency') {
-        if (typeof updateInvoiceCurrencySymbols === 'function') {
-            updateInvoiceCurrencySymbols();
-            if (typeof calc === 'function') calc();
-        }
-        render();
-    }
+    if (key === 'currency') render(); 
 }
 
 function applyAppPrefs() {
@@ -747,7 +570,6 @@ function applyAppPrefs() {
     if (homeView) {
         document.querySelectorAll('.weather-card-uiverse').forEach(el => el.style.display = appPrefs.homeShowWeather ? 'flex' : 'none');
         const progressSection = homeView.querySelector('.progress-joy-bar')?.parentElement;
-        // ... (rest of applyAppPrefs)
         if (progressSection) progressSection.style.display = appPrefs.homeShowProgress ? 'block' : 'none';
         document.querySelectorAll('#musicWidget, #homeDailyFocus, #homeQuoteDisplay, #zenZoneCard').forEach(el => {
              const card = el.closest('.decor-card');
@@ -1449,84 +1271,20 @@ function deleteIncome(incomeId) {
 }
 
 // ===== IMAGE PREVIEW =====
-function showPreview(src, event = null) {
+function showPreview(src) {
     const overlay = document.getElementById("imagePreviewOverlay");
     const img = document.getElementById("previewImage");
     if (!overlay || !img || !src) return;
-
-    img.style.display = "block";
-    img.style.opacity = "1";
     img.src = src;
     overlay.style.display = "flex";
-
-    // Ensure top-left positioning before showing
-    overlay.style.position = "fixed";
-    overlay.style.right = "auto";
-    overlay.style.bottom = "auto";
-
-    const pad = 10;
-    const imgMaxW = Math.floor(window.innerWidth * 0.9);
-    const imgMaxH = Math.floor(window.innerHeight * 0.85);
-
-    const clickX = event && typeof event.clientX === "number" ? event.clientX : window.innerWidth / 2;
-    const clickY = event && typeof event.clientY === "number" ? event.clientY : window.innerHeight / 2;
-
-    // Center popup around click, then clamp so it stays on screen.
-    const top = Math.min(Math.max(clickY - imgMaxH / 2, pad), window.innerHeight - imgMaxH - pad);
-    const left = Math.min(Math.max(clickX - imgMaxW / 2, pad), window.innerWidth - imgMaxW - pad);
-
-    overlay.style.top = `${top}px`;
-    overlay.style.left = `${left}px`;
-
-    // Inject "Open Original" button (best-effort replacement for OS "show file location")
-    // Works when src is a file:// URL (desktop/node scan); for http(s) it opens the URL.
-    const existingLink = document.getElementById("previewOpenOriginalLink");
-    const isFileUrl = String(src).startsWith("file://");
-
-    if (existingLink) {
-        existingLink.href = src;
-        existingLink.style.display = "inline-flex";
-        existingLink.textContent = isFileUrl ? "Show file location" : "Open original";
-        existingLink.title = src;
-    } else {
-        const btnWrap = document.getElementById("previewOpenOriginalWrap");
-        if (btnWrap) {
-            const openBtn = document.createElement("a");
-            openBtn.id = "previewOpenOriginalLink";
-            openBtn.href = src;
-            openBtn.target = "_blank";
-            openBtn.rel = "noopener noreferrer";
-            openBtn.style.display = "inline-flex";
-            openBtn.style.alignItems = "center";
-            openBtn.style.gap = "6px";
-            openBtn.style.padding = "10px 12px";
-            openBtn.style.borderRadius = "10px";
-            openBtn.style.border = "1px solid var(--border-color)";
-            openBtn.style.background = "var(--bg-page)";
-            openBtn.style.color = "var(--primary)";
-            openBtn.style.textDecoration = "none";
-            openBtn.style.fontWeight = "900";
-            openBtn.style.fontSize = "12px";
-            openBtn.title = src;
-
-            openBtn.textContent = isFileUrl ? "Show file location" : "Open original";
-            btnWrap.innerHTML = "";
-            btnWrap.appendChild(openBtn);
-        }
-    }
-
     setTimeout(() => overlay.classList.add("show"), 10);
 }
 
 function closePreview() {
     const overlay = document.getElementById("imagePreviewOverlay");
     if (!overlay) return;
-
     overlay.classList.remove("show");
-    setTimeout(() => {
-        overlay.style.display = "none";
-
-    }, 300);
+    setTimeout(() => overlay.style.display = "none", 300);
 }
 
 function previewImageAt(idx) {
@@ -1685,74 +1443,23 @@ function updateClock() {
 async function updateWeather() {
     const el = document.getElementById("weatherDisplay");
     const coverWeatherContainers = document.querySelectorAll(".cover-weather-info");
-
-    // Null-safe: when running on minimal views (like the invoice template),
-    // weatherDisplay (or its sub-elements) may not exist.
-    if (!el && (!coverWeatherContainers || coverWeatherContainers.length === 0)) return;
     const hrs = new Date().getHours();
     const isNight = hrs >= 18 || hrs < 6;
     const now = Date.now();
     
-    // Fetch real weather so it matches your phone (cached for 5 minutes)
-    const CACHE_KEY = "bw_weather_cache_v1";
-    const TTL_MS = 300000; // 5 minutes
+    // Simulated weather logic (replaces static text)
+    const temps = isNight ? [24, 25, 26, 27, 28] : [31, 32, 33, 34, 35];
 
-    let cached = null;
-    try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        cached = raw ? JSON.parse(raw) : null;
-    } catch {
-        cached = null;
+    if (!appWeatherCache || (now - appWeatherCache.timestamp > 300000) || appWeatherCache.isNight !== isNight) {
+        appWeatherCache = {
+            tempIndex: Math.floor(Math.random() * temps.length),
+            condIndex: Math.floor(Math.random() * (isNight ? 3 : 4)),
+            isNight: isNight,
+            timestamp: now
+        };
     }
 
-    const shouldRefetch =
-        !cached ||
-        typeof cached.timestamp !== "number" ||
-        (now - cached.timestamp > TTL_MS);
-
-    if (shouldRefetch) {
-        try {
-            const resp = await fetch("https://wttr.in/Phnom+Penh?format=j1");
-            const data = await resp.json();
-
-            const current = data?.current_condition?.[0];
-            const tempC = current?.temp_C ? Number(current.temp_C) : null;
-
-            // wttr uses "weatherDesc":[{"value":"..."}]
-            const descRaw = current?.weatherDesc?.[0]?.value ? String(current.weatherDesc[0].value) : "";
-            const descLower = descRaw.toLowerCase();
-
-            let mappedCond = "Clear"; // fallback
-            let condIndex = 0;
-            // Very simple mapping for your existing label logic
-            if (descLower.includes("rain") || descLower.includes("drizzle")) { mappedCond = "Rainy"; condIndex = 2; }
-            else if (descLower.includes("cloud") || descLower.includes("overcast")) { mappedCond = "Partly Cloudy"; condIndex = 1; }
-
-            cached = {
-                tempC: typeof tempC === "number" && !Number.isNaN(tempC) ? tempC : 0,
-                mappedCond,
-                condIndex,
-                isNight,
-                timestamp: now
-            };
-
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
-            } catch {
-                // ignore storage errors (private mode/quota/etc.)
-            }
-        } catch (e) {
-            // If API fails, keep last cached value if any
-            // (or default values)
-            if (!cached || typeof cached.condIndex === 'undefined') {
-                cached = { tempC: 0, mappedCond: "Clear", condIndex: 0, isNight, timestamp: now };
-            }
-        }
-    }
-
-    appWeatherCache = cached;
-
-    const temp = appWeatherCache.tempC;
+    const temp = temps[appWeatherCache.tempIndex];
 
     let conditions;
     if (isNight) {
@@ -1770,16 +1477,13 @@ async function updateWeather() {
         ];
     }
 
-    const condIdx = Math.min(appWeatherCache.condIndex || 0, conditions.length - 1);
+    const condIdx = Math.min(appWeatherCache.condIndex, conditions.length - 1);
     const cond = conditions[condIdx];
     const city = currentLang === 'kh' ? 'ភ្នំពេញ' : 'Phnom Penh';
 
-    const safeCond = cond && typeof cond === 'object' ? cond : { class: 'unknown', emoji: '❔', label: 'Weather' };
-    if (el) {
-        el.innerHTML = `<span class="widget-emoji ${safeCond.class}">${safeCond.emoji}</span> ${safeCond.label} • ${city}: ${temp}°C`;
-    }
+    if (el) el.innerHTML = `<span class="widget-emoji ${cond.class}">${cond.emoji}</span> ${cond.label} • ${city}: ${temp}°C`;
     coverWeatherContainers.forEach(container => {
-        container.innerHTML = `<span class="widget-emoji ${safeCond.class}">${safeCond.emoji}</span> ${safeCond.label} • ${temp}°C`;
+        container.innerHTML = `<span class="widget-emoji ${cond.class}">${cond.emoji}</span> ${cond.label} • ${temp}°C`;
     });
     
     // Update Home Live Progress Strip
@@ -1801,7 +1505,7 @@ async function updateWeather() {
     }
 
     updateGreeting();
-    applyVisualWeatherEffects(appWeatherCache.mappedCond || "Clear");
+    applyVisualWeatherEffects(cond.label);
     if (currentView === 'home' && typeof window.updateHomeLiveStrip === 'function') window.updateHomeLiveStrip();
 }
 
@@ -2137,6 +1841,98 @@ async function resetAllSettings() {
     await BridgeWorkDB.delete("settings", "lang");
     showToast(getTranslation('reset_success'), "info");
     setTimeout(() => window.location.reload(), 1000);
+}
+
+function addRow() {
+    const tbody = document.getElementById('rows-body');
+    if (!tbody) return;
+    const rowCount = tbody.children.length + 1;
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = "1px solid #f1f5f9";
+    tr.innerHTML = `
+        <td style="text-align: center; padding: 12px 10px; color: #94a3b8; font-weight: 700;">${rowCount}</td>
+        <td style="padding: 12px 10px;"><input type="text" data-field="desc" placeholder="Enter item description..." style="width: 100%; border: none; outline: none; background: transparent; font-weight: 600; color: #334155; font-size: 13px;"></td>
+        <td style="padding: 12px 10px; text-align: center;"><input type="number" data-field="qty" value="1" oninput="calc()" style="width: 60px; text-align: center; border: none; outline: none; background: transparent; font-weight: 800; color: #0f172a;"></td>
+        <td style="padding: 12px 10px; text-align: center;"><input type="number" data-field="price" value="0" oninput="calc()" style="width: 80px; text-align: center; border: none; outline: none; background: transparent; font-weight: 800; color: #0f172a;"></td>
+        <td style="padding: 12px 15px; text-align: right; font-weight: 900; color: #0f172a;">$ <span class="row-total">0.00</span></td>
+        <td class="no-print" style="text-align: center;"><button class="del-btn" onclick="this.closest('tr').remove(); calc();" style="opacity: 0.5;">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+    calc();
+}
+
+function calc() {
+    let subtotal = 0;
+    document.querySelectorAll('#rows-body tr').forEach(row => {
+        const qtyInput = row.querySelector('[data-field="qty"]');
+        const priceInput = row.querySelector('[data-field="price"]');
+        if (!qtyInput || !priceInput) return;
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const total = qty * price;
+        const totalEl = row.querySelector('.row-total');
+        if (totalEl) totalEl.textContent = total.toFixed(2);
+        subtotal += total;
+    });
+
+    const taxEnabled = document.getElementById('taxToggle')?.checked;
+    const vat = taxEnabled ? (subtotal * 0.15) : 0;
+    const grand = subtotal + vat;
+
+    if (document.getElementById('sub')) document.getElementById('sub').textContent = subtotal.toFixed(2);
+    if (document.getElementById('vat')) document.getElementById('vat').textContent = vat.toFixed(2);
+    if (document.getElementById('grand')) document.getElementById('grand').textContent = grand.toFixed(2);
+    if (document.getElementById('bal')) document.getElementById('bal').textContent = grand.toFixed(2);
+    
+    const vatRow = document.getElementById('vatRow');
+    if (vatRow) vatRow.style.visibility = taxEnabled ? 'visible' : 'hidden';
+}
+
+function saveImage() {
+    const area = document.getElementById('invoiceCaptureArea');
+    if (!area || typeof html2canvas === 'undefined') return;
+    html2canvas(area).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'invoice.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
+
+function exportInvoiceToExcel() {
+    if (typeof XLSX === 'undefined') return;
+    const data = [];
+    document.querySelectorAll('#rows-body tr').forEach(row => {
+        const desc = row.querySelector('[data-field="desc"]')?.value || "";
+        const qty = row.querySelector('[data-field="qty"]')?.value || "0";
+        const price = row.querySelector('[data-field="price"]')?.value || "0";
+        const total = row.querySelector('.row-total')?.textContent || "0.00";
+        data.push({
+            Description: desc,
+            Qty: qty,
+            Price: price,
+            Total: total
+        });
+    });
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Invoice");
+    XLSX.writeFile(wb, "invoice.xlsx");
+}
+
+function updateDocumentTitle(val) {
+    const titleLabel = document.getElementById('docTitleLabel');
+    if (titleLabel) {
+        if (val === 'invoice') titleLabel.textContent = "INVOICE";
+        else if (val === 'quotation') titleLabel.textContent = "QUOTATION";
+        else titleLabel.textContent = "DOCUMENT";
+    }
+    document.title = (val ? val.toUpperCase() : "Invoice") + " - BridgeWork Pro";
+}
+
+function triggerCalendar() {
+    toggleCalendar();
 }
 
 function updateToolTickerMessage(view, message) {
@@ -2754,10 +2550,6 @@ function updateToolSummaries() {
         siv.textContent = currentLang === 'kh' ? "រួចរាល់" : "Ready";
     }
 
-    // 9. JPG Viewer Status
-    const sjpg = document.getElementById('summaryJpg');
-    if (sjpg) sjpg.textContent = currentLang === 'kh' ? "រួចរាល់" : "Ready";
-
     // 8. Home Stats Reports (Current Month Count)
     const hsr = document.getElementById('homeStatReports');
     if (hsr) {
@@ -2802,7 +2594,6 @@ function render() {
     else if (currentView === 'todo') renderTodos();
     else if (currentView === 'kanban') renderKanbanBoard();
     else if (currentView === 'loan') renderLoans();
-    else if (currentView === 'jpgViewer') { /* Gallery renders on scan action */ }
     else if (currentView === 'eagleGallery') renderEagleGallery();
     // Calendar is rendered separately
     updateMonthDisplay(); // Ensure header month is updated for the current view
@@ -4303,9 +4094,8 @@ window.closeLoanModal = closeLoanModal;
 window.saveLoan = saveLoan;
 window.openHelpModal = openHelpModal;
 window.closeHelpModal = closeHelpModal;
+
 window.handleHelpSearch = handleHelpSearch;
-window.scanJpgLocation = scanJpgLocation; // Expose the scan function
-window.browseJpgFolder = browseJpgFolder; // Expose the browse function
 window.deleteLoan = deleteLoan;
 window.toggleIncomePrivacy = toggleIncomePrivacy;
 window.openIncomeModal = openIncomeModal;
@@ -4360,59 +4150,15 @@ window.importProjectFromCSV = importProjectFromCSV;
 window.exportCSV = exportCSV;
 window.toggleSort = toggleSort;
 window.setDateSort = setDateSort;
-/**
- * Update invoice header fields (called from legacy UI code).
- * This is intentionally defensive: invoice elements may not exist depending on active view.
- */
-function updateInvoiceHeader() {
-    const khName = document.getElementById('businessNameKh');
-    const enName = document.getElementById('businessNameEn');
-    const khAddress = document.getElementById('businessAddressKh');
-    const enAddress = document.getElementById('businessAddressEn');
-    const phoneEl = document.getElementById('businessPhone');
-    const docTitleEl = document.getElementById('docTitle');
-
-    // Prefer persisted prefs if present; otherwise leave template defaults intact.
-    const maybe = (val) => (typeof val === 'string' && val.trim() ? val.trim() : null);
-
-    const nameKh = maybe(appPrefs?.businessNameKh) || maybe(appPrefs?.businessName) && currentLang === 'kh' ? maybe(appPrefs?.businessName) : null;
-    const nameEn = maybe(appPrefs?.businessNameEn) || maybe(appPrefs?.businessName) && currentLang !== 'kh' ? maybe(appPrefs?.businessName) : null;
-
-    const addressKh = maybe(appPrefs?.businessAddressKh);
-    const addressEn = maybe(appPrefs?.businessAddressEn);
-    const phone = maybe(appPrefs?.businessPhone);
-
-    if (khName && nameKh) khName.textContent = nameKh;
-    if (enName && nameEn) enName.textContent = nameEn;
-
-    if (khAddress && addressKh) khAddress.textContent = addressKh;
-    if (enAddress && addressEn) enAddress.textContent = addressEn;
-
-    if (phoneEl && phone) phoneEl.textContent = phone;
-
-    // If doc title element exists, keep it consistent with current doc type / lang
-    if (docTitleEl) {
-        const docType = document.getElementById('docType')?.value || 'invoice';
-        const invoiceLabelKh = t?.[currentLang]?.invoice || t?.[currentLang]?.doc_invoice || 'វិក្កយបត្រ / INVOICE';
-        const quotationLabelKh = t?.[currentLang]?.quotation || t?.[currentLang]?.doc_quotation || 'សេចក្តីសំរេច / QUOTATION';
-        docTitleEl.textContent = docType === 'quotation' ? (currentLang === 'kh' ? quotationLabelKh : quotationLabelKh) : (currentLang === 'kh' ? invoiceLabelKh : invoiceLabelKh);
-    }
-}
-
 window.updateInvoiceHeader = updateInvoiceHeader;
-
-function handleInvoiceLogo() {
-    // No-op fallback: this legacy export exists in App.js, but the logo
-    // switcher may not be used on all pages/views.
-    // If future UI adds logo controls, wire them here safely.
-    const logoLeft = document.getElementById('logoLeft');
-    const logoRight = document.getElementById('logoRight');
-    if (logoLeft) logoLeft.src = logoLeft.src;
-    if (logoRight) logoRight.src = logoRight.src;
-}
-
 window.handleInvoiceLogo = handleInvoiceLogo;
-
+window.addRow = addRow;
+window.calc = calc;
+window.saveImage = saveImage;
+window.exportInvoiceToExcel = exportInvoiceToExcel;
+window.updateDocumentTitle = updateDocumentTitle;
+window.triggerCalendar = triggerCalendar;
+window.updateDate = updateDate;
 window.renderKanbanBoard = renderKanbanBoard;
 window.refreshEagleAssets = refreshEagleAssets;
 window.backupData = backupData;
@@ -4420,7 +4166,6 @@ window.deleteExpense = deleteExpense; // New: Expose delete expense
 window.renderHelpContent = renderHelpContent;
 window.restoreData = restoreData;
 window.resetAllSettings = resetAllSettings;
-window.filterJpgGallery = filterJpgGallery;
 
 // ===== AI CHATBOT FUNCTIONALITY =====
 

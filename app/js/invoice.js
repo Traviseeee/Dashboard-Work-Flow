@@ -1,5 +1,5 @@
 // app/js/invoice.js
-// Logic for the Invoice Generator tool - 100% based on VUTHY TAILOR snippet
+// Logic for the Invoice Generator tool
 
 const khMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
 const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
@@ -8,28 +8,41 @@ function toKhmerNum(num) {
     return num.toString().split('').map(x => khDigits[parseInt(x)] || x).join('');
 }
 
-function triggerInvoiceCalendar() {
-    document.getElementById('hiddenDatePicker').showPicker();
+function triggerCalendar() {
+    const picker = document.getElementById('hiddenDatePicker');
+    if (picker && picker.showPicker) {
+        picker.showPicker();
+    } else if (picker) {
+        picker.click();
+    }
 }
 
 function updateInvoiceDate(dateStr) {
     if (!dateStr) return;
     const d = new Date(dateStr);
-    document.getElementById('khDate').innerText = `ថ្ងៃទី ${toKhmerNum(d.getDate())} ខែ ${khMonths[d.getMonth()]} ឆ្នាំ ${toKhmerNum(d.getFullYear())}`;
-    document.getElementById('enDate').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+    const khDate = document.getElementById('khDate');
+    const enDate = document.getElementById('enDate');
+    const display = document.getElementById('invoiceDateDisplay');
+
+    if (khDate) khDate.innerText = `ថ្ងៃទី ${toKhmerNum(d.getDate())} ខែ ${khMonths[d.getMonth()]} ឆ្នាំ ${toKhmerNum(d.getFullYear())}`;
+
+    const formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    if (enDate) enDate.innerText = formattedDate.replace(/ /g, '-');
+    if (display) display.innerText = formattedDate;
 }
 
 function addRow() {
     const body = document.getElementById('rows-body');
+    if (!body) return;
     const count = body.rows.length + 1;
     const tr = document.createElement('tr');
     tr.className = "group hover:bg-amber-50 transition-colors";
     tr.innerHTML = `
-        <td class="text-center font-bold text-gray-800 text-xs">${count}</td>
+        <td class="text-center font-bold text-gray-300 text-xs">${count}</td>
         <td class="px-4"><div contenteditable="true" class="w-full text-gray-700 font-bold italic">...</div></td>
-        <td class="text-center"><div contenteditable="true" class="qty font-black bg-gray-50 rounded" oninput="calc()">0</div></td>
-        <td class="text-center"><div contenteditable="true" class="price font-black bg-gray-50 rounded" oninput="calc()">0.00</div></td>
-        <td class="text-right pr-4 font-black text-blue-900"><span class="invoice-currency-symbol">$</span> <span class="row-total">0.00</span></td>
+        <td class="text-center"><div contenteditable="true" class="qty font-black bg-gray-50 rounded" oninput="calc()" onblur="calc()">0</div></td>
+        <td class="text-center"><div contenteditable="true" class="price font-black bg-gray-50 rounded" oninput="calc()" onblur="calc()">0.00</div></td>
+        <td class="text-right pr-4 font-black text-blue-900 font-black">$ <span class="row-total">0.00</span></td>
         <td class="no-print text-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button onclick="this.closest('tr').remove(); refreshNums(); calc();" class="text-red-300 hover:text-red-700 font-bold px-2 text-xl transition-all">✕</button>
         </td>
@@ -38,500 +51,332 @@ function addRow() {
     calc();
 }
 
-function refreshNums() {
-    document.querySelectorAll('#rows-body tr').forEach((r, i) => {
-        if (r.cells[0]) r.cells[0].innerText = i + 1;
-    }); 
+function refreshNums() { 
+    document.querySelectorAll('#rows-body tr').forEach((r, i) => r.cells[0].innerText = i + 1); 
+}
+
+function getInvoiceRows() {
+    return Array.from(document.querySelectorAll('#rows-body tr')).map((row, index) => {
+        const description = row.cells[1]?.innerText?.trim() || '';
+        const qty = row.querySelector('.qty')?.innerText?.trim() || '0';
+        const price = row.querySelector('.price')?.innerText?.trim() || '0.00';
+        const amount = row.querySelector('.row-total')?.innerText?.trim() || '0.00';
+        return { no: index + 1, description, qty, price, amount };
+    });
+}
+
+function getText(id, fallback = '-') {
+    const el = document.getElementById(id);
+    if (!el) return fallback;
+    return (el.value !== undefined ? el.value : el.innerText).trim() || fallback;
+}
+
+function getDocumentTypeMeta() {
+    const docType = document.getElementById('docType')?.value || 'invoice';
+    if (docType === 'quotation') {
+        return { type: 'quotation', khEnTitle: 'សម្រង់តម្លៃ / QUOTATION', sheetName: 'Quotation', fileLabel: 'QUOTATION' };
+    }
+    return { type: 'invoice', khEnTitle: 'វិក្កយបត្រ / INVOICE', sheetName: 'Invoice', fileLabel: 'INVOICE' };
+}
+
+function updateDocumentTitle() {
+    const meta = getDocumentTypeMeta();
+    const titleEl = document.getElementById('docTitleLabel');
+    if (titleEl) {
+        titleEl.innerText = meta.khEnTitle;
+        titleEl.style.fontSize = '34px'; // Increased font size for better visibility
+    }
+}
+
+function exportInvoiceToExcel() {
+    calc();
+    const docMeta = getDocumentTypeMeta();
+    const invoiceNumber = getText('invoiceNumber', '000XXX');
+    const clientName = getText('clientName', 'Client');
+    
+    const rows = getInvoiceRows();
+    const csvRows = rows.map(r => [r.no, r.description, r.qty, r.price, r.amount]);
+    
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([
+        [docMeta.khEnTitle],
+        ["Nº", invoiceNumber],
+        ["Client", clientName],
+        [],
+        ["No", "Description", "Qty", "Price", "Amount"],
+        ...csvRows,
+        [],
+        ["Total", document.getElementById('grand')?.innerText || "0.00"]
+    ]);
+    
+    XLSX.utils.book_append_sheet(wb, ws, docMeta.sheetName);
+    XLSX.writeFile(wb, `VUTHY_TAILOR_${docMeta.fileLabel}_${invoiceNumber}_${clientName}.xlsx`.replace(/\s+/g, '_'));
+    showToast("Excel exported!", "success");
 }
 
 function calc() {
     let sub = 0;
     document.querySelectorAll('#rows-body tr').forEach(r => {
-        const q = parseFloat(r.querySelector('.qty').innerText) || 0;
-        const p = parseFloat(r.querySelector('.price').innerText.replace(/[^0-9.]/g, '')) || 0;
+        const qtyCell = r.querySelector('.qty');
+        const priceCell = r.querySelector('.price');
+        const totalCell = r.querySelector('.row-total');
+        if (!qtyCell || !priceCell || !totalCell) return;
+        const q = parseFloat(qtyCell.innerText.replace(/[^0-9.]/g, '')) || 0;
+        const p = parseFloat(priceCell.innerText.replace(/[$,\s]/g, '')) || 0;
         const amt = q * p;
-        r.querySelector('.row-total').innerText = amt.toFixed(2);
+        totalCell.innerText = amt.toFixed(2);
         sub += amt;
     });
 
-    const isTaxEnabled = document.getElementById('taxToggle').checked;
+    const isTaxEnabled = document.getElementById('taxToggle')?.checked;
     const vatVal = isTaxEnabled ? sub * 0.15 : 0;
     const totalVal = sub + vatVal;
-    const depVal = parseFloat(document.getElementById('dep').innerText.replace(/[^0-9.]/g, '')) || 0;
+    const depVal = parseFloat(document.getElementById('dep')?.innerText.replace(/[$,\s]/g, '')) || 0;
     const balVal = totalVal - depVal;
 
-    // UI Updates
-    document.getElementById('sub').innerText = sub.toFixed(2);
-    document.getElementById('vat').innerText = vatVal.toFixed(2);
-    document.getElementById('grand').innerText = totalVal.toFixed(2);
-    document.getElementById('bal').innerText = balVal.toFixed(2);
+    if (document.getElementById('sub')) document.getElementById('sub').innerText = sub.toFixed(2);
+    if (document.getElementById('vat')) document.getElementById('vat').innerText = vatVal.toFixed(2);
+    if (document.getElementById('grand')) document.getElementById('grand').innerText = totalVal.toFixed(2);
+    if (document.getElementById('bal')) document.getElementById('bal').innerText = balVal.toFixed(2);
 
-    // Toggle Rows based on tax status
     if (document.getElementById('vatRow')) document.getElementById('vatRow').style.display = isTaxEnabled ? 'flex' : 'none';
     if (document.getElementById('subtotalRow')) document.getElementById('subtotalRow').style.display = isTaxEnabled ? 'flex' : 'none';
 }
 
-function goBack() {
-    window.history.back();
-}
-
-async function exportPdf() {
-    const target = document.getElementById('capture-area') || document.getElementById('invoiceCaptureArea');
-    if (!target) return;
-    const controls = document.querySelectorAll('.no-print');
-    controls.forEach(c => c.style.visibility = 'hidden');
-
-    const originalStyle = target.getAttribute('style') || '';
-    
-    target.style.width = '210mm';
-    target.style.minHeight = '297mm';
-    target.style.maxWidth = 'none';
-    target.style.borderRadius = '0';
-    target.style.margin = '0 auto';
-    target.style.padding = '12mm';
-    target.style.boxShadow = 'none';
-    target.style.transform = 'none'; // Prevent mobile scaling from leaking into the export
-
-    try {
-        // Ensure html2canvas and jspdf are loaded
-        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
-            if (typeof showToast === 'function') showToast('Required libraries (html2canvas, jspdf) not loaded.', 'error');
-            return;
-        }
-
-        const canvas = await html2canvas(target, { 
-            scale: 3, 
-            backgroundColor: "#ffffff", 
-            useCORS: true,
-            onclone: (clonedDoc) => {
-                // Force display of tax rows only if they were visible in main doc
-                const state = document.getElementById('taxToggle')?.checked; // Use optional chaining for safety
-                if (clonedDoc.getElementById('vatRow')) clonedDoc.getElementById('vatRow').style.display = state ? 'flex' : 'none';
-                if (clonedDoc.getElementById('subtotalRow')) clonedDoc.getElementById('subtotalRow').style.display = state ? 'flex' : 'none';
-                // Force A4 size in clone
-                const area = clonedDoc.getElementById('capture-area');
-                if (area) { // Check if area exists
-                    area.style.width = '210mm';
-                    area.style.minHeight = '297mm';
-                    area.style.maxWidth = 'none';
-                    area.style.borderRadius = '0';
-                    area.style.margin = '0 auto';
-                    area.style.padding = '12mm';
-                    area.style.boxShadow = 'none';
-                }
-            }
-        });
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`VUTHY_TAILOR_Invoice_${Date.now()}.pdf`);
-        if (typeof showToast === 'function') showToast('Invoice exported to PDF!', 'success');
-    } catch (e) {
-        console.error('exportPdf failed:', e);
-        if (typeof showToast === 'function') showToast('Failed to export PDF.', 'error');
-    } finally {
-        controls.forEach(c => c.style.visibility = 'visible');
-        target.setAttribute('style', originalStyle);
-    }
-}
-
 async function saveImage() {
-    const target = document.getElementById('capture-area') || document.getElementById('invoiceCaptureArea');
+    const target = document.getElementById('invoiceCaptureArea');
     if (!target) return;
-    const controls = document.querySelectorAll('.no-print');
-    controls.forEach(c => c.style.visibility = 'hidden');
-
     const originalStyle = target.getAttribute('style') || '';
     
     target.style.width = '210mm';
     target.style.minHeight = '297mm';
     target.style.maxWidth = 'none';
     target.style.borderRadius = '0';
-    target.style.margin = '0 auto';
     target.style.padding = '12mm';
     target.style.boxShadow = 'none';
-    target.style.transform = 'none'; // Prevent mobile scaling from leaking into the export
 
     try {
         const canvas = await html2canvas(target, { 
-            scale: 3, 
+            scale: 2, 
             backgroundColor: "#ffffff", 
-            useCORS: true,
-            // allowTaint: window.location.protocol === 'file:', // Not in snippet
-            onclone: (clonedDoc) => {
-                // Force display of tax rows only if they were visible in main doc
-                const state = document.getElementById('taxToggle').checked;
-                clonedDoc.getElementById('vatRow').style.display = state ? 'flex' : 'none';
-                clonedDoc.getElementById('subtotalRow').style.display = state ? 'flex' : 'none';
-                // Force A4 size in clone
-                const area = clonedDoc.getElementById('capture-area');
-                area.style.width = '210mm';
-                area.style.minHeight = '297mm';
-                area.style.maxWidth = 'none';
-                area.style.borderRadius = '0';
-                area.style.margin = '0 auto';
-                area.style.padding = '12mm';
-                area.style.boxShadow = 'none';
-            }
+            useCORS: window.location.protocol !== 'file:',
+            allowTaint: window.location.protocol === 'file:'
         });
         const link = document.createElement('a');
-        link.download = `VUTHY_TAILOR_Invoice_${Date.now()}.jpg`;
-        link.href = canvas.toDataURL("image/jpeg", 1.0);
+        const invoiceNo = getText('setupInvoiceNumber', Date.now());
+        link.download = `Invoice_${invoiceNo}.jpg`;
+        link.href = canvas.toDataURL("image/jpeg", 0.9);
         link.click();
+        showToast("Invoice saved as image", "success");
     } catch (e) {
         console.error(e);
+        showToast("Failed to save image", "error");
     } finally {
-        controls.forEach(c => c.style.visibility = 'visible');
         target.setAttribute('style', originalStyle);
     }
 }
 
-// Function to update the document title (Invoice/Quotation)
-function updateDocumentTitle() {
-    const docTypeSelect = document.getElementById('docType');
-    const docTitleEl = document.getElementById('docTitle'); // This is the h3 element on the invoice
-    if (!docTypeSelect || !docTitleEl) return;
+/**
+ * Updates the visual invoice header (the preview) based on input setup fields.
+ */
+function updateInvoiceHeader() {
+    const name = getText('setupBusinessName', 'YOUR BUSINESS NAME');
+    const nameKh = getText('setupBusinessNameKh', 'ក្រុមហ៊ុនរបស់អ្នក');
+    const phone = getText('setupPhone', '012 345 678');
+    const address = getText('setupAddress', 'Address details here...');
+    const bankName = getText('setupBankName', 'BANK');
+    const bankNo = getText('setupBankNumber', '000 000 000');
+    const manager = getText('setupManagerName', 'Manager Name');
 
-    const docType = docTypeSelect.value;
-    const isKhmer = typeof currentLang !== 'undefined' && currentLang === 'kh';
+    const set = (id, val, prefix = '', size = null) => { 
+        const el = document.getElementById(id); 
+        if (el) {
+            el.innerText = prefix + val;
+            if (size) el.style.fontSize = size;
+        }
+    };
 
-    docTitleEl.textContent = docType === 'quotation' ? (isKhmer ? 'សេចក្តីសំរេច / QUOTATION' : 'QUOTATION') : (isKhmer ? 'វិក្កយបត្រ / INVOICE' : 'INVOICE');
+    set('businessNameEn', name.toUpperCase(), '', '36px'); // Made English header bigger
+    set('businessNameKh', nameKh, '', '42px');             // Made Khmer header bigger
+    set('businessPhone', phone, 'Tel : ', '14px');
+    set('businessAddress', address, '', '12px');
+    set('abaName', name.toUpperCase()); 
+    set('abaNumber', bankNo);
+    set('bankTitleLabel', bankName.toUpperCase() + ' PAYMENT INFO', '', '16px');
+    set('invoiceManagerName', manager); // Corrected ID to match index.html
 }
 
+/**
+ * Toggles the visibility of the dedicated invoice information setup panel.
+ */
+function toggleInvoiceSetup() {
+    const panel = document.getElementById('invoiceSetupPanel');
+    if (!panel) return;
+    const isHidden = panel.classList.contains('hidden') || panel.style.display === 'none';
+    panel.style.display = isHidden ? 'block' : 'none';
+    panel.classList.toggle('hidden', !isHidden);
+}
 
-function setInvoiceCurrency(symbol) {
-    document.querySelectorAll('.invoice-currency-symbol').forEach(el => {
-        el.textContent = symbol;
+/**
+ * Saves the current setup inputs as a new reusable business profile.
+ */
+async function saveCurrentAsProfile() {
+    const profileName = prompt("Enter a name for this business profile (e.g., 'Main Branch'):");
+    if (!profileName) return;
+
+    if (!appPrefs.invoice) appPrefs.invoice = {};
+    if (!appPrefs.invoice.profiles) appPrefs.invoice.profiles = [];
+
+    const newProfile = {
+        id: "prof_" + Date.now(),
+        profileName: profileName,
+        businessNameEn: getText('setupBusinessName'),
+        businessNameKh: getText('setupBusinessNameKh'),
+        phone: getText('setupPhone'),
+        address: getText('setupAddress'),
+        bankName: getText('setupBankName'),
+        bankNumber: getText('setupBankNumber'),
+        managerName: getText('setupManagerName'),
+        logo: document.getElementById('invoiceLogo')?.src || ''
+    };
+
+    appPrefs.invoice.profiles.push(newProfile);
+    if (typeof savePrefs === 'function') await savePrefs();
+    renderProfileSelector();
+    showToast(`Profile "${profileName}" saved!`, "success");
+}
+
+/**
+ * Loads a selected business profile into the setup inputs.
+ */
+function loadInvoiceProfile(profileId) {
+    if (!profileId || !appPrefs.invoice?.profiles) return;
+    const p = appPrefs.invoice.profiles.find(prof => prof.id === profileId);
+    if (!p) return;
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    set('setupBusinessName', p.businessNameEn);
+    set('setupBusinessNameKh', p.businessNameKh);
+    set('setupPhone', p.phone);
+    set('setupAddress', p.address);
+    set('setupBankName', p.bankName);
+    set('setupBankNumber', p.bankNumber);
+    set('setupManagerName', p.managerName);
+
+    const logo = document.getElementById('invoiceLogo');
+    if (logo && p.logo) logo.src = p.logo;
+
+    updateInvoiceHeader();
+    showToast(`Switched to profile: ${p.profileName}`, "info");
+}
+
+/**
+ * Renders the dropdown options for saved business profiles.
+ */
+function renderProfileSelector() {
+    const sel = document.getElementById('invoiceProfileSelect');
+    if (!sel) return;
+    const profiles = appPrefs.invoice?.profiles || [];
+    
+    let html = `<option value="">-- Select Business Profile --</option>`;
+    profiles.forEach(p => {
+        html += `<option value="${p.id}">${p.profileName}</option>`;
     });
-    const priceTh = document.querySelector('#invoiceView table th:nth-child(4)');
-    const amountTh = document.querySelector('#invoiceView table th:nth-child(5)');
-    if (priceTh) priceTh.textContent = `PRICE (${symbol})`;
-    if (amountTh) amountTh.textContent = `AMOUNT (${symbol})`;
-    calc();
+    sel.innerHTML = html;
+}
+
+/**
+ * Handles the file upload for the invoice logo.
+ */
+function handleInvoiceLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const logo = document.getElementById('invoiceLogo');
+            if (logo) logo.src = e.target.result;
+            showToast("Invoice logo updated!", "success");
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function saveInvoiceSetup() {
+    if (!appPrefs.invoice) appPrefs.invoice = {};
+    
+    appPrefs.invoice.businessNameEn = document.getElementById('setupBusinessName')?.value || '';
+    appPrefs.invoice.businessNameKh = document.getElementById('setupBusinessNameKh')?.value || '';
+    appPrefs.invoice.phone = document.getElementById('setupPhone')?.value || '';
+    appPrefs.invoice.address = document.getElementById('setupAddress')?.value || '';
+    appPrefs.invoice.bankName = document.getElementById('setupBankName')?.value || '';
+    appPrefs.invoice.bankNumber = document.getElementById('setupBankNumber')?.value || '';
+    appPrefs.invoice.invoiceNumber = document.getElementById('setupInvoiceNumber')?.value || '';
+    appPrefs.invoice.managerName = document.getElementById('setupManagerName')?.value || '';
+    
+    const logoImg = document.getElementById('invoiceLogo');
+    if (logoImg && logoImg.src.startsWith('data:')) {
+        appPrefs.invoice.logo = logoImg.src;
+    }
+
+    if (typeof savePrefs === 'function') await savePrefs();
+    showToast("Invoice setup information saved!", "success");
+    updateInvoiceHeader();
 }
 
 function initInvoiceView() {
     const body = document.getElementById('rows-body');
-    if (!body) return;
+    // Load saved preferences into setup inputs
+    if (appPrefs.invoice) {
+        if (document.getElementById('setupBusinessName')) document.getElementById('setupBusinessName').value = appPrefs.invoice.businessNameEn || '';
+        if (document.getElementById('setupBusinessNameKh')) document.getElementById('setupBusinessNameKh').value = appPrefs.invoice.businessNameKh || '';
+        if (document.getElementById('setupPhone')) document.getElementById('setupPhone').value = appPrefs.invoice.phone || '';
+        if (document.getElementById('setupAddress')) document.getElementById('setupAddress').value = appPrefs.invoice.address || '';
+        if (document.getElementById('setupBankName')) document.getElementById('setupBankName').value = appPrefs.invoice.bankName || '';
+        if (document.getElementById('setupBankNumber')) document.getElementById('setupBankNumber').value = appPrefs.invoice.bankNumber || '';
+        if (document.getElementById('setupInvoiceNumber')) document.getElementById('setupInvoiceNumber').value = appPrefs.invoice.invoiceNumber || '';
+        if (document.getElementById('setupManagerName')) document.getElementById('setupManagerName').value = appPrefs.invoice.managerName || '';
+        
+        const logo = document.getElementById('invoiceLogo');
+        if (logo && appPrefs.invoice.logo) {
+            logo.src = appPrefs.invoice.logo;
+        }
+    }
 
-    // Default Initialization
-    const today = new Date();
-    const hiddenPicker = document.getElementById('hiddenDatePicker');
-    if (hiddenPicker && !hiddenPicker.value) {
-        hiddenPicker.valueAsDate = today;
+    renderProfileSelector();
+
+    // Update the invoice display with loaded/default values
+    updateInvoiceHeader();
+
+    // Add default rows if none exist
+    if (body && body.rows.length === 0) {
+        for(let i=0; i<8; i++) addRow();
+        updateDocumentTitle();
+        const today = new Date();
+        const picker = document.getElementById('hiddenDatePicker');
+        if (picker) picker.valueAsDate = today;
         updateInvoiceDate(today.toISOString().split('T')[0]);
     }
 
-    // Default rows
-    if (body.rows.length === 0) for(let i=0; i<8; i++) addRow();
-
-    // Load saved company profile preset (if any)
-    if (typeof window.loadInvoiceProfile === 'function') window.loadInvoiceProfile();
-    updateDocumentTitle(); // Ensure document title is set on init
+    // Set today's date if not already set
+    const today = new Date();
+    const picker = document.getElementById('hiddenDatePicker');
+    if (picker && !picker.value) picker.valueAsDate = today;
+    updateInvoiceDate(picker?.value || today.toISOString().split('T')[0]);
 }
 
-function getElValue(id) {
-    const el = document.getElementById(id);
-    return el ? String(el.value || '').trim() : '';
+function escapeHtml(value) {
+    return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-
-function setElValue(id, val) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.value = val == null ? '' : String(val);
-}
-
-function updateInvoiceFromPreset() {
-    const profile = getInvoiceProfileFromInputs();
-    applyInvoiceProfileToInvoice(profile, false); // false means don't force hardcoded defaults while typing
-}
-
-function getInvoiceProfileFromInputs() {
-    return {
-        businessNameKh: getElValue('profileCompanyNameKh'),
-        businessNameEn: getElValue('profileCompanyNameEn'),
-        businessTel: getElValue('profileCompanyTel'),
-        businessAddressKh: getElValue('profileCompanyAddressKh'),
-        businessAddressEn: getElValue('profileCompanyAddressEn'),
-        abaName: getElValue('profileAbaName'),
-        abaNumber: getElValue('profileAbaNumber'),
-        managerName: getElValue('profileManagerName'),
-
-        clientName: getElValue('profileClientName'),
-        clientPhone: getElValue('profileClientPhone'),
-
-        // logo stored separately (base64 string)
-        invoiceLogo: window.__invoiceLogoBase64 || null
-    };
-}
-
-function applyInvoiceProfileToInvoice(profile, useDefaults = false) {
-    if (!profile || typeof profile !== 'object') {
-        profile = {}; // Treat null/undefined profile as empty for defaults
-    }
-
-    // Helper to set value for input fields in the profile preset section
-    const setProfileInput = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.value = value === null || value === undefined ? '' : String(value);
-    };
-
-    // Helper to set text content for display elements on the invoice
-    // Uses placeholder only if value is null or undefined. Empty string is displayed as empty.
-    const setInvoiceText = (id, value, placeholder = '') => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (useDefaults && (value === null || value === undefined || String(value).trim() === '')) {
-                el.textContent = placeholder;
-            } else {
-                el.textContent = (value === null || value === undefined) ? placeholder : String(value);
-            }
-        }
-    };
-
-    // Helper for elements that could be input or div/span on the invoice
-    const setInvoiceValOrText = (id, value, placeholder = '') => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        let textToSet = (value === null || value === undefined) ? placeholder : String(value);
-        if (useDefaults && (value === null || value === undefined || String(value).trim() === '')) {
-            textToSet = placeholder;
-        }
-
-        if (el.tagName === 'INPUT') el.value = textToSet;
-        else el.textContent = textToSet;
-    };
-
-    // 1. Update profile preset input fields
-    setProfileInput('profileCompanyNameKh', profile.businessNameKh);
-    setProfileInput('profileCompanyNameEn', profile.businessNameEn);
-    setProfileInput('profileCompanyTel', profile.businessTel);
-    setProfileInput('profileCompanyAddressKh', profile.businessAddressKh);
-    setProfileInput('profileCompanyAddressEn', profile.businessAddressEn);
-    setProfileInput('profileAbaName', profile.abaName);
-    setProfileInput('profileAbaNumber', profile.abaNumber);
-    setProfileInput('profileManagerName', profile.managerName);
-    setProfileInput('profileClientName', profile.clientName);
-    setProfileInput('profileClientPhone', profile.clientPhone);
-
-    // 2. Update invoice display fields
-    setInvoiceText('businessNameKh', profile.businessNameKh, useDefaults ? 'វុទ្ធី ឯកទេសកាត់ដេរ' : '...');
-    setInvoiceText('businessNameEn', profile.businessNameEn, useDefaults ? 'VUTHY TAILOR' : '...');
-
-    // Update iOS header title
-    const iosHeaderTitleEl = document.querySelector('.ios-header-title');
-    if (iosHeaderTitleEl) {
-        iosHeaderTitleEl.textContent = profile.businessNameEn || 'VUTHY TAILOR';
-    }
-
-    // Handle phone with prefix
-    const displayedPhone = profile.businessTel;
-    if (useDefaults && (displayedPhone === null || displayedPhone === undefined || String(displayedPhone).trim() === '')) {
-        setInvoiceText('businessPhone', null, 'Tel : 098 22 00 20 / 012 690 595 ➲ 031 7000002');
-    } else {
-        const phoneStr = String(displayedPhone || '');
-        setInvoiceText('businessPhone', phoneStr && !phoneStr.toLowerCase().startsWith('tel') ? `Tel : ${phoneStr}` : phoneStr);
-    }
-
-    // Handle addresses with prefixes
-    const displayedAddressKh = profile.businessAddressKh;
-    if (useDefaults && (displayedAddressKh === null || displayedAddressKh === undefined || String(displayedAddressKh).trim() === '')) {
-        setInvoiceText('businessAddressKh', null, 'អាសយដ្ឋាន: ផ្ទះលេខ ៦៩៥EO ផ្លូវមុនីវង្ស សង្កាត់បឹងកេងកង ៣ ខណ្ឌចំការមន ភ្នំពេញ');
-    } else {
-        const addrStr = String(displayedAddressKh || '');
-        setInvoiceText('businessAddressKh', addrStr && !addrStr.startsWith('អាសយដ្ឋាន') ? `អាសយដ្ឋាន: ${addrStr}` : addrStr);
-    }
-
-    const displayedAddressEn = profile.businessAddressEn;
-    if (useDefaults && (displayedAddressEn === null || displayedAddressEn === undefined || String(displayedAddressEn).trim() === '')) {
-        setInvoiceText('businessAddressEn', null, 'Address : #695Eo, Street Monivong, Sangkat Boengkengkang III, Khan Chamka Morn, Phnom Penh');
-    } else {
-        const addrStr = String(displayedAddressEn || '');
-        setInvoiceText('businessAddressEn', addrStr && !addrStr.toLowerCase().startsWith('address') ? `Address : ${addrStr}` : addrStr);
-    }
-
-    // Client name and phone (these are inputs in the profile preset, but divs on the invoice)
-    setInvoiceValOrText('clientName', profile.clientName, useDefaults ? '...' : '');
-    setInvoiceValOrText('clientPhone', profile.clientPhone, useDefaults ? '...' : '');
-
-    // ABA and Manager Name
-    setInvoiceText('abaName', profile.abaName, useDefaults ? 'LIM VUTHY' : '');
-    setInvoiceText('abaNumber', profile.abaNumber, useDefaults ? '000 665 944' : '');
-    setInvoiceText('managerName', profile.managerName, useDefaults ? 'LIM VUTHY' : '');
-
-    // Invoice logo
-    const logoLeftImg = document.querySelector('#capture-area .w-16 img[alt="logo left"]') || 
-                        document.querySelector('#invoiceCaptureArea .w-16 img[alt="logo left"]');
-    if (logoLeftImg && profile.invoiceLogo) {
-        logoLeftImg.src = profile.invoiceLogo;
-    }
-}
-async function loadInvoiceProfile() {
-    updateDocumentTitle(); // Ensure title is correct on load
-    try {
-        if (typeof BridgeWorkDB === 'undefined') {
-            console.warn('BridgeWorkDB missing; cannot load invoice profile.');
-            return;
-        }
-        const profile = await BridgeWorkDB.get('settings', 'invoiceProfile');
-        if (!profile) { applyInvoiceProfileToInvoice({}, true); return; } // If no profile saved, apply empty with defaults
-
-        window.__invoiceLogoBase64 = profile.invoiceLogo || null;
-        applyInvoiceProfileToInvoice(profile, true);
-    } catch (e) {
-        console.error('loadInvoiceProfile failed:', e);
-        applyInvoiceProfileToInvoice({}, true); // Fallback to empty profile on error
-    }
-}
-
-async function saveInvoiceProfile() {
-    const profile = getInvoiceProfileFromInputs();
-    try {
-        if (typeof BridgeWorkDB === 'undefined') {
-            console.warn('BridgeWorkDB missing; cannot save invoice profile.');
-            return;
-        }
-        await BridgeWorkDB.set('settings', 'invoiceProfile', profile);
-        applyInvoiceProfileToInvoice(profile);
-        if (typeof showToast === 'function') showToast('Invoice company profile saved!', 'success');
-    } catch (e) {
-        console.error('saveInvoiceProfile failed:', e);
-        if (typeof showToast === 'function') showToast('Failed to save invoice profile', 'error');
-    }
-}
-
-function handleInvoiceLogoUpload(input) {
-    const file = input.files && input.files[0];
-    if (!file) return;
-
-    // basic size guard: 3MB
-    if (file.size > 1024 * 1024 * 3) {
-        if (typeof showToast === 'function') showToast('Logo too large (max 3MB).', 'error');
-        input.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-        const base64 = String(reader.result || '');
-        window.__invoiceLogoBase64 = base64;
-
-        // Update immediate preview on invoice (logo left)
-        const logoLeftImg = document.querySelector('#capture-area .w-16 img[alt="logo left"]') || 
-                            document.querySelector('#invoiceCaptureArea .w-16 img[alt="logo left"]');
-        if (logoLeftImg) {
-            logoLeftImg.src = base64;
-        }
-    };
-    reader.readAsDataURL(file);
-}
-
-function clearInvoiceLogo() {
-    window.__invoiceLogoBase64 = null;
-    const logoLeftImg = document.querySelector('#invoiceCaptureArea .w-16 img[alt="logo left"]');
-    if (logoLeftImg) {
-        logoLeftImg.src = 'https://img.icons8.com/ios-filled/100/8B0000/trousers.png';
-    }
-
-    // Also clear file input value (best-effort)
-    const input = document.getElementById('invoiceLogoUpload');
-    if (input) input.value = '';
-}
-
-async function clearInvoiceProfile() {
-    if (!confirm('Clear all company profile preset fields?')) return;
-    if (!confirm('Clear all company profile preset fields and remove from saved data?')) return;
-    
-    const fields = [
-        'profileCompanyNameKh', 'profileCompanyNameEn', 'profileCompanyTel',
-        'profileCompanyAddressKh', 'profileCompanyAddressEn', 'profileAbaName',
-        'profileAbaNumber', 'profileManagerName', 'profileClientName', 'profileClientPhone'
-    ];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-    
-    window.__invoiceLogoBase64 = null;
-    clearInvoiceLogo();
-
-    
-    // Apply an empty profile to the invoice view (truly clear it, no defaults)
-    applyInvoiceProfileToInvoice({
-        businessNameKh: '', businessNameEn: '', businessTel: '', businessAddressKh: '', businessAddressEn: '',
-        abaName: '', abaNumber: '', managerName: '', clientName: '', clientPhone: ''
-    }, false);
-
-    if (typeof showToast === 'function') showToast('Profile fields cleared', 'info');
-    // User must click "Save" after clearing if they want to overwrite the saved preset with empty data.
-    // Delete from IndexedDB
-    if (typeof BridgeWorkDB !== 'undefined') {
-        await BridgeWorkDB.delete('settings', 'invoiceProfile');
-    }
-
-    if (typeof showToast === 'function') showToast('Profile fields cleared and saved data removed!', 'info');
-}
-
-// New function to toggle the visibility of the invoice profile setup content
-function toggleInvoiceProfileSetup() {
-    const setupContent = document.getElementById('invoiceProfileSetupContent');
-    const toggleButtonText = document.getElementById('toggleProfileSetupText');
-    if (setupContent.style.display === 'none' || setupContent.classList.contains('hidden')) {
-        setupContent.style.display = 'block';
-        setupContent.classList.remove('hidden');
-        if (toggleButtonText) toggleButtonText.textContent = 'Hide';
-    } else {
-        setupContent.style.display = 'none';
-        setupContent.classList.add('hidden');
-        if (toggleButtonText) toggleButtonText.textContent = 'Setup';
-    }
-}
-
-function exportInvoiceToExcel() {
-    if (typeof XLSX === 'undefined') {
-        if (typeof showToast === 'function') showToast('XLSX library not loaded.', 'error');
-        return;
-    }
-    const data = [];
-    document.querySelectorAll('#rows-body tr').forEach(row => {
-        const desc = row.querySelector('td:nth-child(2) div')?.textContent || "";
-        const qty = row.querySelector('.qty')?.textContent || "0";
-        const price = row.querySelector('.price')?.textContent.replace(/[^0-9.]/g, '') || "0";
-        const total = row.querySelector('.row-total')?.textContent || "0.00";
-        data.push({
-            Description: desc,
-            Qty: qty,
-            Price: price,
-            Total: total
-        });
-    });
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Invoice");
-    XLSX.writeFile(wb, "invoice.xlsx");
-    if (typeof showToast === 'function') showToast('Invoice exported to Excel!', 'success');
-}
-
-// Export to window for inline onclick
-window.loadInvoiceProfile = loadInvoiceProfile;
-window.saveInvoiceProfile = saveInvoiceProfile;
-window.handleInvoiceLogoUpload = handleInvoiceLogoUpload;
-window.clearInvoiceLogo = clearInvoiceLogo;
-window.clearInvoiceProfile = clearInvoiceProfile;
-window.updateInvoiceFromPreset = updateInvoiceFromPreset;
 
 window.initInvoiceView = initInvoiceView;
 window.addRow = addRow;
 window.calc = calc;
 window.saveImage = saveImage;
-window.triggerInvoiceCalendar = triggerInvoiceCalendar;
-window.updateInvoiceDate = updateInvoiceDate;
-window.refreshNums = refreshNums;
-window.updateDocumentTitle = updateDocumentTitle;
-window.toggleInvoiceProfileSetup = toggleInvoiceProfileSetup; // Export new function
 window.exportInvoiceToExcel = exportInvoiceToExcel;
-window.goBack = goBack; // Export new function
-window.exportPdf = exportPdf; // Export new function
+window.updateDocumentTitle = updateDocumentTitle;
+window.saveInvoiceSetup = saveInvoiceSetup;
+window.triggerCalendar = triggerCalendar;
+window.updateInvoiceDate = updateInvoiceDate;
+window.toggleInvoiceSetup = toggleInvoiceSetup;
+window.saveCurrentAsProfile = saveCurrentAsProfile;
+window.loadInvoiceProfile = loadInvoiceProfile;
+window.renderProfileSelector = renderProfileSelector;

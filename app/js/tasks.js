@@ -426,11 +426,5 @@ function updateAppSetting(key, val) {
     appPrefs[key] = val;
     savePrefs();
     if (['uiScale', 'compactSidebar', 'animations', 'accentColor', 'backgroundImage', 'homeShowWeather', 'homeShowProgress', 'homeShowDecor', 'homeShowNews'].includes(key)) applyAppPrefs();
-    if (key === 'currency') {
-        if (typeof updateInvoiceCurrencySymbols === 'function') {
-            updateInvoiceCurrencySymbols();
-            if (typeof calc === 'function') calc();
-        }
-        render();
-    }
+    if (key === 'currency') render();
 }
