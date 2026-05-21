@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VUTHY TAILOR - Pro Smart Invoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&family=Noto+Serif+Khmer:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans Khmer', sans-serif; background-color: #f1f5f9; }
+        .khmer-muol { font-family: 'Noto Serif Khmer', serif; }
+        .text-maroon { color: #8B0000; }
+        
+        .invoice-wrapper {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 12mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 10px 5px; font-size: 11px; }
+        td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; font-size: 14px; vertical-align: middle; }
+
+        [contenteditable="true"] { outline: none; padding: 2px 4px; border-radius: 4px; }
+        [contenteditable="true"]:hover { background: #fffcf0; }
+        [contenteditable="true"]:focus { background: #fffbeb; box-shadow: inset 0 0 0 1px #fbbf24; }
+        
+        .aba-box { background: #f0f7ff; border-left: 5px solid #1e40af; }
+        .balance-box { border-top: 4px double #000; border-bottom: 4px double #000; }
+
+        #hiddenDatePicker { position: absolute; opacity: 0; width: 0; height: 0; z-index: -1; }
+        .date-container { cursor: pointer; border-radius: 6px; padding: 4px; transition: all 0.2s; border: 1px solid transparent; }
+        .date-container:hover { border-color: #fbbf24; background: #fffbeb; }
+
+        .tax-hidden { display: none !important; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; margin: 0; }
+            .invoice-wrapper { box-shadow: none; margin: 0; padding: 8mm; zoom: 98%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- CONTROL PANEL -->
+<div class="no-print sticky top-0 bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center gap-4 z-50 shadow-sm">
+    <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
+    
+    <!-- TAX TOGGLE -->
+    <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+        <span class="text-xs font-bold text-gray-600 uppercase">ជាមួយពន្ធ / Tax (15%)</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+
+    <button onclick="saveImage()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition-all">🖼️ រក្សាទុកជារូបភាព / Save Image</button>
+    <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-slate-900 transition-all">🖨️ បោះពុម្ពជា PDF / Print PDF</button>
+</div>
+
+<div class="invoice-wrapper" id="capture-area">
+    
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="w-16"><img src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png"></div>
+        <div class="text-center text-maroon">
+            <h1 class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
+            <h2 class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true">VUTHY TAILOR</h2>
+        </div>
+        <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png"></div>
+    </div>
+
+    <div class="text-center text-maroon text-[14px] mb-8">
+        <p class="font-bold uppercase tracking-tight" contenteditable="true">អាសយដ្ឋាន: ផ្ទះលេខ ៦៩៥EO ផ្លូវមុនីវង្ស សង្កាត់បឹងកេងកង ៣ ខណ្ឌចំការមន ភ្នំពេញ</p>
+        <p class="font-medium" contenteditable="true">Address : #695Eo, Street Monivong, Sangkat Boengkengkang III, Khan Chamka Morn, Phnom Penh</p>
+        <p class="font-bold text-lg mt-1 tracking-wide" contenteditable="true">Tel : 098 22 00 20 / 012 690 595 ➲ 031 7000002</p>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="flex justify-between mb-8 px-2">
+        <div class="w-1/2 space-y-4">
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">អតិថិជន / CLIENT NAME</p>
+                <div contenteditable="true" class="text-xl font-bold text-gray-800 leading-none">...</div>
+            </div>
+            <div class="border-b border-gray-100 pb-1">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">លេខទូរស័ព្ទ / PHONE NUMBER</p>
+                <div contenteditable="true" class="font-bold leading-none">...</div>
+            </div>
+        </div>
+        <div class="text-right flex flex-col justify-between">
+            <div class="leading-none">
+                <h3 class="text-3xl font-black text-gray-900 mb-1">វិក្កយបត្រ / INVOICE</h3>
+                <p class="text-xl font-black text-red-700">Nº <span contenteditable="true">000XXX</span></p>
+            </div>
+            
+            <div class="relative inline-block text-right">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">កាលបរិច្ឆេទ / DATE</p>
+                <div class="date-container font-black text-lg leading-tight" onclick="triggerCalendar()">
+                    <span id="khDate">-- -- --</span><br>
+                    <span id="enDate" class="text-xs text-gray-500 font-bold">00-00-0000</span>
+                </div>
+                <input type="date" id="hiddenDatePicker" onchange="updateDate(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <!-- LINE ITEMS -->
+    <table class="mb-6">
+        <thead>
+            <tr class="font-black text-gray-800">
+                <th class="w-12">Nº</th>
+                <th class="text-left px-4 italic font-bold">រាយមុខទំនិញ / DESCRIPTION</th>
+                <th class="w-20 text-center">QTY</th>
+                <th class="w-24 text-center">PRICE ($)</th>
+                <th class="w-32 text-right pr-4">AMOUNT ($)</th>
+                <th class="w-10 no-print"></th>
+            </tr>
+        </thead>
+        <tbody id="rows-body">
+            <!-- Rows -->
+        </tbody>
+    </table>
+
+    <!-- SUMMARY -->
+    <div class="flex justify-between items-start mt-4">
+        <div class="w-1/2">
+            <div class="aba-box p-5 rounded-2xl">
+                <p class="text-[10px] font-black uppercase text-blue-800 mb-2 tracking-widest">ព័ត៌មានបង់ប្រាក់ / PAYMENT INFO</p>
+                <p class="text-blue-900 font-bold text-sm">ABA Name: <span contenteditable="true" class="font-black">LIM VUTHY</span></p>
+                <p class="text-blue-900 font-black text-2xl tracking-widest leading-none mt-1" contenteditable="true">000 665 944</p>
+            </div>
+        </div>
+
+        <div class="w-5/12 space-y-2 pr-2">
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="subtotalRow">
+                <span>សរុប / SUB-TOTAL</span>
+                <span class="text-gray-900 font-black">$ <span id="sub">0.00</span></span>
+            </div>
+            
+            <div class="flex justify-between text-gray-500 text-xs font-bold uppercase tracking-tighter" id="vatRow">
+                <span>ពន្ធ ១៥% / VAT 15%</span>
+                <span class="text-gray-900 font-black">$ <span id="vat">0.00</span></span>
+            </div>
+
+            <div class="flex justify-between items-end border-t border-gray-100 pt-3">
+                <div class="text-left leading-none">
+                    <p class="text-xl font-black uppercase tracking-tighter">សរុបចុងក្រោយ /</p>
+                    <p class="text-xl font-bold text-red-600 uppercase tracking-tighter">TOTAL</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-red-700 font-black text-4xl tracking-tighter leading-none">$ <span id="grand">0.00</span></p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded-xl text-blue-700">
+                <span class="text-[10px] font-black uppercase tracking-widest">ប្រាក់កក់ / DEPOSIT</span>
+                <div class="text-xl font-black flex items-center">
+                    $ <div contenteditable="true" id="dep" oninput="calc()" class="inline-block min-w-[50px] text-right font-black">0.00</div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center py-4 px-1 balance-box mt-3 font-black">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-gray-800">នៅសល់ / BALANCE</span>
+                <span class="text-3xl underline decoration-double">$ <span id="bal">0.00</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="flex justify-between mt-20 text-center px-10">
+        <div class="w-1/3">
+            <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អតិថិជន / CLIENT Signature</p>
+            <div class="w-full border-b border-gray-100 text-[10px] text-gray-300 italic">Sign Here</div>
+        </div>
+        <div class="w-1/4">
+            <p class="text-[11px] font-black uppercase mb-16 underline decoration-gray-100">អ្នកគ្រប់គ្រង / MANAGER</p>
+            <div class="w-full border-b-2 border-gray-200 mb-2"></div>
+            <p class="text-red-700 font-black tracking-widest uppercase text-base" contenteditable="true">LIM VUTHY</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const khMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+    const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+
+    function toKhmerNum(num) {
+        return num.toString().split('').map(x => khDigits[parseInt(x)] || x).join('');
+    }
+
+    function triggerCalendar() { document.getElementById('hiddenDatePicker').showPicker(); }
+
+    function updateDate(dateStr) {
+        if (!dateStr) return;
+        const d = new Date(dateStr);
+        document.getElementById('khDate').innerText = `ថ្ងៃទី ${toKhmerNum(d.getDate())} ខែ ${khMonths[d.getMonth()]} ឆ្នាំ ${toKhmerNum(d.getFullYear())}`;
+        document.getElementById('enDate').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+    }
+
+    // Default Initialization
+    const today = new Date();
+    document.getElementById('hiddenDatePicker').valueAsDate = today;
+    updateDate(today.toISOString().split('T')[0]);
+
+    function addRow() {
+        const body = document.getElementById('rows-body');
+        const count = body.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.className = "group hover:bg-amber-50 transition-colors";
+        tr.innerHTML = `
+            <td class="text-center font-bold text-gray-300 text-xs">${count}</td>
+            <td class="px-4"><div contenteditable="true" class="w-full text-gray-700 font-bold italic">...</div></td>
+            <td class="text-center"><div contenteditable="true" class="qty font-black bg-gray-50 rounded" oninput="calc()">0</div></td>
+            <td class="text-center"><div contenteditable="true" class="price font-black bg-gray-50 rounded" oninput="calc()">0.00</div></td>
+            <td class="text-right pr-4 font-black text-blue-900 font-black">$ <span class="row-total">0.00</span></td>
+            <td class="no-print text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="this.closest('tr').remove(); refreshNums(); calc();" class="text-red-300 hover:text-red-700 font-bold px-2 text-xl transition-all">✕</button>
+            </td>
+        `;
+        body.appendChild(tr);
+        calc();
+    }
+
+    function refreshNums() { document.querySelectorAll('#rows-body tr').forEach((r, i) => r.cells[0].innerText = i + 1); }
+
+    function calc() {
+        let sub = 0;
+        document.querySelectorAll('#rows-body tr').forEach(r => {
+            const q = parseFloat(r.querySelector('.qty').innerText) || 0;
+            const p = parseFloat(r.querySelector('.price').innerText.replace(/[^0-9.]/g, '')) || 0;
+            const amt = q * p;
+            r.querySelector('.row-total').innerText = amt.toFixed(2);
+            sub += amt;
+        });
+
+        const isTaxEnabled = document.getElementById('taxToggle').checked;
+        const vatVal = isTaxEnabled ? sub * 0.15 : 0;
+        const totalVal = sub + vatVal;
+        const depVal = parseFloat(document.getElementById('dep').innerText.replace(/[^0-9.]/g, '')) || 0;
+        const balVal = totalVal - depVal;
+
+        // UI Updates
+        document.getElementById('sub').innerText = sub.toFixed(2);
+        document.getElementById('vat').innerText = vatVal.toFixed(2);
+        document.getElementById('grand').innerText = totalVal.toFixed(2);
+        document.getElementById('bal').innerText = balVal.toFixed(2);
+
+        // Hide Rows if tax disabled
+        document.getElementById('vatRow').style.display = isTaxEnabled ? 'flex' : 'none';
+        document.getElementById('subtotalRow').style.display = isTaxEnabled ? 'flex' : 'none';
+    }
+
+    async function saveImage() {
+        const target = document.getElementById('capture-area');
+        const controls = document.querySelectorAll('.no-print');
+        controls.forEach(c => c.style.visibility = 'hidden');
+
+        try {
+            const canvas = await html2canvas(target, { 
+                scale: 3, 
+                backgroundColor: "#ffffff", 
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    // Force display of tax rows only if they were visible in main doc
+                    const state = document.getElementById('taxToggle').checked;
+                    clonedDoc.getElementById('vatRow').style.display = state ? 'flex' : 'none';
+                    clonedDoc.getElementById('subtotalRow').style.display = state ? 'flex' : 'none';
+                }
+            });
+            const link = document.createElement('a');
+            link.download = `VUTHY_TAILOR_Invoice_${Date.now()}.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 1.0);
+            link.click();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            controls.forEach(c => c.style.visibility = 'visible');
+        }
+    }
+
+    // Default rows
+    for(let i=0; i<8; i++) addRow();
+</script>
+
+</body>
+</html>

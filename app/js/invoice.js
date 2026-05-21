@@ -28,7 +28,10 @@ function updateInvoiceDate(dateStr) {
 
     const formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     if (enDate) enDate.innerText = formattedDate.replace(/ /g, '-');
-    if (display) display.innerText = formattedDate;
+    
+    if (display && !khDate && !enDate) {
+        display.innerText = formattedDate;
+    }
 }
 
 function addRow() {
@@ -148,11 +151,13 @@ async function saveImage() {
     if (!target) return;
     const originalStyle = target.getAttribute('style') || '';
     
-    target.style.width = '210mm';
-    target.style.minHeight = '297mm';
+    const size = document.getElementById('paperSize')?.value || 'A4';
+    const dims = size === 'A5' ? { w: '148mm', h: '210mm' } : { w: '210mm', h: '297mm' };
+
+    target.style.width = dims.w;
+    target.style.minHeight = dims.h;
     target.style.maxWidth = 'none';
     target.style.borderRadius = '0';
-    target.style.padding = '12mm';
     target.style.boxShadow = 'none';
 
     try {
@@ -177,13 +182,36 @@ async function saveImage() {
 }
 
 /**
+ * Updates the paper size of the invoice UI.
+ */
+function updatePaperSize(size) {
+    const target = document.getElementById('invoiceCaptureArea');
+    if (!target) return;
+
+    if (size === 'A5') {
+        target.classList.add('invoice-a5');
+        target.style.width = '148mm';
+        target.style.minHeight = '210mm';
+        target.style.padding = '8mm';
+    } else {
+        target.classList.remove('invoice-a5');
+        target.style.width = '210mm';
+        target.style.minHeight = '297mm';
+        target.style.padding = '12mm';
+    }
+    
+    showToast(`Size changed to ${size}`, "info");
+}
+
+/**
  * Updates the visual invoice header (the preview) based on input setup fields.
  */
 function updateInvoiceHeader() {
     const name = getText('setupBusinessName', 'YOUR BUSINESS NAME');
     const nameKh = getText('setupBusinessNameKh', 'ក្រុមហ៊ុនរបស់អ្នក');
     const phone = getText('setupPhone', '012 345 678');
-    const address = getText('setupAddress', 'Address details here...');
+    const addressKh = getText('setupAddressKh', 'អាសយដ្ឋាន...');
+    const addressEn = getText('setupAddressEn', 'Address...');
     const bankName = getText('setupBankName', 'BANK');
     const bankNo = getText('setupBankNumber', '000 000 000');
     const manager = getText('setupManagerName', 'Manager Name');
@@ -199,7 +227,8 @@ function updateInvoiceHeader() {
     set('businessNameEn', name.toUpperCase(), '', '36px'); // Made English header bigger
     set('businessNameKh', nameKh, '', '42px');             // Made Khmer header bigger
     set('businessPhone', phone, 'Tel : ', '14px');
-    set('businessAddress', address, '', '12px');
+    set('addressKh', addressKh);
+    set('addressEn', addressEn);
     set('abaName', name.toUpperCase()); 
     set('abaNumber', bankNo);
     set('bankTitleLabel', bankName.toUpperCase() + ' PAYMENT INFO', '', '16px');
@@ -233,7 +262,8 @@ async function saveCurrentAsProfile() {
         businessNameEn: getText('setupBusinessName'),
         businessNameKh: getText('setupBusinessNameKh'),
         phone: getText('setupPhone'),
-        address: getText('setupAddress'),
+        addressKh: getText('setupAddressKh'),
+        addressEn: getText('setupAddressEn'),
         bankName: getText('setupBankName'),
         bankNumber: getText('setupBankNumber'),
         managerName: getText('setupManagerName'),
@@ -258,7 +288,8 @@ function loadInvoiceProfile(profileId) {
     set('setupBusinessName', p.businessNameEn);
     set('setupBusinessNameKh', p.businessNameKh);
     set('setupPhone', p.phone);
-    set('setupAddress', p.address);
+    set('setupAddressKh', p.addressKh);
+    set('setupAddressEn', p.addressEn);
     set('setupBankName', p.bankName);
     set('setupBankNumber', p.bankNumber);
     set('setupManagerName', p.managerName);
@@ -306,7 +337,8 @@ async function saveInvoiceSetup() {
     appPrefs.invoice.businessNameEn = document.getElementById('setupBusinessName')?.value || '';
     appPrefs.invoice.businessNameKh = document.getElementById('setupBusinessNameKh')?.value || '';
     appPrefs.invoice.phone = document.getElementById('setupPhone')?.value || '';
-    appPrefs.invoice.address = document.getElementById('setupAddress')?.value || '';
+    appPrefs.invoice.addressKh = document.getElementById('setupAddressKh')?.value || '';
+    appPrefs.invoice.addressEn = document.getElementById('setupAddressEn')?.value || '';
     appPrefs.invoice.bankName = document.getElementById('setupBankName')?.value || '';
     appPrefs.invoice.bankNumber = document.getElementById('setupBankNumber')?.value || '';
     appPrefs.invoice.invoiceNumber = document.getElementById('setupInvoiceNumber')?.value || '';
@@ -329,7 +361,8 @@ function initInvoiceView() {
         if (document.getElementById('setupBusinessName')) document.getElementById('setupBusinessName').value = appPrefs.invoice.businessNameEn || '';
         if (document.getElementById('setupBusinessNameKh')) document.getElementById('setupBusinessNameKh').value = appPrefs.invoice.businessNameKh || '';
         if (document.getElementById('setupPhone')) document.getElementById('setupPhone').value = appPrefs.invoice.phone || '';
-        if (document.getElementById('setupAddress')) document.getElementById('setupAddress').value = appPrefs.invoice.address || '';
+        if (document.getElementById('setupAddressKh')) document.getElementById('setupAddressKh').value = appPrefs.invoice.addressKh || '';
+        if (document.getElementById('setupAddressEn')) document.getElementById('setupAddressEn').value = appPrefs.invoice.addressEn || '';
         if (document.getElementById('setupBankName')) document.getElementById('setupBankName').value = appPrefs.invoice.bankName || '';
         if (document.getElementById('setupBankNumber')) document.getElementById('setupBankNumber').value = appPrefs.invoice.bankNumber || '';
         if (document.getElementById('setupInvoiceNumber')) document.getElementById('setupInvoiceNumber').value = appPrefs.invoice.invoiceNumber || '';
@@ -380,3 +413,4 @@ window.toggleInvoiceSetup = toggleInvoiceSetup;
 window.saveCurrentAsProfile = saveCurrentAsProfile;
 window.loadInvoiceProfile = loadInvoiceProfile;
 window.renderProfileSelector = renderProfileSelector;
+window.updatePaperSize = updatePaperSize;
