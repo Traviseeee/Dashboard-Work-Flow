@@ -3398,29 +3398,28 @@ body.home-shell .app-icon {
 
     /* Invoice Header */
     body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:first-child { /* flex items-center justify-between mb-4 */
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
         margin-bottom: 20px !important;
         padding-bottom: 15px !important;
     }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceLogoContainer {
-        width: 60px !important;
-        height: 60px !important;
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceLogoContainer,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper .w-16 {
+        width: 40px !important;
+        height: 40px !important;
+        flex-shrink: 0;
+    }
         margin-bottom: 10px;
     }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper h1#businessNameKh {
-        font-size: 20px !important;
-        margin-bottom: 0 !important;
-    }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper h2#businessNameEn {
-        font-size: 18px !important;
-        margin-top: 0 !important;
-        margin-bottom: 5px !important;
-    }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper p#businessAddress {
-        font-size: 10px !important;
-        max-width: 100% !important;
-        text-align: center;
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h1#businessNameKh { font-size: 18px !important; margin: 0 !important; }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h2#businessNameEn { font-size: 14px !important; margin: 0 !important; }
+    
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #addressKh,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper #addressEn,
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper p#businessPhone {
+        font-size: 9px !important;
+        text-align: center !important;
     }
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #docTitleLabel {
         font-size: 24px !important;
@@ -3433,23 +3432,23 @@ body.home-shell .app-icon {
     }
 
     /* Info Section (Client Name, Phone, Date) */
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(2) { /* flex justify-between mb-8 px-2 */
-        flex-direction: column;
-        margin-bottom: 20px !important;
-        padding: 10px !important;
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(3) { 
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        margin-bottom: 15px !important;
+        padding: 5px !important;
     }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(2) > div {
-        width: 100% !important;
-        text-align: left !important;
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper > div:nth-child(3) > div {
+        width: 48% !important;
     }
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #clientName,
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #clientPhone {
-        font-size: 14px !important;
-        min-width: 100% !important;
+        font-size: 12px !important;
+        min-width: 0 !important;
     }
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #invoiceDateDisplay {
-        font-size: 14px !important;
-        text-align: left !important;
+        font-size: 12px !important;
+        text-align: right !important;
     }
 
     /* Table */
@@ -3459,6 +3458,7 @@ body.home-shell .app-icon {
         display: block; /* Allow horizontal scrolling */
         overflow-x: auto;
         white-space: nowrap;
+        table-layout: auto !important;
     }
     body.full-screen-tool-shell #invoiceView .invoice-wrapper table th,
     body.full-screen-tool-shell #invoiceView .invoice-wrapper table td {
