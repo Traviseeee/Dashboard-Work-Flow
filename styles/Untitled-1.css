@@ -473,6 +473,7 @@
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
         background: var(--bg-card);
         box-shadow: none;
+        color: var(--text-main);
     }
 
     body.tool-shell.mobile-sidebar-open .sidebar {
@@ -1629,3 +1630,9 @@ mark {
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Invoice export fixes:
+   A5 capture was too tall (long JPG). Reduce spacing specific to A5. */
+.invoice-wrapper.invoice-a5 .mt-20 {
+    margin-top: 15px !important;
+}

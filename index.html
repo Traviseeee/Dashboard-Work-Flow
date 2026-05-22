@@ -1601,8 +1601,8 @@ body::after {
     transition:all .15s;margin-bottom:2px;
     position: relative;
 }
-.sidebar a:hover{background:rgba(255,255,255,.08);color:#fff; transform: translateX(4px);}
-.sidebar a.active{background:rgba(255,255,255,.15);color:#fff; font-weight: 700;}
+.sidebar a:hover{background:rgba(99, 102, 241, 0.1);color:var(--primary); transform: translateX(4px);}
+.sidebar a.active{background:rgba(99, 102, 241, 0.15);color:var(--primary); font-weight: 700;}
 .sidebar a.active::before {
     content: ''; position: absolute; left: -4px; top: 10px; bottom: 10px;
     width: 3px; background: var(--primary); border-radius: 0 4px 4px 0;
@@ -3306,11 +3306,13 @@ body.home-shell .app-icon {
         display: grid !important;
         grid-template-columns: 1fr !important;
         align-items: stretch !important;
-        padding: 10px !important;
-        gap: 10px !important;
+        padding: 8px !important;
+        gap: 6px !important;
         overflow: visible !important;
-        border-radius: 18px !important;
-        background: #eef2f7 !important;
+        border-radius: 16px !important;
+        background: #f8fafc !important;
+        border: 1px solid rgba(148, 163, 184, 0.22) !important;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08) !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-control-panel:has(.invoice-export-group) {
@@ -3323,12 +3325,12 @@ body.home-shell .app-icon {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         align-items: center !important;
-        gap: 8px !important;
-        padding: 10px !important;
-        border-radius: 16px !important;
+        gap: 6px !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
         background: #ffffff !important;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        border: 0 !important;
+        box-shadow: none !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-control-label {
@@ -3347,12 +3349,16 @@ body.home-shell .app-icon {
     body.full-screen-tool-shell #invoiceView .invoice-control-group > label {
         width: 100% !important;
         min-width: 0 !important;
-        height: 38px !important;
+        height: 34px !important;
         justify-content: center !important;
         white-space: nowrap !important;
         overflow: hidden;
         text-overflow: ellipsis;
         margin: 0 !important;
+        border-radius: 10px !important;
+        font-size: 9px !important;
+        font-weight: 800 !important;
+        padding: 0 8px !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-control-group > select {
@@ -3360,31 +3366,52 @@ body.home-shell .app-icon {
         text-align-last: center;
     }
 
-    body.full-screen-tool-shell #invoiceView .invoice-edit-group > button:first-of-type {
+    body.full-screen-tool-shell #invoiceView .invoice-settings-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-tax-toggle {
         grid-column: 1 / -1;
-        height: 42px !important;
-        font-size: 12px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        justify-content: space-between !important;
+        border-radius: 10px !important;
+        margin: 0 !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-tax-toggle span {
+        font-size: 9px !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-tax-toggle label {
+        width: auto !important;
+        height: auto !important;
+        padding: 0 !important;
+    }
+
+    body.full-screen-tool-shell #invoiceView .invoice-edit-group > button:first-of-type {
+        grid-column: auto;
+        height: 34px !important;
+        font-size: 9px !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-export-group {
-        position: fixed !important;
-        left: 10px;
-        right: 10px;
-        bottom: calc(10px + env(safe-area-inset-bottom));
-        z-index: 1200;
+        position: static !important;
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        padding: 8px !important;
-        border-radius: 18px !important;
-        background: rgba(255, 255, 255, 0.94) !important;
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22) !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-export-group > button {
         padding-inline: 6px !important;
-        height: 40px !important;
-        font-size: 10px !important;
+        height: 34px !important;
+        font-size: 9px !important;
     }
 
     body.full-screen-tool-shell #invoiceView .invoice-export-group .invoice-control-label {
@@ -3393,7 +3420,7 @@ body.home-shell .app-icon {
 
     body.full-screen-tool-shell #invoiceView .invoice-wrapper {
         margin-top: 12px !important;
-        margin-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+        margin-bottom: 18px !important;
     }
 
     /* Invoice Header */
@@ -3412,8 +3439,8 @@ body.home-shell .app-icon {
     }
         margin-bottom: 10px;
     }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper h1#businessNameKh { font-size: 18px !important; margin: 0 !important; }
-    body.full-screen-tool-shell #invoiceView .invoice-wrapper h2#businessNameEn { font-size: 14px !important; margin: 0 !important; }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h1#businessNameKh { font-size: 19.2px !important; margin: 0 !important; }
+    body.full-screen-tool-shell #invoiceView .invoice-wrapper h2#businessNameEn { font-size: 16px !important; margin: 0 !important; }
     
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #addressKh,
     body.full-screen-tool-shell #invoiceView .invoice-wrapper #addressEn,
@@ -4625,26 +4652,30 @@ body.home-shell .app-icon {
     <div class="compress-shell" style="max-width: 950px; padding: 20px;">
 
         <!-- ENHANCED CONTROL PANEL -->
-        <div class="no-print sticky top-0 bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center items-center gap-4 z-50 shadow-sm rounded-2xl mb-6">
-            <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
-            <button onclick="toggleInvoiceSetup()" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-bold hover:bg-slate-200 transition-all">Setup Info</button>
-            
-            <select id="docType" onchange="updateDocumentTitle(this.value)" class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-2 rounded-lg font-bold outline-none cursor-pointer">
-                <option value="invoice" selected>Invoice / វិក្កយបត្រ</option>
-                <option value="quotation">Quotation / សម្រង់តម្លៃ</option>
-            </select>
+        <div class="no-print invoice-control-panel sticky top-0 bg-white/95 backdrop-blur border-b p-4 flex flex-wrap justify-center items-center gap-4 z-50 shadow-sm rounded-2xl mb-6">
+            <div class="invoice-control-group invoice-edit-group" style="display: flex; align-items: center; gap: 8px;">
+                <button onclick="addRow()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-emerald-700 transition-all">+ ថែមជួរ / Add Row</button>
+                <button onclick="toggleInvoiceSetup()" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-bold hover:bg-slate-200 transition-all">Setup Info</button>
+            </div>
 
-            <select id="paperSize" onchange="updatePaperSize(this.value)" class="bg-slate-50 border border-slate-200 text-slate-900 px-4 py-2 rounded-lg font-bold outline-none cursor-pointer">
-                <option value="A4" selected>A4 Size (Standard)</option>
-                <option value="A5">A5 Size (Half)</option>
-            </select>
+            <div class="invoice-control-group invoice-settings-group" style="display: flex; align-items: center; gap: 8px;">
+                <select id="docType" onchange="updateDocumentTitle(this.value)" class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-2 rounded-lg font-bold outline-none cursor-pointer">
+                    <option value="invoice" selected>Invoice / វិក្កយបត្រ</option>
+                    <option value="quotation">Quotation / សម្រង់តម្លៃ</option>
+                </select>
 
-            <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-                <span class="text-xs font-bold text-blue-700 uppercase">Tax (15%)</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
-                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                <select id="paperSize" onchange="updatePaperSize(this.value)" class="bg-slate-50 border border-slate-200 text-slate-900 px-4 py-2 rounded-lg font-bold outline-none cursor-pointer">
+                    <option value="A4" selected>A4 Size (Standard)</option>
+                    <option value="A5">A5 Size (Half)</option>
+                </select>
+
+                <div class="invoice-tax-toggle flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+                    <span class="text-xs font-bold text-blue-700 uppercase">Tax (15%)</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="taxToggle" class="sr-only peer" checked onchange="calc()">
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
             </div>
 
             <div class="invoice-control-group invoice-export-group" style="display: flex; align-items: center; gap: 8px;">
@@ -4689,8 +4720,8 @@ body.home-shell .app-icon {
             <div class="flex items-center justify-between mb-4">
                 <div class="w-16" id="invoiceLogoContainer"><img id="invoiceLogo" src="https://img.icons8.com/ios-filled/100/8B0000/trousers.png"></div>
                 <div class="text-center">
-                    <h1 id="businessNameKh" class="text-4xl khmer-muol mb-1 uppercase" contenteditable="true" style="color: #8b0000;">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
-                    <h2 id="businessNameEn" class="text-3xl font-black tracking-widest leading-none uppercase" contenteditable="true" style="color: #8b0000;">VUTHY TAILOR</h2>
+                    <h1 id="businessNameKh" class="khmer-muol mb-1 uppercase" contenteditable="true" style="color: #8b0000; font-size: 43.2px;">វុទ្ធី ឯកទេសកាត់ដេរ</h1>
+                    <h2 id="businessNameEn" class="font-black tracking-widest leading-none uppercase" contenteditable="true" style="color: #8b0000; font-size: 36px;">VUTHY TAILOR</h2>
                 </div>
                 <div class="w-16 flex justify-end"><img src="https://img.icons8.com/ios-filled/100/8B0000/shirt.png"></div>
             </div>

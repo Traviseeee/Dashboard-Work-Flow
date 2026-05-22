@@ -149,35 +149,81 @@ function calc() {
 async function saveImage() {
     const target = document.getElementById('invoiceCaptureArea');
     if (!target) return;
-    const originalStyle = target.getAttribute('style') || '';
-    
-    const size = document.getElementById('paperSize')?.value || 'A4';
-    const dims = size === 'A5' ? { w: '148mm', h: '210mm' } : { w: '210mm', h: '297mm' };
 
-    target.style.width = dims.w;
-    target.style.minHeight = dims.h;
-    target.style.maxWidth = 'none';
-    target.style.borderRadius = '0';
-    target.style.boxShadow = 'none';
+    // Determine fixed paper dimensions for capture.
+    const size = document.getElementById('paperSize')?.value || 'A4';
+    const captureWidth = (size === 'A5') ? 580 : 820;
+    const captureHeight = Math.round(captureWidth * Math.SQRT2);
+    const scale = 2;
+    const captureHost = document.createElement('div');
+    const captureTarget = target.cloneNode(true);
+
+    captureHost.style.position = 'fixed';
+    captureHost.style.left = '-10000px';
+    captureHost.style.top = '0';
+    captureHost.style.width = captureWidth + 'px';
+    captureHost.style.height = captureHeight + 'px';
+    captureHost.style.overflow = 'hidden';
+    captureHost.style.background = '#ffffff';
+    captureHost.style.zIndex = '-1';
+
+    captureTarget.className = target.className;
+    if (size === 'A5') {
+        captureTarget.classList.add('invoice-a5');
+    } else {
+        captureTarget.classList.remove('invoice-a5');
+    }
+
+    captureTarget.style.width = captureWidth + 'px';
+    captureTarget.style.minWidth = captureWidth + 'px';
+    captureTarget.style.maxWidth = 'none';
+    captureTarget.style.height = captureHeight + 'px';
+    captureTarget.style.minHeight = captureHeight + 'px';
+    captureTarget.style.margin = '0';
+    captureTarget.style.borderRadius = '0';
+    captureTarget.style.boxShadow = 'none';
+    captureTarget.style.overflow = 'hidden';
+    captureTarget.style.boxSizing = 'border-box';
+
+    captureHost.appendChild(captureTarget);
+    document.body.appendChild(captureHost);
+
+    // Wait for the cloned paper layout to reflow before capture.
+    await new Promise(r => setTimeout(r, 150));
 
     try {
-        const canvas = await html2canvas(target, { 
-            scale: 2, 
-            backgroundColor: "#ffffff", 
+        const canvas = await html2canvas(captureTarget, {
+            scale,
+            backgroundColor: "#ffffff",
             useCORS: window.location.protocol !== 'file:',
-            allowTaint: window.location.protocol === 'file:'
+            allowTaint: window.location.protocol === 'file:',
+            width: captureWidth,
+            height: captureHeight,
+            windowHeight: captureHeight,
+            windowWidth: captureWidth // Important: tells html2canvas to render at this virtual width
         });
+
+        const output = document.createElement('canvas');
+        output.width = captureWidth * scale;
+        output.height = captureHeight * scale;
+
+        const ctx = output.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, output.width, output.height);
+        ctx.drawImage(canvas, 0, 0);
+
         const link = document.createElement('a');
-        const invoiceNo = getText('setupInvoiceNumber', Date.now());
-        link.download = `Invoice_${invoiceNo}.jpg`;
-        link.href = canvas.toDataURL("image/jpeg", 0.9);
+        const invoiceNo = getText('invoiceNumber', '000');
+        link.download = `Invoice_${invoiceNo}_${size}.jpg`;
+        link.href = output.toDataURL("image/jpeg", 0.9);
         link.click();
+
         showToast("Invoice saved as image", "success");
     } catch (e) {
-        console.error(e);
+        console.error("Capture failed:", e);
         showToast("Failed to save image", "error");
     } finally {
-        target.setAttribute('style', originalStyle);
+        captureHost.remove();
     }
 }
 
@@ -224,8 +270,8 @@ function updateInvoiceHeader() {
         }
     };
 
-    set('businessNameEn', name.toUpperCase(), '', '36px'); // Made English header bigger
-    set('businessNameKh', nameKh, '', '42px');             // Made Khmer header bigger
+    set('businessNameEn', name.toUpperCase(), '', '36px');
+    set('businessNameKh', nameKh, '', '43.2px');
     set('businessPhone', phone, 'Tel : ', '14px');
     set('addressKh', addressKh);
     set('addressEn', addressEn);

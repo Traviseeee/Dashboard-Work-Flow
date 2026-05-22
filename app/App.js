@@ -1888,15 +1888,83 @@ function calc() {
     if (vatRow) vatRow.style.visibility = taxEnabled ? 'visible' : 'hidden';
 }
 
-function saveImage() {
-    const area = document.getElementById('invoiceCaptureArea');
-    if (!area || typeof html2canvas === 'undefined') return;
-    html2canvas(area).then(canvas => {
+async function saveImage() {
+    const target = document.getElementById('invoiceCaptureArea');
+    if (!target || typeof html2canvas === 'undefined') return;
+
+    const size = document.getElementById('paperSize')?.value || 'A4';
+    const captureWidth = (size === 'A5') ? 580 : 820;
+    const captureHeight = Math.round(captureWidth * Math.SQRT2);
+    const scale = 2;
+    const captureHost = document.createElement('div');
+    const captureTarget = target.cloneNode(true);
+
+    captureHost.style.position = 'fixed';
+    captureHost.style.left = '-10000px';
+    captureHost.style.top = '0';
+    captureHost.style.width = captureWidth + 'px';
+    captureHost.style.height = captureHeight + 'px';
+    captureHost.style.overflow = 'hidden';
+    captureHost.style.background = '#ffffff';
+    captureHost.style.zIndex = '-1';
+
+    captureTarget.className = target.className;
+    if (size === 'A5') {
+        captureTarget.classList.add('invoice-a5');
+    } else {
+        captureTarget.classList.remove('invoice-a5');
+    }
+
+    captureTarget.style.width = captureWidth + 'px';
+    captureTarget.style.minWidth = captureWidth + 'px';
+    captureTarget.style.maxWidth = 'none';
+    captureTarget.style.height = captureHeight + 'px';
+    captureTarget.style.minHeight = captureHeight + 'px';
+    captureTarget.style.margin = '0';
+    captureTarget.style.borderRadius = '0';
+    captureTarget.style.boxShadow = 'none';
+    captureTarget.style.overflow = 'hidden';
+    captureTarget.style.boxSizing = 'border-box';
+
+    captureHost.appendChild(captureTarget);
+    document.body.appendChild(captureHost);
+
+    await new Promise(resolve => setTimeout(resolve, 150));
+
+    try {
+        const canvas = await html2canvas(captureTarget, {
+            scale,
+            backgroundColor: "#ffffff",
+            useCORS: window.location.protocol !== 'file:',
+            allowTaint: window.location.protocol === 'file:',
+            width: captureWidth,
+            height: captureHeight,
+            windowHeight: captureHeight,
+            windowWidth: captureWidth
+        });
+
+        const output = document.createElement('canvas');
+        output.width = captureWidth * scale;
+        output.height = captureHeight * scale;
+
+        const ctx = output.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, output.width, output.height);
+        ctx.drawImage(canvas, 0, 0);
+
         const link = document.createElement('a');
-        link.download = 'invoice.png';
-        link.href = canvas.toDataURL();
+        const invoiceNo = document.getElementById('invoiceNumber')?.innerText?.trim() || '000';
+        link.download = `Invoice_${invoiceNo}_${size}.jpg`;
+        link.href = output.toDataURL("image/jpeg", 0.9);
         link.click();
-    });
+
+        if (typeof showToast === 'function') showToast("Invoice saved as image", "success");
+    } catch (error) {
+        console.error("Capture failed:", error);
+        if (typeof showToast === 'function') showToast("Failed to save image", "error");
+    } finally {
+        captureHost.remove();
+    }
 }
 
 
@@ -3813,7 +3881,7 @@ function renderCompressPreview() {
     if (!grid) return;
     grid.innerHTML = compressImageFiles.map(entry => `
         <div class="compress-preview-card">
-            <img src="${entry.previewUrl}" alt="">
+            ${entry.previewUrl ? `<img src="${entry.previewUrl}" alt="">` : `<div style="width:72px; height:54px; background:#1e293b; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:10px; font-weight:800;">SAVED</div>`}
             <div>
                 <strong title="${escapeHtml(entry.file.name)}">${escapeHtml(entry.file.name)}</strong>
                 <small>${formatBytes(entry.file.size)}</small>
@@ -3871,16 +3939,20 @@ function loadImageForCompression(file) {
     });
 }
 
-function canvasToBlob(canvas, quality) {
-    return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+function canvasToBlob(canvas, type, quality) {
+    return new Promise(resolve => canvas.toBlob(resolve, type, quality));
 }
 
-function getCompressedFileName(originalName) {
+function getCompressedFileName(originalName, type) {
     const base = originalName.replace(/\.[^.]+$/, "");
-    return `${base}-compressed.jpg`;
+    const ext = type === 'image/png' ? 'png' : 'jpg';
+    return `${base}-compressed.${ext}`;
 }
 
 async function compressOneImage(entry) {
+    if (!entry.previewUrl) return null; // Safety: skip if file was already saved/overwritten
+
+    const type = entry.file.type;
     const quality = (parseInt(document.getElementById("compressQuality")?.value || "80", 10) || 80) / 100;
     const shouldResize = Boolean(document.getElementById("compressResizeToggle")?.checked);
     const maxWidth = parseInt(document.getElementById("compressMaxWidth")?.value || "1920", 10) || 1920;
@@ -3899,14 +3971,15 @@ async function compressOneImage(entry) {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
+    if (type === 'image/jpeg') {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+    }
     ctx.drawImage(img, 0, 0, width, height);
 
-    const blob = await canvasToBlob(canvas, quality);
+    const blob = await canvasToBlob(canvas, type, quality);
     if (!blob) throw new Error(`Could not compress ${entry.file.name}`);
     const savedPercent = entry.file.size ? Math.max(0, Math.round((1 - blob.size / entry.file.size) * 100)) : 0;
-    const overwriteEnabled = Boolean(document.getElementById("compressOverwriteToggle")?.checked);
     let overwritten = false;
     if (overwriteEnabled && entry.handle) {
         const writable = await entry.handle.createWritable();
@@ -3915,7 +3988,7 @@ async function compressOneImage(entry) {
         overwritten = true;
     }
     return {
-        name: getCompressedFileName(entry.file.name),
+        name: getCompressedFileName(entry.file.name, type),
         originalSize: entry.file.size,
         size: blob.size,
         url: URL.createObjectURL(blob),
@@ -3925,6 +3998,7 @@ async function compressOneImage(entry) {
 }
 
 async function estimateOneCompressedImage(entry) {
+    const type = entry.file.type;
     const quality = (parseInt(document.getElementById("compressQuality")?.value || "80", 10) || 80) / 100;
     const shouldResize = Boolean(document.getElementById("compressResizeToggle")?.checked);
     const maxWidth = parseInt(document.getElementById("compressMaxWidth")?.value || "1920", 10) || 1920;
@@ -3943,11 +4017,13 @@ async function estimateOneCompressedImage(entry) {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
+    if (type === 'image/jpeg') {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+    }
     ctx.drawImage(img, 0, 0, width, height);
 
-    const blob = await canvasToBlob(canvas, quality);
+    const blob = await canvasToBlob(canvas, type, quality);
     return blob ? blob.size : null;
 }
 
@@ -3965,6 +4041,12 @@ async function updateCompressEstimates() {
     for (const entry of compressImageFiles) {
         const el = document.getElementById(`compressEstimate-${entry.id}`);
         if (!el) continue;
+        
+        if (!entry.previewUrl) {
+            el.textContent = "";
+            continue;
+        }
+
         el.textContent = "Estimating...";
         originalTotal += entry.file.size;
         try {
@@ -3974,8 +4056,15 @@ async function updateCompressEstimates() {
                 continue;
             }
             estimatedTotal += estimatedSize;
-            const savedPercent = entry.file.size ? Math.max(0, Math.round((1 - estimatedSize / entry.file.size) * 100)) : 0;
-            el.textContent = `Estimated: ${formatBytes(estimatedSize)} (${savedPercent}% saved)`;
+            
+            const ratio = estimatedSize / entry.file.size;
+            let savedPct = 0;
+            if (ratio < 1) {
+                savedPct = (1 - ratio) * 100;
+                savedPct = savedPct < 1 ? savedPct.toFixed(1) : Math.round(savedPct);
+            }
+
+            el.textContent = `Estimated: ${formatBytes(estimatedSize)} (${savedPct}% saved)`;
         } catch {
             el.textContent = "";
         }
@@ -3997,9 +4086,20 @@ async function compressSelectedImages() {
     setCompressStatus("Compressing...");
     setCompressProgress(0, true);
 
+    const overwriteEnabled = Boolean(document.getElementById("compressOverwriteToggle")?.checked);
+
     try {
         for (let i = 0; i < compressImageFiles.length; i++) {
-            compressedImageResults.push(await compressOneImage(compressImageFiles[i]));
+            const entry = compressImageFiles[i];
+            
+            // Revoke and clear preview URL before overwriting to prevent ERR_UPLOAD_FILE_CHANGED
+            if (overwriteEnabled && entry.previewUrl) {
+                URL.revokeObjectURL(entry.previewUrl);
+                entry.previewUrl = null;
+                renderCompressPreview();
+            }
+
+            compressedImageResults.push(await compressOneImage(entry));
             setCompressProgress(((i + 1) / compressImageFiles.length) * 100, true);
             renderCompressResults();
         }
